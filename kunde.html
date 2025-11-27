@@ -5,6 +5,11 @@
   <title>Thirr taksinë</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
+  <!-- PWA: Manifest + Theme + Icon -->
+  <link rel="manifest" href="/manifest-kunde.json">
+  <meta name="theme-color" content="#FFC300">
+  <link rel="apple-touch-icon" href="/icon-kunde-192.png" />
+
   <link
     rel="stylesheet"
     href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
@@ -395,6 +400,13 @@
       }
     );
   };
+</script>
+
+<!-- PWA: Service Worker Registrierung -->
+<script>
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("/sw-kunde.js").catch(console.error);
+  }
 </script>
 
 </body>

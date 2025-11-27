@@ -1,5 +1,5 @@
 const CACHE_NAME = "thirr-kunde-v1";
-const OFFLINE_URLS = ["/kunden.html", "/icon-kunde-192.png", "/icon-kunde-512.png"];
+const OFFLINE_URLS = ["/kunde.html", "/icon-kunde-192.png", "/icon-kunde-512.png"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(

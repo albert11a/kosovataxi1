@@ -1,0 +1,20 @@
+{
+  "name": "Thirr Taxi",
+  "short_name": "ThirrTaxi",
+  "start_url": "/kunden.html",
+  "display": "standalone",
+  "theme_color": "#FFC300",
+  "background_color": "#FFC300",
+  "icons": [
+    {
+      "src": "/icon-kunde-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-kunde-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

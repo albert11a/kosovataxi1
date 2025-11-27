@@ -1,7 +1,7 @@
 {
   "name": "Thirr Taxi",
   "short_name": "ThirrTaxi",
-  "start_url": "/kunde.html",
+  "start_url": "/index.html",
   "display": "standalone",
   "theme_color": "#FFC300",
   "background_color": "#FFC300",

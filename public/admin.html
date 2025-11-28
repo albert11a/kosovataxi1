@@ -5,18 +5,11 @@
   <title>Admin • KosovaTaxi</title>
 
   <!-- FIX: Prevent zoom + force fullscreen -->
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1, viewport-fit=cover,
-                 maximum-scale=1, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
   <!-- PWA -->
   <link rel="manifest" href="/manifest-admin.json">
   <meta name="theme-color" content="#020617">
-
-    <!-- iOS full-screen mode + Notch color -->
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
 
   <!-- iOS PWA required -->
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -53,29 +46,13 @@
       -webkit-touch-callout: none;
     }
 
-html, body {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  background: #020617 !important; /* fallback */
-  background-color: #020617 !important;
-  overscroll-behavior: none;
-}
-
-/* Dein Gradient — aber an body UND html gleichzeitig */
-body {
-  background-image: radial-gradient(circle at top, #020617, #020617 60%, #020617);
-  background-attachment: fixed !important;
-  background-repeat: no-repeat;
-  background-size: cover;
-  padding: env(safe-area-inset-top) 10px env(safe-area-inset-bottom);
-}
-
-/* Fix: Inputs 16px => kein Zoom */
-input, select {
-  font-size: 16px !important;
-}
-
+    body {
+      margin: 0;
+      padding: 16px 10px 32px;
+      background: var(--bg);
+      font-family: system-ui, -apple-system, "SF Pro Text", sans-serif;
+      color: #e5e7eb;
+    }
 
     .frame {
       max-width: 1080px;

@@ -3,16 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <title>Thirr taksinë</title>
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
-  />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <!-- PWA: Manifest + Theme + Icon -->
-<link rel="manifest" href="/manifest-kunde.json">
-  <meta name="theme-color" content="#020617">
+  <link rel="manifest" href="/manifest-kunde.json">
+  <meta name="theme-color" content="#FFC300">
   <link rel="apple-touch-icon" href="/icon-kunde-192.png" />
 
   <link
@@ -22,17 +17,13 @@
   />
 
   <style>
+    /* FIX gegen weiße Balken iOS */
     html, body {
       margin: 0;
       padding: 0;
       height: 100%;
       background-color: #020617 !important;
       overscroll-behavior: none !important;
-      -webkit-text-size-adjust: 100%;
-    }
-
-    html {
-      background-color: #020617;
     }
 
     /* Hintergrund fixieren */
@@ -43,7 +34,7 @@
       z-index: -1;
       background: radial-gradient(circle at top, #0f172a, #020617);
     }
-
+    
     :root {
       --bg-gradient: radial-gradient(circle at top, #0f172a, #020617);
       --card-bg: rgba(15, 23, 42, 0.82);
@@ -54,32 +45,25 @@
       --border-radius-xl: 24px;
       --shadow-soft: 0 18px 60px rgba(0, 0, 0, 0.55);
     }
+
     * { box-sizing: border-box; }
+
     body {
       font-family: system-ui, -apple-system, "SF Pro Text", sans-serif;
       margin: 0;
       min-height: 100vh;
-      min-height: 100dvh;
-      padding: env(safe-area-inset-top) env(safe-area-inset-right)
-        env(safe-area-inset-bottom) env(safe-area-inset-left);
+      padding: 16px;
       background: var(--bg-gradient);
       color: #e5e7eb;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      /* WICHTIG: Flex-Zentrierung entfernt, damit der dunkle Balken oben weg ist */
     }
+
     .app-frame {
       width: 100%;
       max-width: 430px;
-      min-height: calc(
-        100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom)
-      );
-      padding: 24px 16px calc(28px + env(safe-area-inset-bottom));
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      margin: 0 auto;
+      margin: 16px auto 24px; /* etwas Abstand nach oben/unten, aber kein riesiger Balken */
     }
+
     .app-header {
       padding: 4px 4px 14px;
       display: flex;
@@ -88,6 +72,7 @@
       color: #9ca3af;
       font-size: 13px;
     }
+
     .card {
       background: var(--card-bg);
       border-radius: var(--border-radius-xl);
@@ -97,16 +82,19 @@
       -webkit-backdrop-filter: blur(22px);
       border: 1px solid rgba(148, 163, 184, 0.18);
     }
+
     h1 {
       font-size: 22px;
       margin: 0 0 4px;
       color: #f9fafb;
     }
+
     .card-subtitle {
       font-size: 13px;
       color: #9ca3af;
       margin-bottom: 14px;
     }
+
     label {
       display: block;
       font-size: 13px;
@@ -114,6 +102,7 @@
       margin-top: 10px;
       margin-bottom: 4px;
     }
+
     input {
       width: 100%;
       padding: 10px 12px;
@@ -121,17 +110,19 @@
       border: 1px solid rgba(148, 163, 184, 0.3);
       background: rgba(15, 23, 42, 0.85);
       color: #e5e7eb;
-      font-size: 16px;
+      font-size: 15px;
       outline: none;
       transition: border 0.18s ease, box-shadow 0.18s ease, background 0.18s;
-      touch-action: manipulation;
     }
+
     input::placeholder { color: #6b7280; }
+
     input:focus {
       border-color: var(--accent);
       box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.45);
       background: rgba(15, 23, 42, 0.95);
     }
+
     button {
       width: 100%;
       margin-top: 16px;
@@ -149,36 +140,46 @@
       gap: 8px;
       cursor: pointer;
       transition: transform 0.14s ease, box-shadow 0.14s ease, filter 0.14s ease;
-      touch-action: manipulation;
     }
+
     button:active {
       transform: translateY(1px) scale(0.995);
       box-shadow: 0 8px 28px rgba(34, 197, 94, 0.25);
       filter: brightness(0.97);
     }
-    button:disabled { opacity: 0.55; cursor: default; box-shadow: none; }
+
+    button:disabled {
+      opacity: 0.55;
+      cursor: default;
+      box-shadow: none;
+    }
+
     .btn-icon { font-size: 17px; }
+
     .status {
       margin-top: 10px;
       font-size: 13px;
       min-height: 18px;
     }
+
     .status.error { color: var(--danger); }
     .status.ok { color: var(--success); }
+
     .pending-card {
       margin-top: 18px;
       overflow: hidden;
       max-height: 0;
       opacity: 0;
       transform: translateY(10px);
-      transition: max-height 0.45s ease, opacity 0.35s ease,
-        transform 0.35s ease;
+      transition: max-height 0.45s ease, opacity 0.35s ease, transform 0.35s ease;
     }
+
     .pending-card.visible {
       max-height: 380px;
       opacity: 1;
       transform: translateY(0);
     }
+
     .pending-inner {
       background: rgba(15, 23, 42, 0.92);
       border-radius: 22px;
@@ -188,6 +189,7 @@
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
     }
+
     .pill {
       padding: 4px 10px;
       border-radius: 999px;
@@ -198,6 +200,7 @@
       background: var(--accent-soft);
       color: #e0f2fe;
     }
+
     .pill-dot {
       width: 7px;
       height: 7px;
@@ -205,16 +208,19 @@
       background: #22c55e;
       box-shadow: 0 0 0 5px rgba(34, 197, 94, 0.25);
     }
+
     .pending-text {
       font-size: 13px;
       color: #cbd5f5;
       margin: 6px 0 10px;
     }
+
     .timer {
       font-size: 11px;
       color: #e5e7eb;
       margin-bottom: 6px;
     }
+
     .mini-map {
       width: 100%;
       height: 190px;
@@ -223,7 +229,9 @@
       border: 1px solid rgba(30, 64, 175, 0.9);
       box-shadow: 0 14px 40px rgba(15, 23, 42, 0.9);
     }
+
     .mini-map.leaflet-container { background: #020617; }
+
     .small-caption {
       margin-top: 8px;
       font-size: 11px;
@@ -232,6 +240,7 @@
       justify-content: space-between;
       align-items: center;
     }
+
     .small-caption span:last-child {
       color: #e5e7eb;
       font-weight: 500;

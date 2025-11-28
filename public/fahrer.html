@@ -287,33 +287,35 @@
     <div id="loginMsg" class="login-error"></div>
   </div>
 
-  <!-- DASHBOARD -->
-  <div id="content" style="display:none;">
-    <div class="card">
-      <!-- VOZITJET E MIA -->
-      <div>
-        <div class="section-title">Vozitjet e mia aktive</div>
-        <div class="section-sub">Mund të kesh vetëm një vozitje aktive në të njëjtën kohë.</div>
-        <div id="myOrders"></div>
-        <div id="noMine" class="empty-text"></div>
-      </div>
+<!-- DASHBOARD -->
+<div id="content" style="display:none;">
 
-      <!-- VOZITJET NË PRITJE -->
-      <div style="margin-top:16px;">
-        <div class="section-title">Vozitje në pritje</div>
-        <div class="section-sub">Këto janë kërkesa të hapura që mund t’i pranosh.</div>
-        <div id="orders"></div>
-        <div id="noOpen" class="empty-text"></div>
-      </div>
-    </div>
-
-    <!-- BARAZIMI IM -->
-    <div class="card" style="margin-top:16px;">
-      <div class="section-title">Barazimi im</div>
-      <div id="balanceBox" style="font-size:14px; color:#e5e7eb;"></div>
-    </div>
+  <!-- KARTE 1: VOZITJET E MIA AKTIVE -->
+  <div class="card">
+    <div class="section-title">Vozitjet e mia aktive</div>
+    <div class="section-sub">Mund të kesh vetëm një vozitje aktive në të njëjtën kohë.</div>
+    
+    <div id="myOrders"></div>
+    <div id="noMine" class="empty-text"></div>
   </div>
+
+  <!-- KARTE 2: VOZITJET NË PRITJE -->
+  <div class="card">
+    <div class="section-title">Vozitje në pritje</div>
+    <div class="section-sub">Këto janë kërkesa të hapura që mund t’i pranosh.</div>
+
+    <div id="orders"></div>
+    <div id="noOpen" class="empty-text"></div>
+  </div>
+
+  <!-- KARTE 3: BARAZIMI IM -->
+  <div class="card" style="margin-top:16px;">
+    <div class="section-title">Barazimi im</div>
+    <div id="balanceBox" style="font-size:14px; color:#e5e7eb;"></div>
+  </div>
+
 </div>
+
 
 <script
   src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"

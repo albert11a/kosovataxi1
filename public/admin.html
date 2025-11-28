@@ -53,13 +53,29 @@
       -webkit-touch-callout: none;
     }
 
-    body {
-      margin: 0;
-      padding: env(safe-area-inset-top) 10px env(safe-area-inset-bottom);
-      background: var(--bg);
-      font-family: system-ui, -apple-system, "SF Pro Text", sans-serif;
-      color: #e5e7eb;
-    }
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: #020617 !important; /* fallback */
+  background-color: #020617 !important;
+  overscroll-behavior: none;
+}
+
+/* Dein Gradient — aber an body UND html gleichzeitig */
+body {
+  background-image: radial-gradient(circle at top, #020617, #020617 60%, #020617);
+  background-attachment: fixed !important;
+  background-repeat: no-repeat;
+  background-size: cover;
+  padding: env(safe-area-inset-top) 10px env(safe-area-inset-bottom);
+}
+
+/* Fix: Inputs 16px => kein Zoom */
+input, select {
+  font-size: 16px !important;
+}
+
 
     .frame {
       max-width: 1080px;

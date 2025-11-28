@@ -3,11 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <title>Thirr taksinë</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
+  />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
 
   <!-- PWA: Manifest + Theme + Icon -->
 <link rel="manifest" href="/manifest-kunde.json">
-  <meta name="theme-color" content="#FFC300">
+  <meta name="theme-color" content="#020617">
   <link rel="apple-touch-icon" href="/icon-kunde-192.png" />
 
   <link
@@ -17,6 +22,28 @@
   />
 
   <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background-color: #020617 !important;
+      overscroll-behavior: none !important;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    html {
+      background-color: #020617;
+    }
+
+    /* Hintergrund fixieren */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      background: radial-gradient(circle at top, #0f172a, #020617);
+    }
+
     :root {
       --bg-gradient: radial-gradient(circle at top, #0f172a, #020617);
       --card-bg: rgba(15, 23, 42, 0.82);
@@ -32,14 +59,27 @@
       font-family: system-ui, -apple-system, "SF Pro Text", sans-serif;
       margin: 0;
       min-height: 100vh;
-      padding: 24px 16px;
+      min-height: 100dvh;
+      padding: env(safe-area-inset-top) env(safe-area-inset-right)
+        env(safe-area-inset-bottom) env(safe-area-inset-left);
       background: var(--bg-gradient);
       color: #e5e7eb;
       display: flex;
       align-items: center;
       justify-content: center;
     }
-    .app-frame { width: 100%; max-width: 430px; }
+    .app-frame {
+      width: 100%;
+      max-width: 430px;
+      min-height: calc(
+        100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom)
+      );
+      padding: 24px 16px calc(28px + env(safe-area-inset-bottom));
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      margin: 0 auto;
+    }
     .app-header {
       padding: 4px 4px 14px;
       display: flex;
@@ -81,9 +121,10 @@
       border: 1px solid rgba(148, 163, 184, 0.3);
       background: rgba(15, 23, 42, 0.85);
       color: #e5e7eb;
-      font-size: 15px;
+      font-size: 16px;
       outline: none;
       transition: border 0.18s ease, box-shadow 0.18s ease, background 0.18s;
+      touch-action: manipulation;
     }
     input::placeholder { color: #6b7280; }
     input:focus {
@@ -108,6 +149,7 @@
       gap: 8px;
       cursor: pointer;
       transition: transform 0.14s ease, box-shadow 0.14s ease, filter 0.14s ease;
+      touch-action: manipulation;
     }
     button:active {
       transform: translateY(1px) scale(0.995);

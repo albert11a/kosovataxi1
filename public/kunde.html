@@ -1,16 +1,10 @@
-<!DOCTYPE html>
-<html lang="sq">
 <head>
   <meta charset="UTF-8" />
   <title>Thirr taksinë</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- iOS FULLSCREEN FIX -->
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
-  <!-- PWA -->
-  <link rel="manifest" href="/manifest-kunde.json">
+  <!-- PWA: Manifest + Theme + Icon -->
+<link rel="manifest" href="/manifest-kunde.json">
   <meta name="theme-color" content="#FFC300">
   <link rel="apple-touch-icon" href="/icon-kunde-192.png" />
 
@@ -22,24 +16,24 @@
 
   <style>
 
-    /* FIX gegen WEISSE & SCHWARZE Balken auf iPhone */
-    html, body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      background-color: #020617 !important;
-      overscroll-behavior: none !important;
-    }
+    /* FIX gegen weiße Balken iOS */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background-color: #020617 !important;
+  overscroll-behavior: none !important;
+}
 
-    /* Radialer Hintergrund absolut fixiert */
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      z-index: -1;
-      background: radial-gradient(circle at top, #0f172a, #020617);
-    }
-
+/* Hintergrund fixieren */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(circle at top, #0f172a, #020617);
+}
+    
     :root {
       --bg-gradient: radial-gradient(circle at top, #0f172a, #020617);
       --card-bg: rgba(15, 23, 42, 0.82);
@@ -50,36 +44,27 @@
       --border-radius-xl: 24px;
       --shadow-soft: 0 18px 60px rgba(0, 0, 0, 0.55);
     }
-
     * { box-sizing: border-box; }
-
     body {
       font-family: system-ui, -apple-system, "SF Pro Text", sans-serif;
       margin: 0;
+      min-height: 100vh;
+      padding: 24px 16px;
       background: var(--bg-gradient);
       color: #e5e7eb;
-      /* WICHTIG: KEIN TOP-PADDING → KEIN BALKEN */
-      padding: calc(env(safe-area-inset-top)) 16px 24px;
-      display: block;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
-
-    .app-frame {
-      width: 100%;
-      max-width: 430px;
-      margin: 10px auto 20px;
-    }
-
-    /* HEADER – unverändert gelassen */
+    .app-frame { width: 100%; max-width: 430px; }
     .app-header {
-      padding: 0 4px 14px;
+      padding: 4px 4px 14px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       color: #9ca3af;
       font-size: 13px;
-      margin-top: 0; /* Kein Abstand → kein Balken */
     }
-
     .card {
       background: var(--card-bg);
       border-radius: var(--border-radius-xl);
@@ -89,19 +74,16 @@
       -webkit-backdrop-filter: blur(22px);
       border: 1px solid rgba(148, 163, 184, 0.18);
     }
-
     h1 {
       font-size: 22px;
       margin: 0 0 4px;
       color: #f9fafb;
     }
-
     .card-subtitle {
       font-size: 13px;
       color: #9ca3af;
       margin-bottom: 14px;
     }
-
     label {
       display: block;
       font-size: 13px;
@@ -109,7 +91,6 @@
       margin-top: 10px;
       margin-bottom: 4px;
     }
-
     input {
       width: 100%;
       padding: 10px 12px;
@@ -121,15 +102,12 @@
       outline: none;
       transition: border 0.18s ease, box-shadow 0.18s ease, background 0.18s;
     }
-
     input::placeholder { color: #6b7280; }
-
     input:focus {
       border-color: var(--accent);
       box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.45);
       background: rgba(15, 23, 42, 0.95);
     }
-
     button {
       width: 100%;
       margin-top: 16px;
@@ -148,45 +126,34 @@
       cursor: pointer;
       transition: transform 0.14s ease, box-shadow 0.14s ease, filter 0.14s ease;
     }
-
     button:active {
       transform: translateY(1px) scale(0.995);
       box-shadow: 0 8px 28px rgba(34, 197, 94, 0.25);
       filter: brightness(0.97);
     }
-
-    button:disabled {
-      opacity: 0.55;
-      cursor: default;
-      box-shadow: none;
-    }
-
+    button:disabled { opacity: 0.55; cursor: default; box-shadow: none; }
     .btn-icon { font-size: 17px; }
-
     .status {
       margin-top: 10px;
       font-size: 13px;
       min-height: 18px;
     }
-
     .status.error { color: var(--danger); }
     .status.ok { color: var(--success); }
-
     .pending-card {
       margin-top: 18px;
       overflow: hidden;
       max-height: 0;
       opacity: 0;
       transform: translateY(10px);
-      transition: max-height 0.45s ease, opacity 0.35s ease, transform 0.35s ease;
+      transition: max-height 0.45s ease, opacity 0.35s ease,
+        transform 0.35s ease;
     }
-
     .pending-card.visible {
       max-height: 380px;
       opacity: 1;
       transform: translateY(0);
     }
-
     .pending-inner {
       background: rgba(15, 23, 42, 0.92);
       border-radius: 22px;
@@ -196,7 +163,6 @@
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
     }
-
     .pill {
       padding: 4px 10px;
       border-radius: 999px;
@@ -207,7 +173,6 @@
       background: var(--accent-soft);
       color: #e0f2fe;
     }
-
     .pill-dot {
       width: 7px;
       height: 7px;
@@ -215,19 +180,16 @@
       background: #22c55e;
       box-shadow: 0 0 0 5px rgba(34, 197, 94, 0.25);
     }
-
     .pending-text {
       font-size: 13px;
       color: #cbd5f5;
       margin: 6px 0 10px;
     }
-
     .timer {
       font-size: 11px;
       color: #e5e7eb;
       margin-bottom: 6px;
     }
-
     .mini-map {
       width: 100%;
       height: 190px;
@@ -236,11 +198,7 @@
       border: 1px solid rgba(30, 64, 175, 0.9);
       box-shadow: 0 14px 40px rgba(15, 23, 42, 0.9);
     }
-
-    .mini-map.leaflet-container {
-      background: #020617;
-    }
-
+    .mini-map.leaflet-container { background: #020617; }
     .small-caption {
       margin-top: 8px;
       font-size: 11px;
@@ -249,7 +207,6 @@
       justify-content: space-between;
       align-items: center;
     }
-
     .small-caption span:last-child {
       color: #e5e7eb;
       font-weight: 500;
@@ -261,7 +218,6 @@
 <body>
 
 <div class="app-frame">
-
   <div class="app-header">
     <span>KosovaTaxi</span>
     <span>Online</span>
@@ -303,11 +259,13 @@
         </div>
       </div>
     </div>
-
   </div>
 </div>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<script
+  src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  crossorigin=""
+></script>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
@@ -333,7 +291,6 @@
   const statusLabel = document.getElementById("statusLabel");
   const statusText = document.getElementById("statusText");
   const statusTimer = document.getElementById("statusTimer");
-
   let clientMap = null;
   let currentOrderKey = null;
 
@@ -349,7 +306,6 @@
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         maxZoom: 19,
       }).addTo(clientMap);
-
       L.marker([lat, lng]).addTo(clientMap);
     }, 200);
   }
@@ -374,25 +330,25 @@
         statusText.textContent =
           "Kërkesa është aktive. Sapo një shofer ta pranojë, taksia niset drejt jush.";
         statusTimer.textContent = "";
-      } 
-      else if (data.status === "taken") {
+      } else if (data.status === "taken") {
         const comp = data.takenByCompany || "KosovaTaxi";
         statusLabel.textContent = "Taksia është nisur";
         statusText.textContent =
-          "Shoferi nga " + comp + " është nisur për t’ju marrë.";
+          "Shoferi nga " +
+          comp +
+          " është nisur për t’ju marrë. Ju lutem mbani telefonin afër.";
         statusTimer.textContent =
           "Vozitja është pranuar: " + formatMinutesSince(data.takenAt);
-      } 
-      else if (data.status === "done") {
+      } else if (data.status === "done") {
         statusLabel.textContent = "Vozitja u përfundua";
         statusText.textContent =
-          "Faleminderit që përdorët KosovaTaxi.";
+          "Faleminderit që përdorët KosovaTaxi. Urojmë të keni pasur një udhëtim të këndshëm.";
         statusTimer.textContent = "";
-      } 
-      else if (data.status === "canceled") {
+      } else if (data.status === "canceled") {
         statusLabel.textContent = "Vozitja u anulua";
         statusText.textContent =
-          "Arsyeja: " + (data.canceledReason || "nuk është specifikuar");
+          "Vozitja është anuluar. Arsyeja: " +
+          (data.canceledReason || "nuk është specifikuar");
         statusTimer.textContent = "";
       }
     });
@@ -454,7 +410,8 @@
         });
       },
       (err) => {
-        msg.textContent = "Nuk u mor lokacioni. Lejoni aksesin.";
+        console.error(err);
+        msg.textContent = "Nuk u mor lokacioni. Ju lutem lejoni aksesin.";
         msg.classList.add("error");
         btn.disabled = false;
       }
@@ -462,6 +419,7 @@
   };
 </script>
 
+<!-- PWA: Service Worker Registrierung -->
 <script>
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("/sw-kunde.js").catch(console.error);

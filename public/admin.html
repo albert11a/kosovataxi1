@@ -24,6 +24,27 @@
   </script>
 
   <style>
+
+ html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background-color: #020617 !important;  /* Verhindert Weiß beim Scrollen */
+  overscroll-behavior: none !important;   /* Kein Bounce-Weiß */
+}
+
+/* Fix: Hintergrund so einfügen, OHNE iOS-Weißfehler */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -1;
+  background: radial-gradient(circle at top, #020617, #020617 60%, #020617);
+}
+
     /* FIX: iPhone zoom on input */
     input, select {
       font-size: 16px !important;

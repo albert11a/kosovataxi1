@@ -1,37 +1,32 @@
-<!DOCTYPE html>
 <html lang="sq">
 <head>
   <meta charset="UTF-8" />
   <title>Thirr taksinë</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Fix: Fullscreen + kein Zoom -->
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-
-  <!-- iOS Fullscreen Fix -->
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
-  <!-- PWA -->
-  <link rel="manifest" href="/manifest-kunde.json">
-  <meta name="theme-color" content="#020617">
+  <!-- PWA: Manifest + Theme + Icon -->
+<link rel="manifest" href="/manifest-kunde.json">
+  <meta name="theme-color" content="#FFC300">
   <link rel="apple-touch-icon" href="/icon-kunde-192.png" />
 
-  <!-- Leaflet -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    crossorigin=""
+  />
 
   <style>
-/* ----------------------------- */
-/* 🔥 GLOBAL iOS NO-WHITE FIX    */
-/* ----------------------------- */
+
+    /* FIX gegen weiße Balken iOS */
 html, body {
   margin: 0;
   padding: 0;
   height: 100%;
-  overscroll-behavior: none !important;
   background-color: #020617 !important;
+  overscroll-behavior: none !important;
 }
 
-/* Hintergrund durchgehend */
+/* Hintergrund fixieren */
 body::before {
   content: "";
   position: fixed;
@@ -39,173 +34,200 @@ body::before {
   z-index: -1;
   background: radial-gradient(circle at top, #0f172a, #020617);
 }
-
-/* ----------------------------- */
-/* 🔥 DESIGN VARS                */
-/* ----------------------------- */
-:root {
-  --bg-gradient: radial-gradient(circle at top, #0f172a, #020617);
-  --card-bg: rgba(15, 23, 42, 0.82);
-  --accent: #38bdf8;
-  --accent-soft: rgba(56, 189, 248, 0.16);
-  --danger: #f97373;
-  --success: #4ade80;
-  --radius-xl: 24px;
-  --shadow-soft: 0 18px 60px rgba(0, 0, 0, 0.55);
-}
-
-* { box-sizing: border-box; }
-
-body {
-  font-family: system-ui, -apple-system, "SF Pro Text", sans-serif;
-  color: #e5e7eb;
-
-  /* iPhone notch safe-area */
-  padding: calc(env(safe-area-inset-top) + 20px) 16px calc(env(safe-area-inset-bottom) + 20px);
-
-  min-height: 100vh;
-  background: var(--bg-gradient);
-  display: flex;
-  justify-content: center;
-}
-
-/* ----------------------------- */
-/* 🔥 Header: ThirrTaxi centered */
-/* ----------------------------- */
-.app-header {
-  width: 100%;
-  text-align: center;
-  margin-bottom: 18px;
-  font-size: 20px;
-  font-weight: 700;
-  color: #f1f5f9;
-  letter-spacing: 0.5px;
-  opacity: 0.95;
-}
-
-.app-frame { width: 100%; max-width: 430px; }
-
-/* ----------------------------- */
-/* 🔥 CARD                      */
-/* ----------------------------- */
-.card {
-  background: var(--card-bg);
-  border-radius: var(--radius-xl);
-  padding: 20px 20px 26px;
-  backdrop-filter: blur(22px);
-  -webkit-backdrop-filter: blur(22px);
-  border: 1px solid rgba(148, 163, 184, 0.22);
-  box-shadow: var(--shadow-soft);
-}
-
-h1 {
-  font-size: 23px;
-  margin: 0 0 6px;
-  color: #f9fafb;
-  text-align: center;
-}
-
-.card-subtitle {
-  font-size: 14px;
-  color: #9ca3af;
-  margin-bottom: 18px;
-  text-align: center;
-}
-
-/* ----------------------------- */
-/* 🔥 INPUT                     */
-/* ----------------------------- */
-label {
-  display: block;
-  font-size: 13px;
-  margin-bottom: 4px;
-  margin-top: 12px;
-  color: #cbd5f5;
-}
-
-input {
-  width: 100%;
-  padding: 12px 14px;
-  border-radius: 16px;
-  border: 1px solid rgba(148, 163, 184, 0.35);
-  background: rgba(15, 23, 42, 0.9);
-  color: #e5e7eb;
-  font-size: 16px;
-  outline: none;
-}
-
-input:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.4);
-}
-
-/* ----------------------------- */
-/* 🔥 BUTTON                    */
-/* ----------------------------- */
-button {
-  width: 100%;
-  margin-top: 20px;
-  padding: 14px 18px;
-  border-radius: 999px;
-  border: none;
-  font-size: 17px;
-  font-weight: 600;
-  background: linear-gradient(135deg, #0ea5e9, #22c55e);
-  color: #020617;
-  box-shadow: 0 18px 45px rgba(34, 197, 94, 0.35);
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-  cursor: pointer;
-}
-
-/* Status Text */
-.status { margin-top: 12px; min-height: 18px; font-size: 13px; }
-.status.error { color: var(--danger); }
-.status.ok { color: var(--success); }
-
-/* Pending */
-.pending-card {
-  margin-top: 22px;
-  overflow: hidden;
-  max-height: 0;
-  opacity: 0;
-  transition: 0.45s ease;
-}
-.pending-card.visible {
-  max-height: 380px;
-  opacity: 1;
-}
-
-.pending-inner {
-  border-radius: 22px;
-  padding: 16px;
-  background: rgba(15, 23, 42, 0.92);
-  border: 1px solid rgba(56, 189, 248, 0.38);
-}
-
-.mini-map {
-  width: 100%;
-  height: 190px;
-  border-radius: 18px;
-  overflow: hidden;
-  margin-top: 12px;
-  border: 1px solid rgba(30, 64, 175, 0.8);
-}
+    
+    :root {
+      --bg-gradient: radial-gradient(circle at top, #0f172a, #020617);
+      --card-bg: rgba(15, 23, 42, 0.82);
+      --accent: #38bdf8;
+      --accent-soft: rgba(56, 189, 248, 0.16);
+      --danger: #f97373;
+      --success: #4ade80;
+      --border-radius-xl: 24px;
+      --shadow-soft: 0 18px 60px rgba(0, 0, 0, 0.55);
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: system-ui, -apple-system, "SF Pro Text", sans-serif;
+      margin: 0;
+      min-height: 100vh;
+      padding: 24px 16px;
+      background: var(--bg-gradient);
+      color: #e5e7eb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .app-frame { width: 100%; max-width: 430px; }
+    .app-header {
+      padding: 4px 4px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: #9ca3af;
+      font-size: 13px;
+    }
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--border-radius-xl);
+      padding: 18px 18px 20px;
+      box-shadow: var(--shadow-soft);
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
+      border: 1px solid rgba(148, 163, 184, 0.18);
+    }
+    h1 {
+      font-size: 22px;
+      margin: 0 0 4px;
+      color: #f9fafb;
+    }
+    .card-subtitle {
+      font-size: 13px;
+      color: #9ca3af;
+      margin-bottom: 14px;
+    }
+    label {
+      display: block;
+      font-size: 13px;
+      color: #cbd5f5;
+      margin-top: 10px;
+      margin-bottom: 4px;
+    }
+    input {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      background: rgba(15, 23, 42, 0.85);
+      color: #e5e7eb;
+      font-size: 15px;
+      outline: none;
+      transition: border 0.18s ease, box-shadow 0.18s ease, background 0.18s;
+    }
+    input::placeholder { color: #6b7280; }
+    input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.45);
+      background: rgba(15, 23, 42, 0.95);
+    }
+    button {
+      width: 100%;
+      margin-top: 16px;
+      padding: 13px 14px;
+      border-radius: 999px;
+      border: none;
+      font-size: 16px;
+      font-weight: 600;
+      background: linear-gradient(135deg, #0ea5e9, #22c55e);
+      color: #020617;
+      box-shadow: 0 14px 40px rgba(34, 197, 94, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: transform 0.14s ease, box-shadow 0.14s ease, filter 0.14s ease;
+    }
+    button:active {
+      transform: translateY(1px) scale(0.995);
+      box-shadow: 0 8px 28px rgba(34, 197, 94, 0.25);
+      filter: brightness(0.97);
+    }
+    button:disabled { opacity: 0.55; cursor: default; box-shadow: none; }
+    .btn-icon { font-size: 17px; }
+    .status {
+      margin-top: 10px;
+      font-size: 13px;
+      min-height: 18px;
+    }
+    .status.error { color: var(--danger); }
+    .status.ok { color: var(--success); }
+    .pending-card {
+      margin-top: 18px;
+      overflow: hidden;
+      max-height: 0;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: max-height 0.45s ease, opacity 0.35s ease,
+        transform 0.35s ease;
+    }
+    .pending-card.visible {
+      max-height: 380px;
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .pending-inner {
+      background: rgba(15, 23, 42, 0.92);
+      border-radius: 22px;
+      padding: 14px 14px 16px;
+      border: 1px solid rgba(56, 189, 248, 0.38);
+      box-shadow: 0 16px 40px rgba(15, 23, 42, 0.7);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+    .pill {
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--accent-soft);
+      color: #e0f2fe;
+    }
+    .pill-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: #22c55e;
+      box-shadow: 0 0 0 5px rgba(34, 197, 94, 0.25);
+    }
+    .pending-text {
+      font-size: 13px;
+      color: #cbd5f5;
+      margin: 6px 0 10px;
+    }
+    .timer {
+      font-size: 11px;
+      color: #e5e7eb;
+      margin-bottom: 6px;
+    }
+    .mini-map {
+      width: 100%;
+      height: 190px;
+      border-radius: 18px;
+      overflow: hidden;
+      border: 1px solid rgba(30, 64, 175, 0.9);
+      box-shadow: 0 14px 40px rgba(15, 23, 42, 0.9);
+    }
+    .mini-map.leaflet-container { background: #020617; }
+    .small-caption {
+      margin-top: 8px;
+      font-size: 11px;
+      color: #9ca3af;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .small-caption span:last-child {
+      color: #e5e7eb;
+      font-weight: 500;
+      font-size: 11px;
+      opacity: 0.9;
+    }
   </style>
 </head>
-
 <body>
 
 <div class="app-frame">
-
-  <!-- NEW CENTERED HEADER -->
-  <div class="app-header">ThirrTaxi</div>
+  <div class="app-header">
+    <span>KosovaTaxi</span>
+    <span>Online</span>
+  </div>
 
   <div class="card">
     <h1>Thirr taksinë</h1>
     <div class="card-subtitle">
-      Shkruaj emrin dhe numrin. Ne gjejmë shoferin më të afërt për ty.
+      Shkruaj emrin dhe numrin, lejo lokacionin. Ne gjejmë shoferin më të afërt për ty.
     </div>
 
     <label>Emri</label>
@@ -215,7 +237,8 @@ button {
     <input id="phone" type="tel" placeholder="044 000 000">
 
     <button id="orderBtn">
-      <span>🚕</span> Thirr taksinë
+      <span class="btn-icon">🚕</span>
+      <span>Thirr taksinë</span>
     </button>
 
     <div id="msg" class="status"></div>
@@ -224,40 +247,43 @@ button {
       <div class="pending-inner">
         <div class="pill">
           <span class="pill-dot"></span>
-          <span id="statusLabel">Jemi duke kërkuar shoferin…</span>
+          <span id="statusLabel">Jemi duke kërkuar shoferin tuaj…</span>
         </div>
-
         <div id="statusTimer" class="timer"></div>
-
         <div id="statusText" class="pending-text">
-          Kërkesa është aktive. Po kërkojmë shoferin më të afërt.
+          Kërkesa është dërguar. Jemi duke kërkuar shoferin më të afërt.
         </div>
-
         <div id="clientMap" class="mini-map"></div>
+        <div class="small-caption">
+          <span>Lokacioni yt aktual</span>
+          <span>Live • iOS view</span>
+        </div>
       </div>
     </div>
-
   </div>
 </div>
 
-<!-- LEAFLET -->
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script
+  src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  crossorigin=""
+></script>
 
-<!-- FIREBASE LOGIC (unchanged) -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
   import { getDatabase, ref, push, set, onValue } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-database.js";
 
-  const app = initializeApp({
-    apiKey:"AIzaSyCgCxp8M9XGOKFSIfaU9nM48rxtFQP-Kvs",
-    authDomain:"kosovataxi-f6ca3.firebaseapp.com",
-    projectId:"kosovataxi-f6ca3",
-    storageBucket:"kosovataxi-f6ca3.firebasestorage.app",
-    messagingSenderId:"1075646412122",
-    appId:"1:1075646412122:web:7aab19b92f51844fe32f63",
-    databaseURL:"https://kosovataxi-f6ca3-default-rtdb.europe-west1.firebasedatabase.app/"
-  });
+  const firebaseConfig = {
+    apiKey: "AIzaSyCgCxp8M9XGOKFSIfaU9nM48rxtFQP-Kvs",
+    authDomain: "kosovataxi-f6ca3.firebaseapp.com",
+    projectId: "kosovataxi-f6ca3",
+    storageBucket: "kosovataxi-f6ca3.firebasestorage.app",
+    messagingSenderId: "1075646412122",
+    appId: "1:1075646412122:web:7aab19b92f51844fe32f63",
+    measurementId: "G-QYQE2476PR",
+    databaseURL: "https://kosovataxi-f6ca3-default-rtdb.europe-west1.firebasedatabase.app/"
+  };
 
+  const app = initializeApp(firebaseConfig);
   const db = getDatabase(app);
 
   const btn = document.getElementById("orderBtn");
@@ -266,7 +292,6 @@ button {
   const statusLabel = document.getElementById("statusLabel");
   const statusText = document.getElementById("statusText");
   const statusTimer = document.getElementById("statusTimer");
-
   let clientMap = null;
   let currentOrderKey = null;
 
@@ -274,35 +299,58 @@ button {
     pendingWrapper.classList.add("visible");
     setTimeout(() => {
       if (clientMap) clientMap.remove();
-      clientMap = L.map("clientMap", { zoomControl:false, attributionControl:false })
-        .setView([lat,lng], 16);
+      clientMap = L.map("clientMap", {
+        zoomControl: false,
+        attributionControl: false,
+      }).setView([lat, lng], 16);
 
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png")
-        .addTo(clientMap);
-
-      L.marker([lat,lng]).addTo(clientMap);
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 19,
+      }).addTo(clientMap);
+      L.marker([lat, lng]).addTo(clientMap);
     }, 200);
   }
 
+  function formatMinutesSince(ts) {
+    if (!ts) return "";
+    const diff = Date.now() - ts;
+    const mins = Math.floor(diff / 60000);
+    if (mins <= 0) return "Më pak se 1 minutë më parë";
+    if (mins === 1) return "1 minutë më parë";
+    return mins + " minuta më parë";
+  }
+
   function listenToOrderStatus(orderKey) {
-    onValue(ref(db,"orders/"+orderKey), snap => {
-      const d = snap.val();
-      if (!d) return;
-      if (d.status==="open") {
-        statusLabel.textContent = "Jemi duke kërkuar shoferin…";
-        statusText.textContent = "Sapo një shofer ta pranojë, do niset drejt jush.";
-      }
-      else if (d.status==="taken") {
-        statusLabel.textContent = "Shoferi është nisur";
-        statusText.textContent = "Shoferi është nisur për t’ju marrë.";
-      }
-      else if (d.status==="done") {
+    const orderRef = ref(db, "orders/" + orderKey);
+    onValue(orderRef, (snap) => {
+      const data = snap.val();
+      if (!data) return;
+
+      if (data.status === "open") {
+        statusLabel.textContent = "Jemi duke kërkuar shoferin tuaj…";
+        statusText.textContent =
+          "Kërkesa është aktive. Sapo një shofer ta pranojë, taksia niset drejt jush.";
+        statusTimer.textContent = "";
+      } else if (data.status === "taken") {
+        const comp = data.takenByCompany || "KosovaTaxi";
+        statusLabel.textContent = "Taksia është nisur";
+        statusText.textContent =
+          "Shoferi nga " +
+          comp +
+          " është nisur për t’ju marrë. Ju lutem mbani telefonin afër.";
+        statusTimer.textContent =
+          "Vozitja është pranuar: " + formatMinutesSince(data.takenAt);
+      } else if (data.status === "done") {
         statusLabel.textContent = "Vozitja u përfundua";
-        statusText.textContent = "Faleminderit që përdorët ThirrTaxi.";
-      }
-      else if (d.status==="canceled") {
-        statusLabel.textContent = "Anuluar";
-        statusText.textContent = "Vozitja u anulua.";
+        statusText.textContent =
+          "Faleminderit që përdorët KosovaTaxi. Urojmë të keni pasur një udhëtim të këndshëm.";
+        statusTimer.textContent = "";
+      } else if (data.status === "canceled") {
+        statusLabel.textContent = "Vozitja u anulua";
+        statusText.textContent =
+          "Vozitja është anuluar. Arsyeja: " +
+          (data.canceledReason || "nuk është specifikuar");
+        statusTimer.textContent = "";
       }
     });
   }
@@ -315,13 +363,13 @@ button {
     const phone = document.getElementById("phone").value.trim();
 
     if (!name || !phone) {
-      msg.textContent = "Ju lutem shkruani emrin dhe numrin.";
+      msg.textContent = "Ju lutem shkruani emrin dhe numrin e telefonit.";
       msg.classList.add("error");
       return;
     }
 
     if (!navigator.geolocation) {
-      msg.textContent = "Lokacioni nuk përkrahet.";
+      msg.textContent = "Pajisja juaj nuk e përkrah lokacionin.";
       msg.classList.add("error");
       return;
     }
@@ -330,39 +378,53 @@ button {
     msg.textContent = "Duke marrë lokacionin…";
 
     navigator.geolocation.getCurrentPosition(
-      (pos)=>{
+      (pos) => {
         const lat = pos.coords.latitude;
         const lng = pos.coords.longitude;
 
-        const newRef = push(ref(db,"orders"));
-        currentOrderKey = newRef.key;
+        const ordersRef = ref(db, "orders");
+        const newOrderRef = push(ordersRef);
+        currentOrderKey = newOrderRef.key;
 
-        set(newRef, {
-          name, phone, lat, lng,
-          status:"open",
-          createdAt:Date.now()
-        }).then(()=>{
-          msg.textContent = "Kërkesa u dërgua.";
+        const orderData = {
+          name,
+          phone,
+          lat,
+          lng,
+          status: "open",
+          createdAt: Date.now(),
+          takenByName: null,
+          takenByCompany: null,
+          takenAt: null,
+          completedAt: null,
+          canceledAt: null,
+          canceledReason: null
+        };
+
+        set(newOrderRef, orderData).then(() => {
+          msg.textContent = "Kërkesa u dërgua me sukses.";
           msg.classList.add("ok");
           btn.disabled = false;
 
-          initClientMap(lat,lng);
+          initClientMap(lat, lng);
           listenToOrderStatus(currentOrderKey);
         });
       },
-      ()=>{
-        msg.textContent="Lokacioni nuk u mor.";
+      (err) => {
+        console.error(err);
+        msg.textContent = "Nuk u mor lokacioni. Ju lutem lejoni aksesin.";
         msg.classList.add("error");
-        btn.disabled=false;
+        btn.disabled = false;
       }
     );
   };
 </script>
 
+<!-- PWA: Service Worker Registrierung -->
 <script>
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("/sw-kunde.js");
-}
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("/sw-kunde.js").catch(console.error);
+  }
 </script>
 
 </body>

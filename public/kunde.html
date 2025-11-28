@@ -17,6 +17,25 @@
   />
 
   <style>
+
+    /* FIX gegen weiße Balken iOS */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background-color: #020617 !important;
+  overscroll-behavior: none !important;
+}
+
+/* Hintergrund fixieren */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(circle at top, #0f172a, #020617);
+}
+    
     :root {
       --bg-gradient: radial-gradient(circle at top, #0f172a, #020617);
       --card-bg: rgba(15, 23, 42, 0.82);

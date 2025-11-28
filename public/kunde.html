@@ -3,158 +3,143 @@
 <head>
   <meta charset="UTF-8" />
   <title>Thirr taksinë</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- PWA: Manifest + Theme + Icon -->
+  <!-- iOS + Mobile FULLSCREEN FIX -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#020617">
+
+  <!-- PWA -->
   <link rel="manifest" href="/manifest-kunde.json">
-  <meta name="theme-color" content="#FFC300">
   <link rel="apple-touch-icon" href="/icon-kunde-192.png" />
 
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    crossorigin=""
-  />
+  <!-- Leaflet -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
 
   <style>
-    /* FIX gegen weiße Balken iOS */
+
+    /* iOS Hintergrund-Fix */
     html, body {
       margin: 0;
       padding: 0;
       height: 100%;
+      overscroll-behavior: none;
       background-color: #020617 !important;
-      overscroll-behavior: none !important;
     }
 
-    /* Hintergrund fixieren */
+    /* Hintergrund 100% dunkel deckend */
     body::before {
       content: "";
       position: fixed;
       inset: 0;
       z-index: -1;
-      background: radial-gradient(circle at top, #0f172a, #020617);
+      background: radial-gradient(circle at top, #020617, #020617 60%, #020617);
     }
-    
+
     :root {
-      --bg-gradient: radial-gradient(circle at top, #0f172a, #020617);
       --card-bg: rgba(15, 23, 42, 0.82);
       --accent: #38bdf8;
       --accent-soft: rgba(56, 189, 248, 0.16);
       --danger: #f97373;
       --success: #4ade80;
-      --border-radius-xl: 24px;
-      --shadow-soft: 0 18px 60px rgba(0, 0, 0, 0.55);
+      --radius: 24px;
     }
 
     * { box-sizing: border-box; }
 
     body {
       font-family: system-ui, -apple-system, "SF Pro Text", sans-serif;
-      margin: 0;
-      min-height: 100vh;
-      padding: 16px;
-      background: var(--bg-gradient);
       color: #e5e7eb;
-      /* WICHTIG: Flex-Zentrierung entfernt, damit der dunkle Balken oben weg ist */
+      padding: 24px 16px 40px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
     }
 
     .app-frame {
       width: 100%;
       max-width: 430px;
-      margin: 16px auto 24px; /* etwas Abstand nach oben/unten, aber kein riesiger Balken */
+      text-align: center;
     }
 
+    /* Neuer Header: ThirrTaxi mittig */
     .app-header {
-      padding: 4px 4px 14px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      color: #9ca3af;
-      font-size: 13px;
+      margin-top: 5px;
+      margin-bottom: 22px;
+      font-size: 20px;
+      color: #e5e7eb;
+      font-weight: 600;
+      opacity: 0.92;
     }
 
     .card {
       background: var(--card-bg);
-      border-radius: var(--border-radius-xl);
-      padding: 18px 18px 20px;
-      box-shadow: var(--shadow-soft);
+      border-radius: var(--radius);
+      padding: 20px 20px 22px;
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      box-shadow: 0 20px 55px rgba(0, 0, 0, 0.6);
       backdrop-filter: blur(22px);
       -webkit-backdrop-filter: blur(22px);
-      border: 1px solid rgba(148, 163, 184, 0.18);
+      text-align: left;
     }
 
     h1 {
-      font-size: 22px;
-      margin: 0 0 4px;
+      font-size: 24px;
+      margin: 0 0 6px;
       color: #f9fafb;
     }
 
     .card-subtitle {
-      font-size: 13px;
+      font-size: 14px;
       color: #9ca3af;
-      margin-bottom: 14px;
+      margin-bottom: 18px;
+      line-height: 1.45;
     }
 
     label {
-      display: block;
-      font-size: 13px;
+      font-size: 14px;
       color: #cbd5f5;
-      margin-top: 10px;
-      margin-bottom: 4px;
+      margin-top: 12px;
+      display: block;
     }
 
     input {
       width: 100%;
-      padding: 10px 12px;
+      padding: 12px 14px;
       border-radius: 16px;
-      border: 1px solid rgba(148, 163, 184, 0.3);
-      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      background: rgba(15, 23, 42, 0.88);
+      font-size: 16px;
       color: #e5e7eb;
-      font-size: 15px;
-      outline: none;
-      transition: border 0.18s ease, box-shadow 0.18s ease, background 0.18s;
+      margin-top: 5px;
     }
-
-    input::placeholder { color: #6b7280; }
 
     input:focus {
       border-color: var(--accent);
-      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.45);
+      box-shadow: 0 0 0 1px var(--accent);
       background: rgba(15, 23, 42, 0.95);
+      outline: none;
     }
 
     button {
       width: 100%;
-      margin-top: 16px;
-      padding: 13px 14px;
+      margin-top: 18px;
+      padding: 15px 16px;
+      font-size: 17px;
       border-radius: 999px;
       border: none;
-      font-size: 16px;
       font-weight: 600;
+      cursor: pointer;
       background: linear-gradient(135deg, #0ea5e9, #22c55e);
       color: #020617;
-      box-shadow: 0 14px 40px rgba(34, 197, 94, 0.35);
+      box-shadow: 0 16px 42px rgba(34, 197, 94, 0.38);
       display: flex;
-      align-items: center;
       justify-content: center;
+      align-items: center;
       gap: 8px;
-      cursor: pointer;
-      transition: transform 0.14s ease, box-shadow 0.14s ease, filter 0.14s ease;
     }
-
-    button:active {
-      transform: translateY(1px) scale(0.995);
-      box-shadow: 0 8px 28px rgba(34, 197, 94, 0.25);
-      filter: brightness(0.97);
-    }
-
-    button:disabled {
-      opacity: 0.55;
-      cursor: default;
-      box-shadow: none;
-    }
-
-    .btn-icon { font-size: 17px; }
 
     .status {
       margin-top: 10px;
@@ -166,12 +151,12 @@
     .status.ok { color: var(--success); }
 
     .pending-card {
-      margin-top: 18px;
+      margin-top: 20px;
       overflow: hidden;
       max-height: 0;
       opacity: 0;
       transform: translateY(10px);
-      transition: max-height 0.45s ease, opacity 0.35s ease, transform 0.35s ease;
+      transition: 0.45s ease;
     }
 
     .pending-card.visible {
@@ -182,43 +167,28 @@
 
     .pending-inner {
       background: rgba(15, 23, 42, 0.92);
-      border-radius: 22px;
-      padding: 14px 14px 16px;
-      border: 1px solid rgba(56, 189, 248, 0.38);
-      box-shadow: 0 16px 40px rgba(15, 23, 42, 0.7);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
+      border-radius: 20px;
+      padding: 16px 16px 18px;
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      box-shadow: 0 18px 40px rgba(0,0,0,0.6);
     }
 
     .pill {
-      padding: 4px 10px;
+      background: var(--accent-soft);
+      padding: 6px 12px;
       border-radius: 999px;
-      font-size: 12px;
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      background: var(--accent-soft);
+      font-size: 12px;
       color: #e0f2fe;
     }
 
     .pill-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 999px;
+      width: 8px;
+      height: 8px;
       background: #22c55e;
-      box-shadow: 0 0 0 5px rgba(34, 197, 94, 0.25);
-    }
-
-    .pending-text {
-      font-size: 13px;
-      color: #cbd5f5;
-      margin: 6px 0 10px;
-    }
-
-    .timer {
-      font-size: 11px;
-      color: #e5e7eb;
-      margin-bottom: 6px;
+      border-radius: 999px;
     }
 
     .mini-map {
@@ -226,36 +196,26 @@
       height: 190px;
       border-radius: 18px;
       overflow: hidden;
-      border: 1px solid rgba(30, 64, 175, 0.9);
-      box-shadow: 0 14px 40px rgba(15, 23, 42, 0.9);
+      margin-top: 10px;
+      border: 1px solid rgba(56, 189, 248, 0.45);
     }
 
-    .mini-map.leaflet-container { background: #020617; }
-
     .small-caption {
-      margin-top: 8px;
+      margin-top: 10px;
       font-size: 11px;
       color: #9ca3af;
       display: flex;
       justify-content: space-between;
-      align-items: center;
     }
 
-    .small-caption span:last-child {
-      color: #e5e7eb;
-      font-weight: 500;
-      font-size: 11px;
-      opacity: 0.9;
-    }
   </style>
 </head>
 <body>
 
 <div class="app-frame">
-  <div class="app-header">
-    <span>KosovaTaxi</span>
-    <span>Online</span>
-  </div>
+
+  <!-- Neuer schöner Header -->
+  <div class="app-header">ThirrTaxi</div>
 
   <div class="card">
     <h1>Thirr taksinë</h1>
@@ -270,8 +230,7 @@
     <input id="phone" type="tel" placeholder="044 000 000">
 
     <button id="orderBtn">
-      <span class="btn-icon">🚕</span>
-      <span>Thirr taksinë</span>
+      🚕 <span>Thirr taksinë</span>
     </button>
 
     <div id="msg" class="status"></div>
@@ -283,23 +242,24 @@
           <span id="statusLabel">Jemi duke kërkuar shoferin tuaj…</span>
         </div>
         <div id="statusTimer" class="timer"></div>
+
         <div id="statusText" class="pending-text">
           Kërkesa është dërguar. Jemi duke kërkuar shoferin më të afërt.
         </div>
+
         <div id="clientMap" class="mini-map"></div>
+
         <div class="small-caption">
           <span>Lokacioni yt aktual</span>
-          <span>Live • iOS view</span>
+          <span>Live</span>
         </div>
       </div>
     </div>
+
   </div>
 </div>
 
-<script
-  src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-  crossorigin=""
-></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
@@ -312,7 +272,6 @@
     storageBucket: "kosovataxi-f6ca3.firebasestorage.app",
     messagingSenderId: "1075646412122",
     appId: "1:1075646412122:web:7aab19b92f51844fe32f63",
-    measurementId: "G-QYQE2476PR",
     databaseURL: "https://kosovataxi-f6ca3-default-rtdb.europe-west1.firebasedatabase.app/"
   };
 
@@ -332,6 +291,7 @@
     pendingWrapper.classList.add("visible");
     setTimeout(() => {
       if (clientMap) clientMap.remove();
+
       clientMap = L.map("clientMap", {
         zoomControl: false,
         attributionControl: false,
@@ -340,6 +300,7 @@
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         maxZoom: 19,
       }).addTo(clientMap);
+
       L.marker([lat, lng]).addTo(clientMap);
     }, 200);
   }
@@ -355,6 +316,7 @@
 
   function listenToOrderStatus(orderKey) {
     const orderRef = ref(db, "orders/" + orderKey);
+
     onValue(orderRef, (snap) => {
       const data = snap.val();
       if (!data) return;
@@ -364,20 +326,20 @@
         statusText.textContent =
           "Kërkesa është aktive. Sapo një shofer ta pranojë, taksia niset drejt jush.";
         statusTimer.textContent = "";
+
       } else if (data.status === "taken") {
-        const comp = data.takenByCompany || "KosovaTaxi";
         statusLabel.textContent = "Taksia është nisur";
         statusText.textContent =
-          "Shoferi nga " +
-          comp +
-          " është nisur për t’ju marrë. Ju lutem mbani telefonin afër.";
+          "Shoferi është nisur për t’ju marrë. Ju lutem mbani telefonin afër.";
         statusTimer.textContent =
           "Vozitja është pranuar: " + formatMinutesSince(data.takenAt);
+
       } else if (data.status === "done") {
         statusLabel.textContent = "Vozitja u përfundua";
         statusText.textContent =
-          "Faleminderit që përdorët KosovaTaxi. Urojmë të keni pasur një udhëtim të këndshëm.";
+          "Faleminderit që përdorët shërbimin tonë.";
         statusTimer.textContent = "";
+
       } else if (data.status === "canceled") {
         statusLabel.textContent = "Vozitja u anulua";
         statusText.textContent =
@@ -426,12 +388,10 @@
           lng,
           status: "open",
           createdAt: Date.now(),
-          takenByName: null,
-          takenByCompany: null,
           takenAt: null,
           completedAt: null,
           canceledAt: null,
-          canceledReason: null
+          canceledReason: null,
         };
 
         set(newOrderRef, orderData).then(() => {
@@ -443,8 +403,7 @@
           listenToOrderStatus(currentOrderKey);
         });
       },
-      (err) => {
-        console.error(err);
+      () => {
         msg.textContent = "Nuk u mor lokacioni. Ju lutem lejoni aksesin.";
         msg.classList.add("error");
         btn.disabled = false;
@@ -453,7 +412,7 @@
   };
 </script>
 
-<!-- PWA: Service Worker Registrierung -->
+<!-- Service Worker -->
 <script>
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("/sw-kunde.js").catch(console.error);

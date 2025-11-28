@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="sq">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin • KosovaTaxi</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <style>
+    :root {
+      --bg: radial-gradient(circle at top, #020617, #020617 60%, #020617);
+      --card: rgba(15,23,42,0.9);
+      --border: rgba(148,163,184,0.28);
+      --radius-lg: 22px;
+      --radius-md: 16px;
+      --accent: #38bdf8;
+      --accent-soft: rgba(56,189,248,0.15);
+      --danger: #ef4444;
+      --success: #22c55e;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 16px 10px 32px;
+      background: var(--bg);
+      font-family: system-ui, -apple-system, "SF Pro Text", sans-serif;
+      color: #e5e7eb;
+    }
+    .frame {
+      max-width: 1080px;
+      margin: 0 auto;
+    }
+    .card {
+      background: var(--card);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      padding: 16px 18px 18px;
+      margin-bottom: 14px;
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
+      box-shadow: 0 18px 55px rgba(0,0,0,0.7);
+    }
+    h1, h2, h3 {
+      margin: 0 0 8px;
+      font-weight: 600;
+      color: #f9fafb;
+    }
+    p {
+      margin: 0 0 10px;
+      font-size: 13px;
+      color: #9ca3af;
+    }
+    input, select {
+      width: 100%;
+      padding: 9px 11px;
+      border-radius: 14px;
+      border: 1px solid rgba(148,163,184,0.35);
+      background: rgba(15,23,42,0.96);
+      color: #e5e7eb;
+      font-size: 14px;
+      outline: none;
+      margin-bottom: 8px;
+    }
+    input:focus, select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent-soft);
+    }
+    button {
+      border-radius: 999px;
+      border: none;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 9px 14px;
+      cursor: pointer;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg,#0ea5e9,#6366f1);
+      color: #020617;
+      box-shadow: 0 14px 40px rgba(79,70,229,0.45);
+    }
+    .btn-small {
+      background: #22c55e;
+      color: #022c22;
+      font-size: 12px;
+      padding: 6px 10px;
+      margin-right: 6px;
+      border-radius: 14px;
+    }
+    .btn-danger {
+      background: var(--danger);
+      color: #fef2f2;
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 14px;
+      margin-top: 4px;
+    }
+    .btn-chip {
+      padding: 5px 10px;
+      font-size: 12px;
+      background: rgba(15,23,42,0.96);
+      border-radius: 999px;
+      border: 1px solid transparent;
+      cursor: pointer;
+      margin-right: 4px;
+      margin-bottom: 4px;
+      color: #9ca3af;
+    }
+    .btn-chip.active {
+      border-color: rgba(59,130,246,0.7);
+      background: rgba(37,99,235,0.2);
+      color: #e5e7eb;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 10px;
+    }
+    .stat-card {
+      background: rgba(15,23,42,0.96);
+      border-radius: var(--radius-md);
+      padding: 10px 12px;
+      border: 1px solid rgba(55,65,81,0.9);
+      font-size: 13px;
+    }
+    .stat-label {
+      color: #9ca3af;
+      font-size: 12px;
+    }
+    .stat-value {
+      font-size: 19px;
+      font-weight: 600;
+      margin-top: 4px;
+    }
+    .stat-sub {
+      font-size: 11px;
+      color: #6b7280;
+      margin-top: 2px;
+    }
+    .flex {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .pill-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+    .pill-tab {
+      padding: 5px 11px;
+      border-radius: 999px;
+      background: rgba(15,23,42,0.95);
+      border: 1px solid transparent;
+      font-size: 12px;
+      cursor: pointer;
+      color: #9ca3af;
+    }
+    .pill-tab.active {
+      border-color: rgba(59,130,246,0.8);
+      background: rgba(37,99,235,0.25);
+      color: #e5e7eb;
+    }
+    .tab-section {
+      display: none;
+    }
+    .tab-section.active {
+      display: block;
+    }
+    .list-item {
+      background: rgba(15,23,42,0.96);
+      border-radius: var(--radius-md);
+      padding: 9px 10px 10px;
+      border: 1px solid rgba(55,65,81,0.9);
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+    .badge {
+      display: inline-block;
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      margin-bottom: 3px;
+    }
+    .badge-open    { background: rgba(250,204,21,0.18); color: #facc15; }
+    .badge-taken   { background: rgba(56,189,248,0.18); color: #7dd3fc; }
+    .badge-done    { background: rgba(34,197,94,0.18); color: #bbf7d0; }
+    .badge-cancel  { background: rgba(239,68,68,0.18); color: #fecaca; }
+    .badge-pending { background: rgba(250,204,21,0.18); color: #fde047; }
+    .badge-driver  { background: rgba(56,189,248,0.16); color: #e0f2fe; }
+    .text-danger { color: #fecaca; font-size: 12px; }
+    .login-error { color: #f97373; font-size: 13px; margin-top: 6px; }
+    .month-list {
+      margin-top: 8px;
+      font-size: 12px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    .month-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 5px 0;
+      border-bottom: 1px dashed rgba(55,65,81,0.8);
+    }
+    .month-row:last-child { border-bottom: none; }
+  </style>
+</head>
+<body>
+<div class="frame">
+
+  <!-- LOGIN -->
+  <div id="loginView" class="card">
+    <h1>Admin • KosovaTaxi</h1>
+    <p>Kyçje vetëm për administratorë (Albert &amp; Drilon)</p>
+
+    <input id="adminUser" placeholder="Përdoruesi ">
+    <input id="adminPass" type="password" placeholder="Fjalëkalimi">
+
+    <button id="adminLoginBtn" class="btn-primary" style="width:100%;margin-top:8px;">Hyr si admin</button>
+    <div id="adminLoginError" class="login-error"></div>
+  </div>
+
+  <!-- ADMIN PANEL -->
+  <div id="adminView" style="display:none;">
+
+    <!-- ANALYTICS / PERMBLEDHJE -->
+    <div class="card">
+      <div class="flex" style="margin-bottom:10px;">
+        <div>
+          <h2>Përmbledhja analitike</h2>
+          <p>Zgjidh datën dhe shiko statistikat ditore, javore dhe mujore. Të ardhurat llogariten me 0.25 € për çdo vozitje të përfunduar.</p>
+        </div>
+        <div style="min-width: 180px;">
+          <label style="font-size:12px;color:#9ca3af;">Data e zgjedhur</label>
+          <input id="datePicker" type="date">
+        </div>
+      </div>
+
+      <div class="grid">
+        <!-- Dita -->
+        <div class="stat-card">
+          <div class="stat-label">Përmbledhja e ditës</div>
+          <div id="dayOrders" class="stat-value">0 vozitje</div>
+          <div id="dayRevenue" class="stat-sub">Të ardhurat: 0.00 €</div>
+          <div id="dayStatusSplit" class="stat-sub"></div>
+        </div>
+
+        <!-- Java -->
+        <div class="stat-card">
+          <div class="stat-label">Përmbledhja javore</div>
+          <div id="weekOrders" class="stat-value">0 vozitje</div>
+          <div id="weekRevenue" class="stat-sub">Të ardhurat: 0.00 €</div>
+          <div id="weekRange" class="stat-sub"></div>
+        </div>
+
+        <!-- Muaji -->
+        <div class="stat-card">
+          <div class="stat-label">Përmbledhja mujore</div>
+          <div id="monthOrders" class="stat-value">0 vozitje</div>
+          <div id="monthRevenue" class="stat-sub">Të ardhurat: 0.00 €</div>
+          <div id="monthName" class="stat-sub"></div>
+        </div>
+
+        <!-- Muajt e vitit -->
+        <div class="stat-card">
+          <div class="stat-label">Të ardhurat mujore (viti aktual)</div>
+          <div class="month-list" id="yearMonths"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TABS / DATA -->
+    <div class="card">
+      <div class="pill-tabs">
+        <button class="pill-tab active" data-target="tabOrders">Porositë</button>
+        <button class="pill-tab" data-target="tabRegs">Regjistrimet</button>
+        <button class="pill-tab" data-target="tabDrivers">Shoferët</button>
+        <button class="pill-tab" data-target="tabCompanies">Kompanitë</button>
+        <button class="pill-tab" data-target="tabBalances">Barazimet</button>
+      </div>
+
+      <!-- POROSITË -->
+      <div id="tabOrders" class="tab-section active">
+        <h3>Porositë</h3>
+        <p>Lista e porosive sipas statusit. Mund të fshish manualisht porositë në rast testesh ose gabimesh.</p>
+
+        <h4>Porositë e hapura</h4>
+        <div id="ordersOpen"></div>
+
+        <h4>Porositë në vozitje</h4>
+        <div id="ordersTaken"></div>
+
+        <h4>Porositë e përfunduara / anuluara</h4>
+        <div id="ordersDone"></div>
+      </div>
+
+      <!-- REGJISTRIMET -->
+      <div id="tabRegs" class="tab-section">
+        <h3>Regjistrimet e shoferëve</h3>
+        <p>Shoferët e rinj që regjistrohen nga aplikacioni i shoferit. Mund t'i aprovoshn dhe të gjenerosh PIN.</p>
+        <div id="regList"></div>
+      </div>
+
+      <!-- SHOFERËT -->
+      <div id="tabDrivers" class="tab-section">
+        <h3>Lista e shoferëve</h3>
+        <p>Shoferët aktivë në sistem, me PIN-et e tyre dhe kompaninë.</p>
+        <div id="driverList"></div>
+      </div>
+
+      <!-- KOMPANITË -->
+      <div id="tabCompanies" class="tab-section">
+        <h3>Kompanitë e taksive</h3>
+        <div class="flex" style="margin-bottom:10px;">
+          <div style="flex:1;">
+            <input id="companyName" placeholder="Emri i kompanisë (p.sh. Taxi Pink)">
+          </div>
+          <button id="addCompanyBtn" class="btn-small">Shto kompaninë</button>
+        </div>
+        <div id="companyList"></div>
+      </div>
+
+      <!-- BALANCET -->
+      <div id="tabBalances" class="tab-section">
+        <h3>Barazimet e shoferëve</h3>
+        <p>Çdo vozitje e përfunduar shton 0.25 € si borxh i shoferit ndaj kompanisë. Këtu mund t’i aprovosh barazimet.</p>
+        <div id="balanceList"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+  import {
+    getDatabase,
+    ref,
+    onValue,
+    set,
+    push,
+    remove,
+    update
+  } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCgCxp8M9XGOKFSIfaU9nM48rxtFQP-Kvs",
+    authDomain: "kosovataxi-f6ca3.firebaseapp.com",
+    projectId: "kosovataxi-f6ca3",
+    storageBucket: "kosovataxi-f6ca3.firebasestorage.app",
+    messagingSenderId: "1075646412122",
+    appId: "1:1075646412122:web:7aab19b92f51844fe32f63",
+    databaseURL: "https://kosovataxi-f6ca3-default-rtdb.europe-west1.firebasedatabase.app/"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+
+  // Simple admin accounts
+  const ADMINS = {
+    "albert": "1992",
+    "drilon": "1995"
+  };
+
+  // DOM
+  const loginView = document.getElementById("loginView");
+  const adminView = document.getElementById("adminView");
+  const adminUser = document.getElementById("adminUser");
+  const adminPass = document.getElementById("adminPass");
+  const adminLoginBtn = document.getElementById("adminLoginBtn");
+  const adminLoginError = document.getElementById("adminLoginError");
+
+  const datePicker = document.getElementById("datePicker");
+  const dayOrdersEl = document.getElementById("dayOrders");
+  const dayRevenueEl = document.getElementById("dayRevenue");
+  const dayStatusSplitEl = document.getElementById("dayStatusSplit");
+  const weekOrdersEl = document.getElementById("weekOrders");
+  const weekRevenueEl = document.getElementById("weekRevenue");
+  const weekRangeEl = document.getElementById("weekRange");
+  const monthOrdersEl = document.getElementById("monthOrders");
+  const monthRevenueEl = document.getElementById("monthRevenue");
+  const monthNameEl = document.getElementById("monthName");
+  const yearMonthsEl = document.getElementById("yearMonths");
+
+  const statDrivers = document.createElement("span");
+  const statCompanies = document.createElement("span");
+  // (Optional: Wenn du sie irgendwo extra anzeigen willst, kannst du sie einbauen)
+
+  const ordersOpenEl = document.getElementById("ordersOpen");
+  const ordersTakenEl = document.getElementById("ordersTaken");
+  const ordersDoneEl = document.getElementById("ordersDone");
+
+  const regListEl = document.getElementById("regList");
+  const driverListEl = document.getElementById("driverList");
+  const companyListEl = document.getElementById("companyList");
+  const companyNameInput = document.getElementById("companyName");
+  const addCompanyBtn = document.getElementById("addCompanyBtn");
+  const balanceListEl = document.getElementById("balanceList");
+
+  let ordersCache = {};
+  let driversCache = {};
+  let balancesCache = {};
+  let companiesCache = {};
+
+  // ======= LOGIN =======
+  adminLoginBtn.addEventListener("click", () => {
+    const u = adminUser.value.trim().toLowerCase();
+    const p = adminPass.value.trim();
+    if (!u || !p) {
+      adminLoginError.textContent = "Ju lutem plotësoni të dy fushat.";
+      return;
+    }
+    if (ADMINS[u] === p) {
+      adminLoginError.textContent = "";
+      loginView.style.display = "none";
+      adminView.style.display = "block";
+      initAdmin();
+    } else {
+      adminLoginError.textContent = "Përdoruesi ose fjalëkalimi është gabim.";
+    }
+  });
+
+  // ======= TABS =======
+  document.querySelectorAll(".pill-tab").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".pill-tab").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      const target = btn.dataset.target;
+      document.querySelectorAll(".tab-section").forEach(sec => {
+        sec.classList.toggle("active", sec.id === target);
+      });
+    });
+  });
+
+  // ======= INIT =======
+  function initAdmin() {
+    // Default: heute im Datepicker
+    const today = new Date();
+    datePicker.value = today.toISOString().slice(0, 10);
+
+    datePicker.addEventListener("change", updateAnalytics);
+
+    loadOrders();
+    loadDrivers();
+    loadCompanies();
+    loadRegistrations();
+    loadBalances();
+  }
+
+  // ======= HELPERS: DATES & MONTH NAMES =======
+  const monthNamesSq = [
+    "Janar", "Shkurt", "Mars", "Prill", "Maj", "Qershor",
+    "Korrik", "Gusht", "Shtator", "Tetor", "Nëntor", "Dhjetor"
+  ];
+
+  function startOfDay(d) {
+    const n = new Date(d);
+    n.setHours(0,0,0,0);
+    return n;
+  }
+  function endOfDay(d) {
+    const n = startOfDay(d);
+    n.setDate(n.getDate() + 1);
+    return n;
+  }
+  function startOfWeek(d) {
+    const n = startOfDay(d);
+    const day = n.getDay(); // 0=Sun
+    const diff = (day === 0 ? -6 : 1 - day); // Montag als start
+    n.setDate(n.getDate() + diff);
+    return n;
+  }
+  function endOfWeek(d) {
+    const s = startOfWeek(d);
+    const e = new Date(s);
+    e.setDate(e.getDate() + 7);
+    return e;
+  }
+  function startOfMonth(d) {
+    const n = startOfDay(d);
+    return new Date(n.getFullYear(), n.getMonth(), 1);
+  }
+  function endOfMonth(d) {
+    const s = startOfMonth(d);
+    return new Date(s.getFullYear(), s.getMonth() + 1, 1);
+  }
+
+  function isDone(order) {
+    return order.status === "done";
+  }
+
+  // ======= LOAD ORDERS =======
+  function loadOrders() {
+    onValue(ref(db, "orders"), snap => {
+      ordersCache = snap.val() || {};
+      renderOrders();
+      updateAnalytics();
+    });
+  }
+
+  function renderOrders() {
+    ordersOpenEl.innerHTML = "";
+    ordersTakenEl.innerHTML = "";
+    ordersDoneEl.innerHTML = "";
+
+    Object.entries(ordersCache).forEach(([id, o]) => {
+      const div = document.createElement("div");
+      div.className = "list-item";
+
+      let badgeHtml = "";
+      if (o.status === "open")       badgeHtml = '<span class="badge badge-open">E hapur</span>';
+      else if (o.status === "taken") badgeHtml = '<span class="badge badge-taken">Në vozitje</span>';
+      else if (o.status === "done")  badgeHtml = '<span class="badge badge-done">E përfunduar</span>';
+      else if (o.status === "canceled") badgeHtml = '<span class="badge badge-cancel">E anuluar</span>';
+
+      const created = o.createdAt ? new Date(o.createdAt).toLocaleString() : "-";
+      const taken   = o.takenAt   ? new Date(o.takenAt).toLocaleTimeString() : "-";
+      const completed = o.completedAt ? new Date(o.completedAt).toLocaleTimeString() : "-";
+
+      let extraLines = "";
+      if (o.status === "taken") {
+        extraLines += `<small>Pranuar: ${taken}</small><br>`;
+      }
+      if (o.status === "done") {
+        extraLines += `<small>Përfunduar: ${completed}</small><br>`;
+      }
+      if (o.status === "canceled") {
+        extraLines += `<small>Arsye anulimi: ${o.canceledReason || "-"}</small><br>`;
+      }
+
+      div.innerHTML = `
+        ${badgeHtml}<br>
+        <strong>${o.name}</strong> • ${o.phone}<br>
+        <small>Krijuar: ${created}</small><br>
+        <small>Kompania: ${o.takenByCompany || "-"}</small><br>
+        ${extraLines}
+        <button class="btn-danger" onclick="window.deleteOrder('${id}')">Fshije porosinë</button>
+      `;
+
+      if (o.status === "open") {
+        ordersOpenEl.appendChild(div);
+      } else if (o.status === "taken") {
+        ordersTakenEl.appendChild(div);
+      } else {
+        ordersDoneEl.appendChild(div);
+      }
+    });
+  }
+
+  // Globale Funktion für HTML-Button
+  window.deleteOrder = (id) => {
+    if (!confirm("A jeni i sigurt që doni ta fshini këtë porosi?")) return;
+    remove(ref(db, "orders/" + id));
+  };
+
+  // ======= ANALYTICS =======
+  function updateAnalytics() {
+    if (!ordersCache) return;
+    const dateStr = datePicker.value;
+    if (!dateStr) return;
+
+    const dayDate   = new Date(dateStr + "T00:00:00");
+    const dayStart  = startOfDay(dayDate);
+    const dayEnd    = endOfDay(dayDate);
+    const weekStart = startOfWeek(dayDate);
+    const weekEnd   = endOfWeek(dayDate);
+    const monthStart= startOfMonth(dayDate);
+    const monthEnd  = endOfMonth(dayDate);
+
+    let dayTotal = 0, dayDone = 0, dayOpen = 0, dayTaken = 0, dayCanceled = 0;
+    let weekDone = 0;
+    let monthDone = 0;
+
+    // Yearly revenue per month
+    const nowYear = dayDate.getFullYear();
+    const monthRevenueMap = new Array(12).fill(0);
+
+    Object.values(ordersCache).forEach(o => {
+      if (!o.createdAt) return;
+      const t = o.createdAt;
+      if (t >= +dayStart && t < +dayEnd) {
+        dayTotal++;
+        if (o.status === "open") dayOpen++;
+        else if (o.status === "taken") dayTaken++;
+        else if (o.status === "done") dayDone++;
+        else if (o.status === "canceled") dayCanceled++;
+      }
+      if (t >= +weekStart && t < +weekEnd && isDone(o)) {
+        weekDone++;
+      }
+      if (t >= +monthStart && t < +monthEnd && isDone(o)) {
+        monthDone++;
+      }
+
+      const d = new Date(t);
+      if (d.getFullYear() === nowYear && isDone(o)) {
+        monthRevenueMap[d.getMonth()] += 0.25;
+      }
+    });
+
+    // Day stats
+    const dayRevenue = dayDone * 0.25;
+    dayOrdersEl.textContent = `${dayTotal} vozitje`;
+    dayRevenueEl.textContent = `Të ardhurat: ${dayRevenue.toFixed(2)} €`;
+    dayStatusSplitEl.textContent =
+      `E hapur: ${dayOpen} • Në vozitje: ${dayTaken} • Përfunduar: ${dayDone} • Anuluar: ${dayCanceled}`;
+
+    // Week stats
+    const weekRevenue = weekDone * 0.25;
+    weekOrdersEl.textContent = `${weekDone} vozitje të përfunduara`;
+    weekRevenueEl.textContent = `Të ardhurat: ${weekRevenue.toFixed(2)} €`;
+    weekRangeEl.textContent =
+      `Java: ${weekStart.toLocaleDateString()} - ${new Date(weekEnd.getTime()-1).toLocaleDateString()}`;
+
+    // Month stats
+    const monthRevenue = monthDone * 0.25;
+    const monthIndex = monthStart.getMonth();
+    monthOrdersEl.textContent = `${monthDone} vozitje të përfunduara`;
+    monthRevenueEl.textContent = `Të ardhurat: ${monthRevenue.toFixed(2)} €`;
+    monthNameEl.textContent =
+      `Muaji: ${monthNamesSq[monthIndex]} ${monthStart.getFullYear()}`;
+
+    // Year month list
+    yearMonthsEl.innerHTML = "";
+    for (let m = 0; m < 12; m++) {
+      const row = document.createElement("div");
+      row.className = "month-row";
+      row.innerHTML = `
+        <span>${monthNamesSq[m]}</span>
+        <span>${monthRevenueMap[m].toFixed(2)} €</span>
+      `;
+      yearMonthsEl.appendChild(row);
+    }
+  }
+
+  // ======= DRIVERS =======
+  function loadDrivers() {
+    onValue(ref(db, "drivers"), snap => {
+      driversCache = snap.val() || {};
+      driverListEl.innerHTML = "";
+      Object.entries(driversCache).forEach(([id, d]) => {
+        const div = document.createElement("div");
+        div.className = "list-item";
+        div.innerHTML = `
+          <span class="badge badge-driver">Shofer</span><br>
+          <strong>${d.name}</strong> • ${d.company}<br>
+          <small>Veturë: ${d.plate || "-"}</small><br>
+          <small>Tel: ${d.phone || "-"}</small><br>
+          <small>PIN: ${d.pin}</small>
+        `;
+        driverListEl.appendChild(div);
+      });
+    });
+  }
+
+  // ======= REGISTRATIONS =======
+  function loadRegistrations() {
+    onValue(ref(db, "driverRegistrations"), snap => {
+      regListEl.innerHTML = "";
+      const data = snap.val() || {};
+      Object.entries(data).forEach(([id, r]) => {
+        const div = document.createElement("div");
+        div.className = "list-item";
+        div.innerHTML = `
+          <span class="badge badge-pending">Në pritje</span><br>
+          <strong>${r.name}</strong> • ${r.company}<br>
+          <small>${r.plate || ""} • ${r.phone || ""}</small><br>
+        `;
+        const approveBtn = document.createElement("button");
+        approveBtn.className = "btn-small";
+        approveBtn.textContent = "Aprovo & gjenero PIN";
+        approveBtn.onclick = () => approveDriver(id, r);
+
+        const rejectBtn = document.createElement("button");
+        rejectBtn.className = "btn-danger";
+        rejectBtn.textContent = "Refuzo";
+        rejectBtn.onclick = () => remove(ref(db, "driverRegistrations/" + id));
+
+        div.appendChild(approveBtn);
+        div.appendChild(rejectBtn);
+        regListEl.appendChild(div);
+      });
+    });
+  }
+
+  function approveDriver(regId, data) {
+    const newRef = push(ref(db, "drivers"));
+    const pin = Math.floor(1000 + Math.random() * 9000);
+    set(newRef, {
+      company: data.company,
+      name: data.name,
+      plate: data.plate,
+      phone: data.phone,
+      pin: pin,
+      approved: true,
+      createdAt: Date.now()
+    }).then(() => {
+      remove(ref(db, "driverRegistrations/" + regId));
+      alert(`Shoferi u aprovua!\nEmri: ${data.name}\nPIN: ${pin}`);
+    });
+  }
+
+  // ======= COMPANIES =======
+  function loadCompanies() {
+    onValue(ref(db, "companies"), snap => {
+      companyListEl.innerHTML = "";
+      companiesCache = snap.val() || {};
+      Object.entries(companiesCache).forEach(([id, c]) => {
+        const div = document.createElement("div");
+        div.className = "list-item";
+        div.innerHTML = `
+          <strong>${c.name}</strong><br>
+          <small>ID: ${id}</small>
+        `;
+        companyListEl.appendChild(div);
+      });
+    });
+  }
+
+  addCompanyBtn.addEventListener("click", () => {
+    const name = companyNameInput.value.trim();
+    if (!name) return;
+    const newRef = push(ref(db, "companies"));
+    set(newRef, { name, createdAt: Date.now() });
+    companyNameInput.value = "";
+  });
+
+  // ======= BALANCES (BARAZIMET) =======
+  function loadBalances() {
+    onValue(ref(db, "balances"), snap => {
+      balancesCache = snap.val() || {};
+      renderBalances();
+    });
+  }
+
+  function renderBalances() {
+    balanceListEl.innerHTML = "";
+    const data = balancesCache || {};
+    const entries = Object.entries(data);
+    if (entries.length === 0) {
+      balanceListEl.innerHTML = "<div class='list-item'>Nuk ka ende barazime.</div>";
+      return;
+    }
+
+    entries.forEach(([driverId, b]) => {
+      const drv = driversCache[driverId];
+      if (!drv) return;
+
+      const div = document.createElement("div");
+      div.className = "list-item";
+
+      const total = Number(b.total || 0);
+      const statusTxt = b.status === "closed" ? "Barazim i përfunduar" : "Barazim i hapur";
+
+      div.innerHTML = `
+        <strong>${drv.name}</strong> • ${drv.company || "-"}</strong><br>
+        <small>Veturë: ${drv.plate || "-"}</small><br>
+        <small>Totali aktual: ${total.toFixed(2)} €</small><br>
+        <small>Statusi: ${statusTxt}</small><br>
+      `;
+
+      if (b.status !== "closed" && total > 0) {
+        const btn = document.createElement("button");
+        btn.className = "btn-small";
+        btn.textContent = "Aprovo barazimin";
+        btn.onclick = () => {
+          update(ref(db, "balances/" + driverId), {
+            total: 0,
+            status: "closed",
+            lastUpdate: Date.now()
+          });
+        };
+        div.appendChild(btn);
+      }
+
+      balanceListEl.appendChild(div);
+    });
+  }
+</script>
+</body>
+</html>

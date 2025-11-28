@@ -1,9 +1,18 @@
-<!DOCTYPE html>
-<html lang="sq">
 <head>
   <meta charset="UTF-8">
   <title>Shoferi - KosovaTaxi</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- PWA -->
+  <link rel="manifest" href="/public/manifest-shofer.json">
+  <meta name="theme-color" content="#3A80F9">
+
+  <script>
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/public/sw-shofer.js")
+        .catch(err => console.log("SW error:", err));
+    }
+  </script>
 
   <link
     rel="stylesheet"

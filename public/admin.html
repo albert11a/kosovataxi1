@@ -5,6 +5,19 @@
   <title>Admin • KosovaTaxi</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
+  <!-- PWA -->
+<link rel="manifest" href="/manifest-admin.json">
+<meta name="theme-color" content="#0ea5e9">
+<link rel="apple-touch-icon" href="/icon-admin-192.png">
+
+<script>
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("/sw-admin.js")
+      .catch(console.error);
+  }
+</script>
+
+
   <style>
     :root {
       --bg: radial-gradient(circle at top, #020617, #020617 60%, #020617);

@@ -1,7 +1,7 @@
 {
   "name": "Thirr Shofer",
   "short_name": "Shofer",
-  "start_url": "/public/fahrer.html",
+  "start_url": "fahrer.html",
   "scope": "/public/",
   "display": "standalone",
   "theme_color": "#3A80F9",

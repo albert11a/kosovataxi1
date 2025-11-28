@@ -1,27 +1,55 @@
 <!DOCTYPE html>
 <html lang="sq">
 <head>
-  <meta charset="UTF-8" />
-  <title>Admin • KosovaTaxi</title>
 
-  <!-- FIX: Prevent zoom + force fullscreen -->
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<!-- ========================================= -->
+<!-- ============= BASIC PAGE SETUP ========== -->
+<!-- ========================================= -->
 
-  <!-- PWA -->
-  <link rel="manifest" href="/manifest-admin.json">
-  <meta name="theme-color" content="#020617">
+<meta charset="UTF-8" />
+<title>Admin • KosovaTaxi</title>
 
-  <!-- iOS PWA required -->
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <link rel="apple-touch-icon" href="/icon-admin-192.png">
+<!-- Verhindert Zoom auf Inputs (iOS) & erzwingt Fullscreen -->
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
-  <script>
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("/sw-admin.js")
-        .catch(console.error);
-    }
-  </script>
+
+<!-- ========================================= -->
+<!-- =================== PWA ================== -->
+<!-- ========================================= -->
+
+<!-- Manifest für Admin-PWA -->
+<link rel="manifest" href="/manifest-admin.json">
+
+<!-- Farbe der Statusleiste (Android) -->
+<meta name="theme-color" content="#020617">
+
+
+<!-- ========================================= -->
+<!-- =============== iOS PWA FIX ============= -->
+<!-- ========================================= -->
+
+<!-- Erlaubt PWA-Vollbildmodus auf iOS -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+<!-- Farbe der iOS Statusbar (transparent/dunkel) -->
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+<!-- Icon für iPhone Homescreen -->
+<link rel="apple-touch-icon" href="/icon-admin-192.png">
+
+
+<!-- ========================================= -->
+<!-- =========== SERVICE WORKER SETUP ========= -->
+<!-- ========================================= -->
+
+<script>
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("/sw-admin.js")
+      .catch(console.error);     /* Falls Fehler passiert → Zeige Error */
+  }
+</script>
+
+
 
   <style>
 

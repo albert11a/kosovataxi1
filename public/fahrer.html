@@ -4,14 +4,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <!-- PWA -->
-  <link rel="manifest" href="/manifest-shofer.json">
+  <link rel="manifest" href="/public/manifest-shofer.json">
   <meta name="theme-color" content="#3A80F9">
-    <link rel="apple-touch-icon" href="/icon-shofer-192.png" />
-
+  <link rel="apple-touch-icon" href="/public/icon-shofer-192.png">
   <script>
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.register("/public/sw-shofer.js")
-        .catch(err => console.log("SW error:", err));
+        .catch(console.error);
     }
   </script>
 

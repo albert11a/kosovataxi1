@@ -1,432 +1,290 @@
-<!DOCTYPE html>
 <html lang="sq">
 <head>
+  <meta charset="UTF-8" />
+  <title>Admin • KosovaTaxi</title>
 
-<!-- ========================================= -->
-<!-- ============= BASIC PAGE SETUP ========== -->
-<!-- ========================================= -->
+  <!-- FIX: Prevent zoom + force fullscreen -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
-<meta charset="UTF-8" />
-<title>Admin • KosovaTaxi</title>
+  <!-- PWA -->
+  <link rel="manifest" href="/manifest-admin.json">
+  <meta name="theme-color" content="#020617">
 
-<!-- Verhindert Zoom auf Inputs (iOS) & erzwingt Fullscreen -->
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <!-- iOS PWA required -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" href="/icon-admin-192.png">
 
+  <script>
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/sw-admin.js")
+        .catch(console.error);
+    }
+  </script>
 
-<!-- ========================================= -->
-<!-- =================== PWA ================== -->
-<!-- ========================================= -->
+  <style>
 
-<!-- Manifest für Admin-PWA -->
-<link rel="manifest" href="/manifest-admin.json">
-
-<!-- Farbe der Statusleiste (Android) -->
-<meta name="theme-color" content="#020617">
-
-
-<!-- ========================================= -->
-<!-- =============== iOS PWA FIX ============= -->
-<!-- ========================================= -->
-
-<!-- Erlaubt PWA-Vollbildmodus auf iOS -->
-<meta name="apple-mobile-web-app-capable" content="yes">
-
-<!-- Farbe der iOS Statusbar (transparent/dunkel) -->
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
-<!-- Icon für iPhone Homescreen -->
-<link rel="apple-touch-icon" href="/icon-admin-192.png">
-
-
-<!-- ========================================= -->
-<!-- =========== SERVICE WORKER SETUP ========= -->
-<!-- ========================================= -->
-
-<script>
-  if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("/sw-admin.js")
-      .catch(console.error);     /* Falls Fehler passiert → Zeige Error */
-  }
-</script>
-
-
-
-<style>
-
-<!-- ========================================= -->
-<!-- =========== GLOBAL PAGE RESET =========== -->
-<!-- ========================================= -->
-
-html, body {
-  margin: 0;                    /* Entfernt Default-Abstände */
-  padding: 0;                   /* Entfernt Default-Abstände */
-  height: 100%;                 /* Für Vollbild-Hintergrund */
-  background-color: #020617 !important;  /* Fallback-Farbe; verhindert weiß */
-  overscroll-behavior: none !important;  /* Entfernt iOS Bounce-Weiß */
+ html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background-color: #020617 !important;  /* Verhindert Weiß beim Scrollen */
+  overscroll-behavior: none !important;   /* Kein Bounce-Weiß */
 }
 
-
-
-/* ========================================= */
-/* ===== iOS BACKGROUND FIX (HINTERGRUND) ==== */
-/* ========================================= */
-/* verhindert iOS Weißes Blitzen beim Scrollen */
-
+/* Fix: Hintergrund so einfügen, OHNE iOS-Weißfehler */
 body::before {
   content: "";
   position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  z-index: -1;                  /* Hintergrund hinter den Inhalt */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -1;
   background: radial-gradient(circle at top, #020617, #020617 60%, #020617);
 }
 
-
-
-/* ========================================= */
-/* ===== INPUT ZOOM FIX (iOS Auto-Zoom) ===== */
-/* ========================================= */
-
-input, select {
-  font-size: 16px !important;   /* Mindestgröße, damit iOS NICHT zoomt */
-}
-
-
-
-/* ========================================= */
-/* ========== DESIGN-VARIABLEN ============= */
-/* ========================================= */
-/* Ein zentraler Ort für Farben, Radius, Effekte → super wichtig für Design */
-
-:root {
-  --bg: radial-gradient(circle at top, #020617, #020617 60%, #020617);
-  --card: rgba(15,23,42,0.9);
-  --border: rgba(148,163,184,0.28);
-  --radius-lg: 22px;
-  --radius-md: 16px;
-  --accent: #38bdf8;
-  --accent-soft: rgba(56,189,248,0.15);
-  --danger: #ef4444;
-  --success: #22c55e;
-}
-
-
-
-/* ========================================= */
-/* ================ GLOBAL ================= */
-/* ========================================= */
-
-* { 
-  box-sizing: border-box;       /* Bessere Layout-Kontrolle */
-  -webkit-touch-callout: none;  /* Verhindert Text-Auswahl-Menü auf iOS */
-}
-
-body {
-  margin: 0;
-  padding: 16px 10px 32px;      /* Innenabstand des gesamten Screens */
-  background: var(--bg);        /* Hintergrund mit Gradient */
-  font-family: system-ui, -apple-system, "SF Pro Text", sans-serif;
-  color: #e5e7eb;               /* Standard-Textfarbe */
-}
-
-
-
-/* ========================================= */
-/* ======== FRAME (HAUPT-LAYOUT WRAPPER) ==== */
-/* ========================================= */
-/* WICHTIG: HIER ist der Abstand links/rechts */
-/* Du kannst padding-left/right ändern */
-
-.frame {
-  max-width: 1080px;            /* Maximale Breite für große Geräte */
-  margin: 0 auto;               /* Zentriert den Container */
-  padding-left: 18px;           /* Abstand links (kannst auf 20 setzen) */
-  padding-right: 18px;          /* Abstand rechts */
-}
-
-
-
-/* ========================================= */
-/* ================ CARD ==================== */
-/* ========================================= */
-
-.card {
-  background: var(--card);      /* Dunkle Glassmoke Card */
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border);
-  padding: 16px 18px 18px;
-  margin-bottom: 14px;
-  backdrop-filter: blur(22px);     /* Blur-Effekt */
-  -webkit-backdrop-filter: blur(22px);
-  box-shadow: 0 18px 55px rgba(0,0,0,0.7); /* Tiefer Schatten */
-}
-
-
-
-/* ========================================= */
-/* =============== HEADINGS ================= */
-/* ========================================= */
-
-h1, h2, h3 {
-  margin: 0 0 8px;
-  font-weight: 600;
-  color: #f9fafb;               /* Helle Titel */
-}
-
-
-
-/* ========================================= */
-/* =============== PARAGRAPHS =============== */
-/* ========================================= */
-
-p {
-  margin: 0 0 10px;
-  font-size: 13px;
-  color: #9ca3af;              /* Leicht heller Text */
-}
-
-
-
-/* ========================================= */
-/* ============= INPUTS & SELECTS =========== */
-/* ========================================= */
-
-input, select {
-  width: 100%;
-  padding: 9px 11px;
-  border-radius: 14px;
-  border: 1px solid rgba(148,163,184,0.35);
-  background: rgba(15,23,42,0.96);
-  color: #e5e7eb;
-  outline: none;
-  margin-bottom: 8px;
-}
-
-input:focus, select:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 1px var(--accent-soft);
-}
-
-
-
-/* ========================================= */
-/* ================= BUTTONS =============== */
-/* ========================================= */
-
-button {
-  border-radius: 999px;         /* Pill-Style */
-  border: none;
-  font-size: 14px;
-  font-weight: 600;
-  padding: 9px 14px;
-  cursor: pointer;
-}
-
-.btn-primary {
-  background: linear-gradient(135deg,#0ea5e9,#6366f1);
-  color: #020617;
-  box-shadow: 0 14px 40px rgba(79,70,229,0.45);
-}
-
-.btn-small {
-  background: #22c55e;
-  color: #022c22;
-  font-size: 12px;
-  padding: 6px 10px;
-  margin-right: 6px;
-  border-radius: 14px;
-}
-
-.btn-danger {
-  background: var(--danger);
-  color: #fef2f2;
-  font-size: 12px;
-  padding: 6px 10px;
-  border-radius: 14px;
-  margin-top: 4px;
-}
-
-
-
-/* ========================================= */
-/* ================== CHIPS ================= */
-/* ========================================= */
-
-.btn-chip {
-  padding: 5px 10px;
-  font-size: 12px;
-  background: rgba(15,23,42,0.96);
-  border-radius: 999px;
-  border: 1px solid transparent;
-  cursor: pointer;
-  margin-right: 4px;
-  margin-bottom: 4px;
-  color: #9ca3af;
-}
-
-.btn-chip.active {
-  border-color: rgba(59,130,246,0.7);
-  background: rgba(37,99,235,0.2);
-  color: #e5e7eb;
-}
-
-
-
-/* ========================================= */
-/* ================== GRID ================== */
-/* ========================================= */
-
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-  gap: 10px;
-}
-
-
-
-/* ========================================= */
-/* ============= STAT CARDS ================= */
-/* ========================================= */
-
-.stat-card {
-  background: rgba(15,23,42,0.96);
-  border-radius: var(--radius-md);
-  padding: 10px 12px;
-  border: 1px solid rgba(55,65,81,0.9);
-  font-size: 13px;
-}
-
-.stat-label {
-  color: #9ca3af;
-  font-size: 12px;
-}
-
-.stat-value {
-  font-size: 19px;
-  font-weight: 600;
-  margin-top: 4px;
-}
-
-.stat-sub {
-  font-size: 11px;
-  color: #6b7280;
-  margin-top: 2px;
-}
-
-
-
-/* ========================================= */
-/* ================== FLEX ================== */
-/* ========================================= */
-
-.flex {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-
-
-/* ========================================= */
-/* ================== TABS ================== */
-/* ========================================= */
-
-.pill-tabs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-bottom: 10px;
-}
-
-.pill-tab {
-  padding: 5px 11px;
-  border-radius: 999px;
-  background: rgba(15,23,42,0.95);
-  border: 1px solid transparent;
-  font-size: 12px;
-  cursor: pointer;
-  color: #9ca3af;
-}
-
-.pill-tab.active {
-  border-color: rgba(59,130,246,0.8);
-  background: rgba(37,99,235,0.25);
-  color: #e5e7eb;
-}
-
-.tab-section {
-  display: none;
-}
-
-.tab-section.active {
-  display: block;
-}
-
-
-
-/* ========================================= */
-/* ================= LIST ITEMS ============= */
-/* ========================================= */
-
-.list-item {
-  background: rgba(15,23,42,0.96);
-  border-radius: var(--radius-md);
-  padding: 9px 10px 10px;
-  border: 1px solid rgba(55,65,81,0.9);
-  font-size: 13px;
-  margin-bottom: 8px;
-}
-
-
-
-/* ========================================= */
-/* ================= BADGES ================ */
-/* ========================================= */
-
-.badge {
-  display: inline-block;
-  font-size: 11px;
-  padding: 3px 8px;
-  border-radius: 999px;
-  margin-bottom: 3px;
-}
-
-.badge-open    { background: rgba(250,204,21,0.18); color: #facc15; }
-.badge-taken   { background: rgba(56,189,248,0.18); color: #7dd3fc; }
-.badge-done    { background: rgba(34,197,94,0.18); color: #bbf7d0; }
-.badge-cancel  { background: rgba(239,68,68,0.18); color: #fecaca; }
-.badge-pending { background: rgba(250,204,21,0.18); color: #fde047; }
-.badge-driver  { background: rgba(56,189,248,0.16); color: #e0f2fe; }
-
-.text-danger { color: #fecaca; font-size: 12px; }
-.login-error { color: #f97373; font-size: 13px; margin-top: 6px; }
-
-
-
-/* ========================================= */
-/* ============== MONTH LIST =============== */
-/* ========================================= */
-
-.month-list {
-  margin-top: 8px;
-  font-size: 12px;
-  max-height: 200px;
-  overflow-y: auto;
-}
-
-.month-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 5px 0;
-  border-bottom: 1px dashed rgba(55,65,81,0.8);
-}
-
-.month-row:last-child {
-  border-bottom: none;
-}
-
-</style>
+    /* FIX: iPhone zoom on input */
+    input, select {
+      font-size: 16px !important;
+    }
+
+    :root {
+      --bg: radial-gradient(circle at top, #020617, #020617 60%, #020617);
+      --card: rgba(15,23,42,0.9);
+      --border: rgba(148,163,184,0.28);
+      --radius-lg: 22px;
+      --radius-md: 16px;
+      --accent: #38bdf8;
+      --accent-soft: rgba(56,189,248,0.15);
+      --danger: #ef4444;
+      --success: #22c55e;
+    }
+
+    * { 
+      box-sizing: border-box; 
+      -webkit-touch-callout: none;
+    }
+
+    body {
+      margin: 0;
+      padding: 16px 10px 32px;
+      background: var(--bg);
+      font-family: system-ui, -apple-system, "SF Pro Text", sans-serif;
+      color: #e5e7eb;
+    }
+
+    .frame {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding-left: 18px;
+      padding-right: 18px;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      padding: 16px 18px 18px;
+      margin-bottom: 14px;
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
+      box-shadow: 0 18px 55px rgba(0,0,0,0.7);
+    }
+
+    h1, h2, h3 {
+      margin: 0 0 8px;
+      font-weight: 600;
+      color: #f9fafb;
+    }
+
+    p {
+      margin: 0 0 10px;
+      font-size: 13px;
+      color: #9ca3af;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 9px 11px;
+      border-radius: 14px;
+      border: 1px solid rgba(148,163,184,0.35);
+      background: rgba(15,23,42,0.96);
+      color: #e5e7eb;
+      outline: none;
+      margin-bottom: 8px;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent-soft);
+    }
+
+    button {
+      border-radius: 999px;
+      border: none;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 9px 14px;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg,#0ea5e9,#6366f1);
+      color: #020617;
+      box-shadow: 0 14px 40px rgba(79,70,229,0.45);
+    }
+
+    .btn-small {
+      background: #22c55e;
+      color: #022c22;
+      font-size: 12px;
+      padding: 6px 10px;
+      margin-right: 6px;
+      border-radius: 14px;
+    }
+
+    .btn-danger {
+      background: var(--danger);
+      color: #fef2f2;
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 14px;
+      margin-top: 4px;
+    }
+
+    .btn-chip {
+      padding: 5px 10px;
+      font-size: 12px;
+      background: rgba(15,23,42,0.96);
+      border-radius: 999px;
+      border: 1px solid transparent;
+      cursor: pointer;
+      margin-right: 4px;
+      margin-bottom: 4px;
+      color: #9ca3af;
+    }
+
+    .btn-chip.active {
+      border-color: rgba(59,130,246,0.7);
+      background: rgba(37,99,235,0.2);
+      color: #e5e7eb;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 10px;
+    }
+
+    .stat-card {
+      background: rgba(15,23,42,0.96);
+      border-radius: var(--radius-md);
+      padding: 10px 12px;
+      border: 1px solid rgba(55,65,81,0.9);
+      font-size: 13px;
+    }
+
+    .stat-label {
+      color: #9ca3af;
+      font-size: 12px;
+    }
+
+    .stat-value {
+      font-size: 19px;
+      font-weight: 600;
+      margin-top: 4px;
+    }
+
+    .stat-sub {
+      font-size: 11px;
+      color: #6b7280;
+      margin-top: 2px;
+    }
+
+    .flex {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .pill-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .pill-tab {
+      padding: 5px 11px;
+      border-radius: 999px;
+      background: rgba(15,23,42,0.95);
+      border: 1px solid transparent;
+      font-size: 12px;
+      cursor: pointer;
+      color: #9ca3af;
+    }
+
+    .pill-tab.active {
+      border-color: rgba(59,130,246,0.8);
+      background: rgba(37,99,235,0.25);
+      color: #e5e7eb;
+    }
+
+    .tab-section {
+      display: none;
+    }
+
+    .tab-section.active {
+      display: block;
+    }
+
+    .list-item {
+      background: rgba(15,23,42,0.96);
+      border-radius: var(--radius-md);
+      padding: 9px 10px 10px;
+      border: 1px solid rgba(55,65,81,0.9);
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+
+    .badge {
+      display: inline-block;
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      margin-bottom: 3px;
+    }
+
+    .badge-open    { background: rgba(250,204,21,0.18); color: #facc15; }
+    .badge-taken   { background: rgba(56,189,248,0.18); color: #7dd3fc; }
+    .badge-done    { background: rgba(34,197,94,0.18); color: #bbf7d0; }
+    .badge-cancel  { background: rgba(239,68,68,0.18); color: #fecaca; }
+    .badge-pending { background: rgba(250,204,21,0.18); color: #fde047; }
+    .badge-driver  { background: rgba(56,189,248,0.16); color: #e0f2fe; }
+    .text-danger { color: #fecaca; font-size: 12px; }
+    .login-error { color: #f97373; font-size: 13px; margin-top: 6px; }
+
+    .month-list {
+      margin-top: 8px;
+      font-size: 12px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .month-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 5px 0;
+      border-bottom: 1px dashed rgba(55,65,81,0.8);
+    }
+
+    .month-row:last-child {
+      border-bottom: none;
+    }
+  </style>
 </head>
 
 <body>

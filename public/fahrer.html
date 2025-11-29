@@ -2,383 +2,648 @@
 <html lang="sq">
 <head>
   <meta charset="UTF-8">
-  <title>Shoferi · Thirr Taxi</title>
+  <title>Shoferi - KosovaTaxi</title>
 
+  <!-- iOS / Mobile Viewport -->
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-  <meta name="theme-color" content="#020617">
   <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#020617">
+
+  <!-- PWA -->
+  <link rel="manifest" href="/manifest-shofer.json">
+  <link rel="apple-touch-icon" href="/icon-shofer-192.png">
+
+  <script>
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/sw-shofer.js")
+        .catch(console.error);
+    }
+  </script>
+
+  <!-- Leaflet -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    crossorigin=""
+  />
 
   <style>
-    :root {
-      --bg: #020617;
-      --card-bg: #0f172a;
-      --accent: #22c55e;
-      --accent2: #38bdf8;
-      --radius: 20px;
-      --text: #e5e7eb;
-      --sub: #94a3b8;
-    }
-
-    * { box-sizing: border-box; }
-
-    body {
+    /* iOS FIX – kein Weiß, kein Balken */
+    html, body {
       margin: 0;
       padding: 0;
-      background: var(--bg);
-      font-family: -apple-system, system-ui, sans-serif;
-      color: var(--text);
+      height: 100%;
+      overscroll-behavior: none;
+      background-color: #020617 !important;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
     }
 
-    .app { padding: 14px; max-width: 800px; margin: auto; }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      background: radial-gradient(circle at top, #020617, #020617 60%, #020617);
+    }
 
-    /* HEADER */
+    :root {
+      --bg: radial-gradient(circle at top, #020617, #020617 60%, #020617);
+      --card-bg: rgba(15, 23, 42, 0.9);
+      --accent: #38bdf8;
+      --border-radius-xl: 24px;
+      --shadow-soft: 0 20px 60px rgba(0, 0, 0, 0.65);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      margin: 0;
+      padding: calc(14px + env(safe-area-inset-top, 0px)) 10px calc(22px + env(safe-area-inset-bottom, 0px));
+      background: var(--bg);
+      color: #e5e7eb;
+      overflow-y: auto;
+    }
+
+    .frame {
+      max-width: 440px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-height: calc(100vh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 36px);
+    }
+
     .header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 12px;
+      padding: 2px 4px 10px;
+      font-size: 13px;
+      color: #9ca3af;
+      flex-shrink: 0;
     }
 
-    .header-title { font-size: 18px; font-weight: 600; }
-    .header-sub { font-size: 12px; color: var(--sub); }
-
-    /* SWITCH */
-    .switch {
-      width: 40px; height: 20px;
-      background: #475569;
-      border-radius: 999px;
-      position: relative;
-      cursor: pointer;
-      transition: 0.2s;
+    .header-center {
+      display:flex;
+      align-items:center;
+      gap:6px;
+      font-weight:500;
+      color:#e5e7eb;
     }
-    .switch.on { background: var(--accent); }
-    .thumb {
-      width: 16px; height: 16px;
-      background: white;
-      border-radius: 50%;
-      position: absolute;
-      top: 2px; left: 2px;
-      transition: 0.2s;
-    }
-    .switch.on .thumb { transform: translateX(20px); }
 
-    /* TABS – bottom iOS style */
-    .tabs {
-      position: fixed;
-      bottom: 0; left: 0; right: 0;
-      background: #0f172a;
-      display: flex;
-      border-top: 1px solid #1e293b;
-      padding: 6px 0;
-      z-index: 99;
+    .dot {
+      width:6px;
+      height:6px;
+      border-radius:999px;
+      background:#22c55e;
+      box-shadow:0 0 0 5px rgba(34,197,94,0.25);
     }
-    .tab {
-      flex: 1;
-      text-align: center;
-      font-size: 12px;
-      color: var(--sub);
-      padding: 6px 0;
-      cursor: pointer;
-    }
-    .tab.active { color: var(--accent2); font-weight: 600; }
 
-    /* PANELS */
-    .panel { display: none; padding-bottom: 90px; }
-    .panel.active { display: block; }
-
-    /* CARD */
     .card {
       background: var(--card-bg);
-      padding: 14px;
-      border-radius: var(--radius);
-      margin-bottom: 10px;
-      border: 1px solid #1e293b;
+      border-radius: var(--border-radius-xl);
+      padding: 16px 16px 18px;
+      box-shadow: var(--shadow-soft);
+      border: 1px solid rgba(148,163,184,0.22);
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
+      margin-bottom: 8px;
     }
 
-    .title { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
-    .sub { color: var(--sub); font-size: 12px; }
-
-    /* ORDER CARD */
-    .order-name { font-size: 15px; font-weight: 600; }
-    .order-meta { font-size: 12px; color: var(--sub); }
-
-    .btn {
-      width: 100%;
-      border: none;
-      border-radius: 12px;
-      padding: 10px;
-      font-size: 14px;
-      margin-top: 8px;
-      cursor: pointer;
+    .card-title {
+      font-size: 19px;
       font-weight: 600;
+      margin-bottom: 4px;
     }
 
-    .btn-accept {
-      background: var(--accent);
-      color: #022c22;
+    .card-subtitle {
+      font-size: 13px;
+      color: #9ca3af;
+      margin-bottom: 10px;
+    }
+
+    label {
+      display:block;
+      margin-top:8px;
+      font-size:13px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(148,163,184,0.35);
+      background: rgba(15,23,42,0.94);
+      color: #e5e7eb;
+      font-size: 16px; /* 16px, damit iOS NICHT reinzoomt */
+      outline: none;
+      margin-top: 4px;
+      transition: border 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+    }
+
+    input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(56,189,248,0.45);
+      background: rgba(15,23,42,0.98);
+    }
+
+    button {
+      border-radius:999px;
+      border:none;
+      font-size:15px;
+      font-weight:600;
+      padding:11px 12px;
+      cursor:pointer;
+      transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
+    }
+
+    button:active {
+      transform: translateY(1px) scale(0.99);
+      filter: brightness(0.97);
+    }
+
+    .btn-primary {
+      width:100%;
+      margin-top:12px;
+      background: linear-gradient(135deg,#22c55e,#4ade80);
+      color:#022c22;
+      box-shadow:0 14px 38px rgba(34,197,94,0.4);
     }
 
     .btn-secondary {
-      background: var(--accent2);
-      color: #082f49;
+      background: linear-gradient(135deg,#facc15,#f97316);
+      color:#111827;
+      box-shadow:0 10px 28px rgba(250,204,21,0.4);
+      font-size:14px;
+      padding:8px 10px;
+      width:100%;
+      margin-top:6px;
     }
 
     .btn-danger {
-      background: #ef4444;
-      color: white;
+      background:#ef4444;
+      color:white;
+      font-size:13px;
+      padding:7px 10px;
+      width:100%;
+      margin-top:6px;
+      box-shadow:0 6px 22px rgba(239,68,68,0.55);
     }
 
-    /* MAP IMAGE */
-    .map {
+    .login-error {
+      margin-top:8px;
+      font-size:12px;
+      color:#f97373;
+    }
+
+    .section-title {
+      font-size:14px;
+      font-weight:500;
+      margin-top:4px;
+      margin-bottom:6px;
+    }
+
+    .section-sub {
+      font-size:11px;
+      color:#9ca3af;
+      margin-bottom:4px;
+    }
+
+    .order-card {
+      background: radial-gradient(circle at top left, rgba(59,130,246,.22), rgba(15,23,42,.96));
+      border-radius: 22px;
+      padding: 12px 12px 14px;
+      margin-top: 10px;
+      border: 1px solid rgba(55, 65, 81, 0.9);
+      box-shadow: 0 18px 48px rgba(15, 23, 42, 0.95);
+      cursor: default;
+    }
+
+    .order-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+      gap: 8px;
+    }
+
+    .order-name { font-size: 15px; font-weight: 600; }
+    .order-phone { font-size: 13px; opacity: .9; }
+
+    .badge {
+      font-size:11px;
+      padding:4px 8px;
+      border-radius:999px;
+      white-space: nowrap;
+    }
+
+    .badge-active { background:rgba(34,197,94,0.18); color:#bbf7d0; }
+    .badge-open { background:rgba(251,191,36,0.18); color:#facc15; }
+
+    .mini-map {
       width: 100%;
-      height: 150px;
-      border-radius: 12px;
+      height: 140px;
+      border-radius: 16px;
+      overflow: hidden;
       margin-top: 8px;
-      background: #1e293b;
-      object-fit: cover;
+      border: 1px solid rgba(15, 23, 42, .9);
     }
 
+    .order-footer {
+      margin-top: 8px;
+      font-size: 11.5px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #9ca3af;
+      gap:8px;
+      flex-wrap: wrap;
+    }
+
+    .order-footer a {
+      color: #38bdf8;
+      text-decoration: none;
+      font-size: 12px;
+    }
+
+    .timer {
+      font-size:11px;
+      color:#e5e7eb;
+    }
+
+    .empty-text {
+      font-size:12px;
+      color:#6b7280;
+      margin-top:4px;
+    }
+
+    @media (max-width: 400px) {
+      body {
+        padding: calc(10px + env(safe-area-inset-top, 0px)) 8px calc(18px + env(safe-area-inset-bottom, 0px));
+      }
+      .card {
+        padding: 14px 12px 16px;
+        border-radius: 20px;
+      }
+      .card-title {
+        font-size: 18px;
+      }
+      .order-name {
+        font-size: 14px;
+      }
+    }
   </style>
 </head>
-
 <body>
-<div class="app">
 
-  <!-- HEADER -->
+<div class="frame">
   <div class="header">
-    <div>
-      <div class="header-title">Shoferi · Thirr Taxi</div>
-      <div class="header-sub" id="driverNameLabel">I paidentifikuar</div>
+    <span>KosovaTaxi</span>
+    <div class="header-center">
+      <div class="dot"></div>
+      <span id="headerDriverName">Shoferi</span>
     </div>
-
-    <div style="text-align:right;">
-      <div class="header-sub">Statusi</div>
-      <div id="onlineSwitch" class="switch"><div class="thumb"></div></div>
-    </div>
+    <span id="headerStatus">Offline</span>
   </div>
 
   <!-- LOGIN -->
-  <div id="login" class="card">
-    <div class="title">Hyr si shofer</div>
-    <div class="sub">Shkruaj PIN-in që ta ka dhënë administratori.</div>
-    <input id="pin" placeholder="PIN" style="width:100%;padding:10px;border-radius:12px;margin-top:10px;background:#1e293b;border:1px solid #334155;color:white;">
-    <button id="btnLogin" class="btn btn-secondary">Hyr</button>
-    <div id="loginMsg" class="sub" style="color:#f87171;margin-top:6px;"></div>
+  <div id="loginCard" class="card">
+    <div class="card-title">Hyr si shofer</div>
+    <div class="card-subtitle">
+      Shkruaj vetëm PIN-in që të ka dhënë admini. Emri dhe kompania merren automatikisht.
+    </div>
+
+    <label>PIN</label>
+    <input id="loginPin" placeholder="p.sh. 4829">
+
+    <button id="loginBtn" class="btn-primary">Hyr online</button>
+    <div id="loginMsg" class="login-error"></div>
   </div>
 
-  <!-- PANELS -->
-  <div id="p-requests" class="panel active">
-    <div class="title">Kërkesat e reja</div>
-    <div id="orders"></div>
-  </div>
+  <!-- DASHBOARD -->
+  <div id="content" style="display:none;">
 
-  <div id="p-current" class="panel">
-    <div class="title">Udhëtimi aktual</div>
-    <div id="currentRide"></div>
-  </div>
+    <!-- KARTE 1: VOZITJET E MIA AKTIVE -->
+    <div class="card">
+      <div class="section-title">Vozitjet e mia aktive</div>
+      <div class="section-sub">Mund të kesh vetëm një vozitje aktive në të njëjtën kohë.</div>
 
-  <div id="p-balance" class="panel">
-    <div class="title">Bilanci</div>
-    <div id="balance"></div>
-  </div>
+      <div id="myOrders"></div>
+      <div id="noMine" class="empty-text"></div>
+    </div>
 
+    <!-- KARTE 2: VOZITJET NË PRITJE -->
+    <div class="card">
+      <div class="section-title">Vozitje në pritje</div>
+      <div class="section-sub">Këto janë kërkesa të hapura që mund t’i pranosh.</div>
+
+      <div id="orders"></div>
+      <div id="noOpen" class="empty-text"></div>
+    </div>
+
+    <!-- KARTE 3: BARAZIMI IM -->
+    <div class="card">
+      <div class="section-title">Barazimi im</div>
+      <div id="balanceBox" style="font-size:14px; color:#e5e7eb;"></div>
+    </div>
+
+  </div>
 </div>
 
-<!-- TABS -->
-<div class="tabs">
-  <div class="tab active" data-tab="p-requests">Kërkesat</div>
-  <div class="tab" data-tab="p-current">Vozitja</div>
-  <div class="tab" data-tab="p-balance">Bilanci</div>
-</div>
+<script
+  src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  crossorigin=""
+></script>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
-  import { getDatabase, ref, onValue, set, runTransaction } 
-    from "https://www.gstatic.com/firebasejs/12.6.0/firebase-database.js";
+  import { getDatabase, ref, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-database.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyCgCxp8M9XGOKFSIfaU9nM48rxtFQP-Kvs",
     authDomain: "kosovataxi-f6ca3.firebaseapp.com",
+    projectId: "kosovataxi-f6ca3",
+    storageBucket: "kosovataxi-f6ca3.firebasestorage.app",
+    messagingSenderId: "1075646412122",
+    appId: "1:1075646412122:web:7aab19b92f51844fe32f63",
+    measurementId: "G-QYQE2476PR",
     databaseURL: "https://kosovataxi-f6ca3-default-rtdb.europe-west1.firebasedatabase.app/"
   };
 
   const app = initializeApp(firebaseConfig);
   const db = getDatabase(app);
 
-  /* =============== STATE =================== */
-  let driver = null;
-  let online = false;
-  let activeRide = null;
+  let currentDriver = null;
+  let hasActiveRide = false;
 
-  /* =============== LOGIN =================== */
-  document.getElementById("btnLogin").onclick = () => {
-    const pin = document.getElementById("pin").value.trim();
-    const msg = document.getElementById("loginMsg");
-    msg.textContent = "";
+  const loginCard = document.getElementById("loginCard");
+  const content = document.getElementById("content");
+  const loginBtn = document.getElementById("loginBtn");
+  const loginMsg = document.getElementById("loginMsg");
+  const headerDriverName = document.getElementById("headerDriverName");
+  const headerStatus = document.getElementById("headerStatus");
+  const balanceBox = document.getElementById("balanceBox");
 
-    const rf = ref(db, "drivers");
-    onValue(rf, snap => {
-      const drivers = snap.val() || {};
-      for (const [id,d] of Object.entries(drivers)) {
-        if (String(d.pin) === pin && d.approved === true) {
-          driver = { id, ...d };
-          document.getElementById("driverNameLabel").textContent = d.name;
-          document.getElementById("login").style.display = "none";
-          subscribeOrders();
-          subscribeBalance();
-          return;
-        }
-      }
-      msg.textContent = "PIN i pasaktë.";
-    }, { onlyOnce:true });
-  };
-
-  /* =============== ONLINE SWITCH =================== */
-  const sw = document.getElementById("onlineSwitch");
-  sw.onclick = () => {
-    if (!driver) return;
-    online = !online;
-    sw.classList.toggle("on", online);
-    set(ref(db, "drivers/"+driver.id+"/online"), online);
-  };
-
-  /* =============== TABS =================== */
-  document.querySelectorAll(".tab").forEach(tab => {
-    tab.onclick = () => {
-      document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-      tab.classList.add("active");
-
-      const id = tab.dataset.tab;
-      document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
-      document.getElementById(id).classList.add("active");
-    };
-  });
-
-  /* =============== STATIC MAP GENERATOR =================== */
-  function mapURL(lat,lng) {
-    return `https://maps.googleapis.com/maps/api/staticmap?center=${lat},${lng}&zoom=16&size=600x300&maptype=roadmap&markers=color:red|${lat},${lng}&key=YOUR_GOOGLE_MAPS_API_KEY`;
-  }
-
-  /* =============== ORDERS =================== */
-  function subscribeOrders() {
-    const orf = ref(db, "orders");
-    onValue(orf, snap => {
-      const data = snap.val() || {};
-      const list = Object.entries(data)
-        .filter(([id,o]) => o.status === "open")
-        .sort((a,b) => (b[1].createdAt || 0) - (a[1].createdAt || 0))
-        .slice(0, 100); // vetëm 100 më të fundit
-
-      const box = document.getElementById("orders");
-      box.innerHTML = "";
-
-      list.forEach(([id,o]) => {
-        const c = document.createElement("div");
-        c.className = "card";
-
-        c.innerHTML = `
-          <div class="order-name">${o.name || "Klienti"} · ${o.phone || ""}</div>
-          <div class="order-meta">${o.address || "Pa adresë"}</div>
-
-          ${o.lat && o.lng ? `<img class="map" src="${mapURL(o.lat,o.lng)}">` : ""}
-
-          <button class="btn-accept btn" data-id="${id}">Prano</button>
-        `;
-
-        c.querySelector(".btn-accept").onclick = () => {
-          if (!online) return alert("Duhet të jeni ONLINE");
-
-          runTransaction(ref(db, "orders/"+id), cur => {
-            if (!cur || cur.status !== "open") return cur;
-            cur.status = "taken";
-            cur.takenByDriverId = driver.id;
-            cur.takenByName = driver.name;
-            cur.takenAt = Date.now();
-            return cur;
-          });
-        };
-
-        box.appendChild(c);
-      });
-    });
-  }
-
-  /* =============== CURRENT RIDE =================== */
-  onValue(ref(db,"orders"), snap => {
-    if (!driver) return;
-    const data = snap.val() || {};
-    activeRide = null;
-
-    for (const [id,o] of Object.entries(data)) {
-      if (o.status === "taken" && o.takenByDriverId === driver.id) {
-        activeRide = { id, ...o };
-      }
-    }
-
-    const box = document.getElementById("currentRide");
-    box.innerHTML = "";
-
-    if (!activeRide) {
-      box.innerHTML = `<div class="sub">Nuk keni udhëtim aktiv.</div>`;
+  loginBtn.onclick = () => {
+    loginMsg.textContent = "";
+    const pin = document.getElementById("loginPin").value.trim();
+    if (!pin) {
+      loginMsg.textContent = "Ju lutem shkruani PIN-in.";
       return;
     }
 
-    const a = activeRide;
+    const driversRef = ref(db, "drivers");
+    onValue(
+      driversRef,
+      (snap) => {
+        const data = snap.val() || {};
+        let found = null;
+        Object.entries(data).forEach(([id, d]) => {
+          if (
+            String(d.pin) === String(pin) &&
+            d.approved === true &&
+            (d.active !== false)
+          ) {
+            found = { id, ...d };
+          }
+        });
 
-    box.innerHTML = `
-      <div class="card">
-        <div class="order-name">${a.name}</div>
-        <div class="order-meta">${a.address}</div>
-        ${a.lat && a.lng ? `<img class="map" src="${mapURL(a.lat,a.lng)}">` : ""}
-        
-        <button id="finishRide" class="btn btn-secondary">Përfundo</button>
-        <button id="cancelRide" class="btn btn-danger">Anulo</button>
-      </div>
-    `;
+        if (!found) {
+          loginMsg.textContent = "PIN i pavlefshëm ose shoferi nuk është aktiv.";
+          return;
+        }
 
-    document.getElementById("finishRide").onclick = () => {
-      runTransaction(ref(db,"orders/"+a.id), cur => {
-        if (!cur || cur.status!=="taken") return cur;
-        cur.status = "done";
-        cur.completedAt = Date.now();
-        return cur;
+        if (!currentDriver) {
+          currentDriver = found;
+          headerDriverName.textContent = found.name || "Shoferi";
+          headerStatus.textContent = "Online";
+          loginCard.style.display = "none";
+          content.style.display = "block";
+          subscribeOrders();
+          subscribeBalance();
+        }
+      },
+      { onlyOnce: true }
+    );
+  };
+
+  function createMiniMap(containerId, lat, lng) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    container.innerHTML = "";
+    const map = L.map(containerId, {
+      zoomControl: false,
+      attributionControl: false,
+    }).setView([lat, lng], 16);
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 19,
+    }).addTo(map);
+
+    L.marker([lat, lng]).addTo(map);
+  }
+
+  function formatMinutesSince(timestamp) {
+    if (!timestamp) return "-";
+    const diffMs = Date.now() - timestamp;
+    const mins = Math.floor(diffMs / 60000);
+    if (mins <= 0) return "më pak se 1 min";
+    if (mins === 1) return "1 minutë";
+    return mins + " minuta";
+  }
+
+  function subscribeOrders() {
+    const ordersRef = ref(db, "orders");
+
+    onValue(ordersRef, (snap) => {
+      const data = snap.val() || {};
+      const openBox = document.getElementById("orders");
+      const mineBox = document.getElementById("myOrders");
+      const noOpen = document.getElementById("noOpen");
+      const noMine = document.getElementById("noMine");
+
+      openBox.innerHTML = "";
+      mineBox.innerHTML = "";
+      let openCount = 0;
+      let mineCount = 0;
+      hasActiveRide = false;
+
+      Object.entries(data).forEach(([id, o]) => {
+        const safeIdOpen = "map_open_" + id.replace(/[^a-zA-Z0-9_-]/g, "");
+        const safeIdMine = "map_mine_" + id.replace(/[^a-zA-Z0-9_-]/g, "");
+
+        /* VOZITJE NË PRITJE */
+        if (o.status === "open") {
+          openCount++;
+          const wrapper = document.createElement("div");
+          wrapper.className = "order-card";
+
+          wrapper.innerHTML = `
+            <div class="order-header">
+              <div>
+                <div class="order-name">${o.name}</div>
+                <div class="order-phone">${o.phone}</div>
+              </div>
+              <span class="badge badge-open">Vozitje në pritje</span>
+            </div>
+            <div id="${safeIdOpen}" class="mini-map"></div>
+            <div class="order-footer">
+              <span>Kliko për ta pranuar këtë vozitje.</span>
+              <a href="https://maps.google.com/?q=${o.lat},${o.lng}" target="_blank">Google Maps</a>
+            </div>
+          `;
+
+          const onAccept = () => {
+            if (hasActiveRide) {
+              alert("Nuk mund të pranoni më shumë se një vozitje.");
+              return;
+            }
+            const thisOrder = ref(db, "orders/" + id);
+            runTransaction(thisOrder, (current) => {
+              if (!current || current.status !== "open") return current;
+              current.status = "taken";
+              current.takenByName = currentDriver.name;
+              current.takenByCompany = currentDriver.company || "KosovaTaxi";
+              current.takenByDriverId = currentDriver.id;
+              current.takenAt = Date.now();
+              return current;
+            });
+          };
+
+          const acceptBtn = document.createElement("button");
+          acceptBtn.className = "btn-secondary";
+          acceptBtn.textContent = "✅ Prano vozitjen";
+          acceptBtn.onclick = onAccept;
+
+          wrapper.appendChild(acceptBtn);
+
+          // Optional: ganze Karte (ohne Link/Button) klickbar machen
+          wrapper.addEventListener("click", (e) => {
+            const tag = e.target.tagName.toLowerCase();
+            if (tag === "a" || tag === "button") return;
+            onAccept();
+          });
+
+          openBox.appendChild(wrapper);
+          setTimeout(() => createMiniMap(safeIdOpen, o.lat, o.lng), 50);
+        }
+
+        /* VOZITJET E MIA (AKTIVE) */
+        if (
+          o.status === "taken" &&
+          o.takenByDriverId === currentDriver?.id
+        ) {
+          mineCount++;
+          hasActiveRide = true;
+
+          const wrapper = document.createElement("div");
+          wrapper.className = "order-card";
+
+          const timeText = formatMinutesSince(o.takenAt);
+
+          wrapper.innerHTML = `
+            <div class="order-header">
+              <div>
+                <div class="order-name">${o.name}</div>
+                <div class="order-phone">${o.phone}</div>
+              </div>
+              <span class="badge badge-active">Aktive</span>
+            </div>
+            <div id="${safeIdMine}" class="mini-map"></div>
+            <div class="order-footer">
+              <span class="timer">Vozitja: ${timeText} më parë</span>
+              <a href="https://maps.google.com/?q=${o.lat},${o.lng}" target="_blank">Google Maps</a>
+            </div>
+          `;
+
+          const finishBtn = document.createElement("button");
+          finishBtn.className = "btn-secondary";
+          finishBtn.textContent = "✅ Perfundo vozitjen";
+          finishBtn.onclick = () => {
+            const thisOrder = ref(db, "orders/" + id);
+
+            runTransaction(thisOrder, (current) => {
+              if (!current || current.status !== "taken") return current;
+              current.status = "done";
+              current.completedAt = Date.now();
+              return current;
+            }).then(() => {
+              // Update balance (+0.25 € für jede Fahrt)
+              const balRef = ref(db, "balances/" + currentDriver.id);
+              runTransaction(balRef, (cur) => {
+                if (!cur) {
+                  return {
+                    total: 0.25,
+                    status: "open",
+                    lastUpdate: Date.now()
+                  };
+                }
+                cur.total = (cur.total || 0) + 0.25;
+                cur.status = "open";
+                cur.lastUpdate = Date.now();
+                return cur;
+              });
+            });
+          };
+
+          const cancelBtn = document.createElement("button");
+          cancelBtn.className = "btn-danger";
+          cancelBtn.textContent = "✖ Anulo vozitjen";
+          cancelBtn.onclick = () => {
+            const reason = prompt("Shkruaj arsyen:");
+            if (!reason) return;
+            const thisOrder = ref(db, "orders/" + id);
+            runTransaction(thisOrder, (current) => {
+              if (!current || current.status !== "taken") return current;
+              current.status = "canceled";
+              current.canceledAt = Date.now();
+              current.canceledReason = reason;
+              return current;
+            });
+          };
+
+          wrapper.appendChild(finishBtn);
+          wrapper.appendChild(cancelBtn);
+          mineBox.appendChild(wrapper);
+
+          setTimeout(() => createMiniMap(safeIdMine, o.lat, o.lng), 50);
+        }
       });
-    };
 
-    document.getElementById("cancelRide").onclick = () => {
-      const reason = prompt("Arsyeja e anulimit:");
-      if (!reason) return;
-
-      runTransaction(ref(db,"orders/"+a.id), cur => {
-        if (!cur || cur.status!=="taken") return cur;
-        cur.status = "canceled";
-        cur.canceledAt = Date.now();
-        cur.canceledReason = reason;
-        return cur;
-      });
-    };
-  });
-
-  /* =============== BALANCE =================== */
-  function subscribeBalance() {
-    const rf = ref(db, "balances/" + driver.id);
-    onValue(rf, snap => {
-      const b = snap.val();
-      const box = document.getElementById("balance");
-
-      if (!b) {
-        box.innerHTML = `<div class="sub">Nuk ka të dhëna për bilancin.</div>`;
-        return;
-      }
-
-      box.innerHTML = `
-        <div class="card">
-          <div class="order-name">Totali: ${Number(b.total||0).toFixed(2)} €</div>
-        </div>
-      `;
+      noOpen.textContent =
+        openCount === 0 ? "Për momentin nuk ka vozitje në pritje." : "";
+      noMine.textContent =
+        mineCount === 0 ? "Për momentin nuk keni vozitje aktive." : "";
     });
   }
 
+  function subscribeBalance() {
+    const balRef = ref(db, "balances/" + currentDriver.id);
+    onValue(balRef, (snap) => {
+      const data = snap.val();
+      if (!data) {
+        balanceBox.innerHTML = "Nuk ka barazim aktual.";
+        return;
+      }
+
+      if (data.status === "open") {
+        balanceBox.innerHTML = `
+          <strong>Barazim i hapur:</strong> ${data.total.toFixed(2)} €<br>
+          <small>Ju lutem barazohuni me administratën.</small>
+        `;
+      } else {
+        balanceBox.innerHTML = `
+          <strong>Barazim i përfunduar ✔</strong><br>
+          <small>Aktualisht nuk keni borxh.</small>
+        `;
+      }
+    });
+  }
 </script>
 
 </body>

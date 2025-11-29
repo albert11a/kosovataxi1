@@ -1,534 +1,637 @@
 <!DOCTYPE html>
 <html lang="sq">
+
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Shoferi - Thirr Taxi</title>
 
+  <!-- iOS FULLSCREEN -->
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#020617">
 
-  <link rel="manifest" href="/manifest-shofer.json">
-  <link rel="apple-touch-icon" href="/icon-shofer-192.png">
+  <!-- PWA -->
+  <link rel="manifest" href="/manifest-shofer.json" />
+  <link rel="apple-touch-icon" href="/icon-shofer-192.png" />
+
+  <!-- Leaflet -->
+  <link rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    crossorigin="">
 
   <script>
     if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("/sw-shofer.js")
-        .catch(console.error);
+      navigator.serviceWorker.register("/sw-shofer.js");
     }
   </script>
 
-  <link rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    crossorigin=""
-  />
+  <!-- ======================= -->
+  <!--        CSS UI          -->
+  <!-- ======================= -->
 
   <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: #020617 !important;
+      overscroll-behavior: none;
+    }
 
-/* GLOBAL */
-html, body {
-  margin: 0; padding: 0; height: 100%;
-  background:#020617 !important;
-  overscroll-behavior:none;
-}
+    body {
+      font-family: system-ui, -apple-system, "SF Pro Text", sans-serif;
+      padding: 18px 12px 50px;
+      color: #e5e7eb;
+    }
 
-body {
-  font-family: system-ui, -apple-system, "SF Pro Text", sans-serif;
-  padding: 18px 12px 60px;
-  color: #e5e7eb;
-}
+    * {
+      transition: 0.15s ease;
+      box-sizing: border-box;
+    }
 
-/* iOS Smooth */
-* { transition: 0.15s ease; }
+    /* Fade-In */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
 
-/* CARDS */
-.card {
-  background: rgba(15,23,42,0.80);
-  border-radius: 20px;
-  padding: 18px 16px 20px;
-  margin-bottom: 18px;
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255,255,255,0.07);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.25);
-  animation: fadeIn 0.35s ease;
-}
+    /* HEADER */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+    }
 
-@keyframes fadeIn {
-  from { opacity:0; transform:translateY(8px); }
-  to { opacity:1; transform:translateY(0); }
-}
+    .header-left {
+      font-size: 18px;
+      font-weight: 600;
+    }
 
-/* HEADER */
-.header {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:14px;
-}
+    .header-center {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
 
-.header-left {
-  font-size:18px;
-  font-weight:600;
-}
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 99px;
+      background: #22c55e;
+      box-shadow: 0 0 0 3px rgba(34,197,94,0.25);
+    }
 
-.dot {
-  width:7px;
-  height:7px;
-  border-radius:999px;
-  background:#22c55e;
-  box-shadow:0 0 0 3px rgba(34,197,94,0.25);
-}
+    /* ------------------------------------------------------------ */
+    /*                          LOGIN CARD                          */
+    /* ------------------------------------------------------------ */
 
-.header-center { display:flex; gap:6px; align-items:center; }
+    .card {
+      background: rgba(15,23,42,0.82);
+      padding: 18px 16px 20px;
+      border-radius: 20px;
+      margin-bottom: 18px;
+      border: 1px solid rgba(255,255,255,0.08);
+      backdrop-filter: blur(18px);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.28);
+      animation: fadeIn 0.35s ease;
+    }
 
-/* BUTTONS */
-button {
-  width:100%; border:none; border-radius:999px;
-  padding:11px 14px;
-  font-size:15px; font-weight:600;
-  cursor:pointer;
-  box-shadow:0 2px 5px rgba(0,0,0,0.25);
-}
+    .card-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
 
-button:hover {
-  transform:translateY(-1px);
-  box-shadow:0 4px 12px rgba(0,0,0,0.35);
-}
+    .card-subtitle {
+      font-size: 13px;
+      color: #9ca3af;
+      margin-bottom: 10px;
+    }
 
-.btn-primary { background:#22c55e; color:#022c22; }
-.btn-secondary { background:#0ea5e9; color:#022c22; }
-.btn-danger { background:#ef4444; color:white; }
+    label { font-size: 13px; }
 
-/* INPUT */
-input {
-  width:100%; padding:10px 12px; margin-top:4px;
-  background:rgba(255,255,255,0.10);
-  border:1px solid rgba(255,255,255,0.15);
-  border-radius:14px;
-  color:white;
-  font-size:15px;
-}
+    input {
+      width: 100%;
+      margin-top: 4px;
+      padding: 10px 12px;
+      background: rgba(255,255,255,0.10);
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 14px;
+      color: white;
+      font-size: 15px;
+    }
 
-/* ----------------------------------------------- */
-/*                PERFORMANCA IME                  */
-/* ----------------------------------------------- */
+    /* BUTTONS */
+    button {
+      width: 100%;
+      border: none;
+      border-radius: 99px;
+      padding: 12px 14px;
+      font-weight: 600;
+      font-size: 15px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.30);
+      cursor: pointer;
+    }
 
-.stats-card {
-  background:rgba(15,23,42,0.85);
-  border-radius:22px;
-  padding:22px 18px 26px;
-  text-align:center;
-  border:1px solid rgba(255,255,255,0.08);
-  box-shadow:0 6px 14px rgba(0,0,0,0.28);
-}
+    button:hover { transform: translateY(-1px); }
 
-.stats-title {
-  font-size:16px;
-  font-weight:600;
-  margin-bottom:6px;
-}
+    .btn-primary { background: #22c55e; color: #022c22; }
+    .btn-secondary { background: #0ea5e9; color: #022c22; }
+    .btn-danger { background: #ef4444; color: white; }
 
-.stats-sub {
-  font-size:12px;
-  color:#9ca3af;
-  margin-bottom:18px;
-}
+    .login-error {
+      margin-top: 8px;
+      font-size: 12px;
+      color: #f97373;
+    }
 
-.stats-big {
-  font-size:48px;
-  font-weight:700;
-  margin-bottom:6px;
-  color:white;
-}
+    /* ------------------------------------------------------------ */
+    /*                     PERFORMANCA IME (SOT)                    */
+    /* ------------------------------------------------------------ */
 
-.stats-label {
-  font-size:14px;
-  color:#cbd5e1;
-}
+    .stats-card {
+      background: rgba(15,23,42,0.9);
+      padding: 26px 18px 32px;
+      border-radius: 22px;
+      border: 1px solid rgba(255,255,255,0.06);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.22);
+      text-align: center;
+      animation: fadeIn 0.35s ease;
+      margin-bottom: 22px;
+    }
 
-/* ----------------------------------------------- */
-/*                   BILANCI                       */
-/* ----------------------------------------------- */
+    .stats-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
 
-.balance-summary-box {
-  background:rgba(56,189,248,0.15);
-  padding:16px;
-  border-radius:16px;
-  margin-bottom:12px;
-  border:1px solid rgba(56,189,248,0.25);
-  text-align:center;
-}
+    .stats-sub {
+      font-size: 12px;
+      color: #9ca3af;
+      margin-bottom: 18px;
+    }
 
-.balance-summary-box strong {
-  font-size:20px;
-}
+    .stats-big {
+      font-size: 52px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
 
-.balance-history-card {
-  padding:14px 16px;
-  background:rgba(255,255,255,0.06);
-  border-radius:16px;
-  margin-bottom:10px;
-  border:1px solid rgba(255,255,255,0.10);
-  box-shadow:0 2px 6px rgba(0,0,0,0.25);
-}
+    .stats-label {
+      font-size: 14px;
+      color: #cbd5e1;
+    }
 
-.balance-entry-title {
-  font-size:15px;
-  font-weight:600;
-}
+    /* ------------------------------------------------------------ */
+    /*                             TABS                              */
+    /* ------------------------------------------------------------ */
 
-.balance-entry-time {
-  font-size:12px;
-  color:#9ca3af;
-  margin:4px 0 8px;
-}
+    .tabs {
+      display: flex;
+      gap: 6px;
+      padding: 4px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+      backdrop-filter: blur(14px);
+      margin-bottom: 16px;
+    }
 
-.balance-entry-amount {
-  font-size:16px;
-  font-weight:700;
-  color:#22c55e;
-  text-align:right;
-}
+    .tab-btn {
+      flex: 1;
+      border: none;
+      background: transparent;
+      color: #9ca3af;
+      padding: 9px 0;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .tab-btn.active {
+      background: rgba(255,255,255,0.25);
+      color: white;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+    }
+
+    /* ------------------------------------------------------------ */
+    /*                         ORDER CARDS                          */
+    /* ------------------------------------------------------------ */
+
+    .order-card {
+      background: rgba(30,41,59,0.75);
+      padding: 14px 16px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.07);
+      margin-bottom: 12px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.28);
+      animation: fadeIn 0.35s ease;
+    }
+
+    .empty-text {
+      font-size: 12px;
+      text-align: center;
+      color: #6b7280;
+      margin-top: 10px;
+    }
+
+    /* ------------------------------------------------------------ */
+    /*                           BILANCI                             */
+    /* ------------------------------------------------------------ */
+
+    .balance-summary-box {
+      background: rgba(56,189,248,0.18);
+      padding: 18px;
+      border-radius: 18px;
+      text-align: center;
+      border: 1px solid rgba(56,189,248,0.3);
+      margin-bottom: 18px;
+    }
+
+    .balance-summary-box strong {
+      font-size: 22px;
+    }
+
+    .balance-history-card {
+      background: rgba(255,255,255,0.06);
+      border-radius: 18px;
+      padding: 14px 16px;
+      border: 1px solid rgba(255,255,255,0.10);
+      margin-bottom: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+    }
+
+    .balance-entry-title {
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .balance-entry-time {
+      font-size: 13px;
+      color: #9ca3af;
+      margin: 2px 0 6px;
+    }
+
+    .balance-entry-amount {
+      text-align: right;
+      font-size: 16px;
+      color: #22c55e;
+      font-weight: 700;
+    }
 
   </style>
 </head>
 
 <body>
 
-<div class="frame">
+  <div class="frame">
 
-  <div class="header">
-    <div class="header-left">Thirr Taxi</div>
+    <!-- ================= HEADER ================= -->
+    <div class="header">
+      <div class="header-left">Thirr Taxi</div>
 
-    <div class="header-center">
-      <div class="dot"></div>
-      <span id="headerDriverName">Shoferi</span>
-    </div>
-
-    <span id="headerStatus" class="header-status">Offline</span>
-  </div>
-
-  <!-- LOGIN -->
-  <div id="loginCard" class="card">
-    <div class="card-title">Hyr si shofer</div>
-    <div class="card-subtitle">Shkruaj vetëm PIN-in.</div>
-
-    <label>PIN</label>
-    <input id="loginPin" inputmode="numeric" placeholder="4829">
-
-    <button id="loginBtn" class="btn-primary">Hyr online</button>
-
-    <div id="loginMsg" class="login-error"></div>
-  </div>
-
-  <!-- CONTENT -->
-  <div id="content" style="display:none;">
-
-
-    <!-- PERFORMANCA IME (NUR HEUTE) -->
-    <div class="stats-card">
-      <div class="stats-title">Performanca ime</div>
-      <div class="stats-sub">Udhëtime të përfunduara sot</div>
-
-      <div id="statToday" class="stats-big">0</div>
-      <div class="stats-label">Sot</div>
-    </div>
-
-
-    <!-- TABS -->
-    <div class="tabs">
-      <button class="tab-btn active" data-tab="tab-requests"><span>Kërkesa</span></button>
-      <button class="tab-btn" data-tab="tab-active"><span>Aktive</span></button>
-      <button class="tab-btn" data-tab="tab-balance"><span>Bilanci</span></button>
-    </div>
-    <!-- TAB: KËRKESA -->
-    <div id="tab-requests" class="tab-panel" style="display:block;">
-      <div class="card">
-        <div class="section-title">Kërkesa të reja</div>
-        <div class="section-sub">Udhëtimet që mund t’i pranosh.</div>
-
-        <div id="orders"></div>
-        <div id="noOpen" class="empty-text"></div>
+      <div class="header-center">
+        <div class="dot"></div>
+        <span id="headerDriverName">Shoferi</span>
       </div>
+
+      <span id="headerStatus" style="font-size:13px;color:#9ca3af;">Offline</span>
+    </div>
+
+    <!-- ================= LOGIN ================= -->
+    <div id="loginCard" class="card">
+      <div class="card-title">Hyr si shofer</div>
+      <div class="card-subtitle">Shkruaj vetëm PIN-in.</div>
+
+      <label>PIN</label>
+      <input id="loginPin" inputmode="numeric" placeholder="4829">
+
+      <button id="loginBtn" class="btn-primary">Hyr online</button>
+
+      <div id="loginMsg" class="login-error"></div>
     </div>
 
 
-    <!-- TAB: AKTIVE -->
-    <div id="tab-active" class="tab-panel" style="display:none;">
-      <div class="card">
-        <div class="section-title">Udhëtimet e mia aktive</div>
-        <div class="section-sub">Vetëm një udhëtim aktiv në të njëjtën kohë.</div>
+    <!-- ================= CONTENT ================= -->
+    <div id="content" style="display:none;">
 
-        <div id="myOrders"></div>
-        <div id="noMine" class="empty-text"></div>
+
+      <!-- ===== PERFORMANCA IME (SOT) ===== -->
+      <div class="stats-card">
+        <div class="stats-title">Performanca ime</div>
+        <div class="stats-sub">Udhëtime të përfunduara sot</div>
+
+        <div id="statToday" class="stats-big">0</div>
+        <div class="stats-label">Sot</div>
       </div>
-    </div>
 
 
-
-    <!-- TAB: BILANCI -->
-    <div id="tab-balance" class="tab-panel" style="display:none;">
-      <div class="card">
-
-        <div class="section-title">Bilanci im</div>
-        <div class="section-sub">Gjendja aktuale dhe levizjet.</div>
-
-        <div id="balanceSummaryBox" class="balance-summary-box"></div>
-
-        <div id="balanceHistoryList"></div>
+      <!-- ===== TABS ===== -->
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="tab-requests">Kërkesa</button>
+        <button class="tab-btn" data-tab="tab-active">Aktive</button>
+        <button class="tab-btn" data-tab="tab-balance">Bilanci</button>
       </div>
-    </div>
 
 
-  </div><!-- /content -->
+      <!-- ===== KËRKESA ===== -->
+      <div id="tab-requests" class="tab-panel" style="display:block;">
+        <div class="card">
+          <div class="section-title" style="font-size:15px;font-weight:600;margin-bottom:4px;">Kërkesa të reja</div>
+          <div class="section-sub" style="font-size:12px;color:#9ca3af;margin-bottom:8px;">Udhëtimet që mund t’i pranosh.</div>
+
+          <div id="orders"></div>
+          <div id="noOpen" class="empty-text"></div>
+        </div>
+      </div>
 
 
-</div><!-- /frame -->
+      <!-- ===== AKTIVE ===== -->
+      <div id="tab-active" class="tab-panel" style="display:none;">
+        <div class="card">
+          <div class="section-title" style="font-size:15px;font-weight:600;margin-bottom:4px;">Udhëtimet e mia aktive</div>
+          <div class="section-sub" style="font-size:12px;color:#9ca3af;margin-bottom:8px;">
+            Vetëm një udhëtim aktiv.
+          </div>
+
+          <div id="myOrders"></div>
+          <div id="noMine" class="empty-text"></div>
+        </div>
+      </div>
 
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+      <!-- ===== BILANCI ===== -->
+      <div id="tab-balance" class="tab-panel" style="display:none;">
+        <div class="card">
 
-<script type="module">
+          <div class="section-title" style="font-size:15px;font-weight:600;margin-bottom:6px;">
+            Bilanci im
+          </div>
 
-/* ---------------------------------------------- */
-/*  FIREBASE INIT */
-/* ---------------------------------------------- */
+          <div id="balanceSummaryBox" class="balance-summary-box"></div>
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
-import { getDatabase, ref, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-database.js";
+          <div id="balanceHistoryList"></div>
 
-const firebaseConfig = {
-  apiKey: "AIzaSyCgCxp8M9XGOKFSIfaU9nM48rxtFQP-Kvs",
-  authDomain: "kosovataxi-f6ca3.firebaseapp.com",
-  projectId: "kosovataxi-f6ca3",
-  storageBucket: "kosovataxi-f6ca3.firebasestorage.app",
-  messagingSenderId: "1075646412122",
-  appId: "1:1075646412122:web:7aab19b92f51844fe32f63",
-  databaseURL: "https://kosovataxi-f6ca3-default-rtdb.europe-west1.firebasedatabase.app/"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-
-/* ---------------------------------------------- */
-
-let currentDriver = null;
-const LS_KEY = "thirrTaxiDriverId";
-
-const loginCard = document.getElementById("loginCard");
-const content = document.getElementById("content");
-const loginBtn = document.getElementById("loginBtn");
-const loginMsg = document.getElementById("loginMsg");
-
-const ordersBox = document.getElementById("orders");
-const myOrdersBox = document.getElementById("myOrders");
-const noOpen = document.getElementById("noOpen");
-const noMine = document.getElementById("noMine");
-
-const statToday = document.getElementById("statToday");
-const balanceSummaryBox = document.getElementById("balanceSummaryBox");
-const balanceHistoryList = document.getElementById("balanceHistoryList");
-
-/* ---------------------------------------------- */
-/* LOGIN */
-/* ---------------------------------------------- */
-
-function afterLoginSetup() {
-  loginCard.style.display = "none";
-  content.style.display = "block";
-  subscribeOrders();
-  subscribeBalance();
-}
-
-loginBtn.onclick = () => {
-  const pin = document.getElementById("loginPin").value.trim();
-  if (!pin) return loginMsg.textContent = "Shkruaj PIN.";
-
-  const driversRef = ref(db, "drivers");
-  onValue(driversRef, snap => {
-    const data = snap.val() || {};
-    let found = null;
-
-    Object.entries(data).forEach(([id, d]) => {
-      if (String(d.pin) === pin && d.approved === true) {
-        found = { id, ...d };
-      }
-    });
-
-    if (!found) {
-      loginMsg.textContent = "PIN i pavlefshëm.";
-      return;
-    }
-
-    currentDriver = found;
-    localStorage.setItem(LS_KEY, currentDriver.id);
-    afterLoginSetup();
-
-  }, { onlyOnce:true });
-};
+        </div>
+      </div>
 
 
-/* ---------------------------------------------- */
-/* AUTO LOGIN */
-/* ---------------------------------------------- */
+    </div><!-- END CONTENT -->
 
-const saved = localStorage.getItem(LS_KEY);
-if (saved) {
-  const refDrv = ref(db, "drivers/" + saved);
-  onValue(refDrv, snap => {
-    const d = snap.val();
-    if (d && d.approved) {
-      currentDriver = { id:saved, ...d };
-      afterLoginSetup();
-    } else {
-      localStorage.removeItem(LS_KEY);
-    }
-  }, {onlyOnce:true});
-}
+  </div><!-- END FRAME -->
 
 
-/* ---------------------------------------------- */
-/* ORDERS */
-/* ---------------------------------------------- */
+  <!-- ======================= -->
+  <!--         JS LOGIC        -->
+  <!-- ======================= -->
 
-function subscribeOrders() {
-  const ordersRef = ref(db, "orders");
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-  onValue(ordersRef, snap => {
-    const data = snap.val() || {};
-    ordersBox.innerHTML = "";
-    myOrdersBox.innerHTML = "";
+  <script type="module">
 
-    let todayCount = 0;
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+    import { getDatabase, ref, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-database.js";
 
-    Object.entries(data).forEach(([id, o]) => {
+    const firebaseConfig = {
+      apiKey: "AIzaSyCgCxp8M9XGOKFSIfaU9nM48rxtFQP-Kvs",
+      authDomain: "kosovataxi-f6ca3.firebaseapp.com",
+      projectId: "kosovataxi-f6ca3",
+      storageBucket: "kosovataxi-f6ca3.firebasestorage.app",
+      messagingSenderId: "1075646412122",
+      appId: "1:1075646412122:web:7aab19b92f51844fe32f63",
+      databaseURL: "https://kosovataxi-f6ca3-default-rtdb.europe-west1.firebasedatabase.app/"
+    };
 
-      /* COUNT TODAY */
-      if (o.takenByDriverId === currentDriver?.id && o.status === "done") {
-        const d = new Date(o.completedAt || o.takenAt || 0);
-        const now = new Date();
-        if (d.toDateString() === now.toDateString()) {
-          todayCount++;
-        }
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+
+    /* ELEMENTS */
+    const loginCard = document.getElementById("loginCard");
+    const content = document.getElementById("content");
+    const loginBtn = document.getElementById("loginBtn");
+    const loginMsg = document.getElementById("loginMsg");
+
+    const statToday = document.getElementById("statToday");
+
+    const ordersBox = document.getElementById("orders");
+    const myOrdersBox = document.getElementById("myOrders");
+
+    const noOpen = document.getElementById("noOpen");
+    const noMine = document.getElementById("noMine");
+
+    const balanceSummaryBox = document.getElementById("balanceSummaryBox");
+    const balanceHistoryList = document.getElementById("balanceHistoryList");
+
+    let currentDriver = null;
+    const LS_KEY = "thirrTaxiDriverId";
+
+
+    /* ================= LOGIN ==================== */
+    loginBtn.onclick = () => {
+      const pin = document.getElementById("loginPin").value.trim();
+
+      if (!pin) {
+        loginMsg.textContent = "Shkruaj PIN-in.";
+        return;
       }
 
-      /* OPEN ORDERS */
-      if (o.status === "open") {
-        const el = document.createElement("div");
-        el.className = "card";
-        el.innerHTML = `
-          <div style="font-size:16px;font-weight:600">${o.name || "Klienti"}</div>
-          <div style="font-size:13px;color:#9ca3af">${o.phone || ""}</div>
-          <div style="margin-top:8px;font-size:12px">Adresa: ${o.addressStreet || o.address || "-"}</div>
+      const drvRef = ref(db, "drivers");
 
-          <button class="btn-secondary" style="margin-top:14px">Prano</button>
-        `;
+      onValue(drvRef, snap => {
+        const data = snap.val() || {};
+        let found = null;
 
-        el.querySelector("button").onclick = () => {
-          const orderRef = ref(db, "orders/" + id);
-          runTransaction(orderRef, cur => {
-            if (cur && cur.status === "open") {
-              cur.status = "taken";
-              cur.takenByDriverId = currentDriver.id;
-              cur.takenAt = Date.now();
-            }
-            return cur;
-          });
-        };
-
-        ordersBox.appendChild(el);
-      }
-
-      /* ACTIVE MY ORDER */
-      if (o.takenByDriverId === currentDriver?.id && o.status === "taken") {
-        const el = document.createElement("div");
-        el.className = "card";
-        el.innerHTML = `
-          <div style="font-size:16px;font-weight:600">${o.name}</div>
-          <div style="font-size:13px;color:#9ca3af">${o.phone}</div>
-          <div style="margin-top:8px;font-size:12px">Adresa: ${o.addressStreet || o.address || "-"}</div>
-
-          <button class="btn-secondary" style="margin-top:14px">Përfundo</button>
-        `;
-
-        el.querySelector("button").onclick = () => {
-          const orderRef = ref(db, "orders/" + id);
-          runTransaction(orderRef, cur => {
-            if (cur && cur.status === "taken") {
-              cur.status = "done";
-              cur.completedAt = Date.now();
-            }
-            return cur;
-          });
-        };
-
-        myOrdersBox.appendChild(el);
-      }
-
-    });
-
-    statToday.textContent = todayCount;
-  });
-}
-
-
-/* ---------------------------------------------- */
-/* BALANCE */
-/* ---------------------------------------------- */
-
-function subscribeBalance() {
-  const balRef = ref(db, "balances/" + currentDriver.id);
-
-  onValue(balRef, snap => {
-    const data = snap.val();
-
-    if (!data) {
-      balanceSummaryBox.innerHTML = "<strong>0.00 €</strong><br>Asnjë bilanc";
-      balanceHistoryList.innerHTML = "";
-      return;
-    }
-
-    /* SUMMARY */
-    balanceSummaryBox.innerHTML = `
-      <strong>${(data.total || 0).toFixed(2)} €</strong>
-      <div style="font-size:12px;color:#cbd5e1;margin-top:6px;">Bilanci aktual</div>
-    `;
-
-    /* HISTORY */
-    balanceHistoryList.innerHTML = "";
-
-    const history = data.history || {};
-
-    Object.entries(history)
-      .sort((a,b) => b[1].timestamp - a[1].timestamp)
-      .forEach(([id, h]) => {
-
-        const dt = new Date(h.timestamp).toLocaleTimeString("de-DE", {
-          hour:"2-digit",
-          minute:"2-digit"
+        Object.entries(data).forEach(([id, d]) => {
+          if (String(d.pin) === pin && d.approved) {
+            found = { id, ...d };
+          }
         });
 
-        const address = h.address || "Adresë pa emër";
+        if (!found) {
+          loginMsg.textContent = "PIN i pavlefshëm.";
+          return;
+        }
 
-        const el = document.createElement("div");
-        el.className = "balance-history-card";
+        currentDriver = found;
+        localStorage.setItem(LS_KEY, found.id);
 
-        el.innerHTML = `
-          <div class="balance-entry-title">📍 ${address}</div>
-          <div class="balance-entry-time">⏱ ${dt}</div>
-          <div class="balance-entry-amount">+0.25 €</div>
+        loginCard.style.display = "none";
+        content.style.display = "block";
+
+        subscribeOrders();
+        subscribeBalance();
+
+      }, { onlyOnce: true });
+    };
+
+
+    /* ========== AUTO LOGIN ========== */
+    const saved = localStorage.getItem(LS_KEY);
+    if (saved) {
+      const drv = ref(db, "drivers/" + saved);
+
+      onValue(drv, snap => {
+        const d = snap.val();
+        if (d && d.approved) {
+          currentDriver = { id: saved, ...d };
+
+          loginCard.style.display = "none";
+          content.style.display = "block";
+
+          subscribeOrders();
+          subscribeBalance();
+        }
+      }, { onlyOnce: true });
+    }
+
+
+    /* ================== SUBSCRIBE ORDERS ================== */
+
+    function subscribeOrders() {
+      const ordersRef = ref(db, "orders");
+
+      onValue(ordersRef, snap => {
+        const data = snap.val() || {};
+
+        ordersBox.innerHTML = "";
+        myOrdersBox.innerHTML = "";
+
+        let todayCount = 0;
+
+        const now = new Date();
+        const todayStr = now.toDateString();
+
+        Object.entries(data).forEach(([id, o]) => {
+
+          /* ===== Count Today ===== */
+          if (o.takenByDriverId === currentDriver?.id && o.status === "done") {
+            const d = new Date(o.completedAt);
+            if (d.toDateString() === todayStr) todayCount++;
+          }
+
+          /* ===== OPEN REQUESTS ===== */
+          if (o.status === "open") {
+            const card = document.createElement("div");
+            card.className = "order-card";
+
+            card.innerHTML = `
+              <div style="font-size:16px;font-weight:600;">${o.name || "Klienti"}</div>
+              <div style="font-size:13px;color:#9ca3af;">${o.phone || ""}</div>
+              <div style="margin-top:6px;font-size:12px;">📍 ${o.addressStreet || o.address || "-"}</div>
+
+              <button class="btn-secondary" style="margin-top:14px;">Prano</button>
+            `;
+
+            card.querySelector("button").onclick = () => {
+              const orderRef = ref(db, "orders/" + id);
+              runTransaction(orderRef, cur => {
+                if (cur && cur.status === "open") {
+                  cur.status = "taken";
+                  cur.takenByDriverId = currentDriver.id;
+                  cur.takenAt = Date.now();
+                }
+                return cur;
+              });
+            };
+
+            ordersBox.appendChild(card);
+          }
+
+          /* ===== ACTIVE RIDE ===== */
+          if (o.status === "taken" && o.takenByDriverId === currentDriver?.id) {
+            const card = document.createElement("div");
+            card.className = "order-card";
+
+            card.innerHTML = `
+              <div style="font-size:16px;font-weight:600;">${o.name}</div>
+              <div style="font-size:13px;color:#9ca3af;">${o.phone}</div>
+              <div style="margin-top:6px;font-size:12px;">📍 ${o.addressStreet || o.address || "-"}</div>
+
+              <button class="btn-secondary" style="margin-top:14px;">Përfundo</button>
+            `;
+
+            card.querySelector("button").onclick = () => {
+              const orderRef = ref(db, "orders/" + id);
+              runTransaction(orderRef, cur => {
+                if (cur && cur.status === "taken") {
+                  cur.status = "done";
+                  cur.completedAt = Date.now();
+                }
+                return cur;
+              });
+            };
+
+            myOrdersBox.appendChild(card);
+          }
+        });
+
+        /* UPDATE TODAY STATS */
+        statToday.textContent = todayCount;
+
+        noOpen.textContent = ordersBox.children.length === 0
+          ? "Nuk ka kërkesa."
+          : "";
+
+        noMine.textContent = myOrdersBox.children.length === 0
+          ? "Asnjë udhëtim aktiv."
+          : "";
+      });
+    }
+
+
+    /* ====================== BALANCE ======================= */
+
+    function subscribeBalance() {
+      const balRef = ref(db, "balances/" + currentDriver.id);
+
+      onValue(balRef, snap => {
+        const data = snap.val();
+
+        if (!data) {
+          balanceSummaryBox.innerHTML = `<strong>0.00 €</strong><br><div style="font-size:12px;">Asnjë bilanc</div>`;
+          balanceHistoryList.innerHTML = "";
+          return;
+        }
+
+        /* SUMMARY */
+        balanceSummaryBox.innerHTML = `
+          <strong>${(data.total || 0).toFixed(2)} €</strong>
+          <div style="font-size:12px;margin-top:6px;color:#d1d5db;">Bilanci aktual</div>
         `;
 
-        balanceHistoryList.appendChild(el);
+        /* HISTORY */
+        balanceHistoryList.innerHTML = "";
+
+        const history = data.history || {};
+
+        Object.entries(history)
+          .sort((a,b) => b[1].timestamp - a[1].timestamp)
+          .forEach(([id, h]) => {
+
+            const dt = new Date(h.timestamp)
+              .toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" });
+
+            const address = h.address || "Adresë";
+
+            const card = document.createElement("div");
+            card.className = "balance-history-card";
+
+            card.innerHTML = `
+              <div class="balance-entry-title">📍 ${address}</div>
+              <div class="balance-entry-time">⏱ ${dt}</div>
+              <div class="balance-entry-amount">+0.25 €</div>
+            `;
+
+            balanceHistoryList.appendChild(card);
+          });
+
       });
-  });
-}
+    }
 
-/* ---------------------------------------------- */
-
-</script>
+  </script>
 
 </body>
 </html>
-

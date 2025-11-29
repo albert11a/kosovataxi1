@@ -219,70 +219,59 @@
       margin-top:4px;
     }
 
-    /* ------------------ TABS MIT ICON + LABEL ------------------ */
+    /* ---------- NEUE FLAT-TABS (jede Tab eigene Fläche) ---------- */
     .tabs {
-      position: relative;
       display: flex;
-      justify-content: space-around;
-      background: rgba(15,23,42,0.8);
-      padding: 8px 0;
-      border-radius: 20px;
+      gap: 8px;
+      width: 100%;
       margin-bottom: 12px;
-      border: 1px solid rgba(148,163,184,0.15);
     }
 
     .tab {
-      position: relative;
+      flex: 1;
+      background: rgba(255,255,255,0.05);
+      border-radius: 14px;
+      padding: 10px 0;
       display: flex;
       flex-direction: column;
+      justify-content: center;
       align-items: center;
-      gap: 4px;
-      width: 33%;
-      padding: 6px 0;
+      gap: 6px;
       cursor: pointer;
+      transition:
+        background .25s ease,
+        transform .20s ease;
+      user-select: none;
       color: #9ca3af;
-      z-index: 2;
-      transition: color .25s ease;
     }
 
     .tab-icon {
-      width: 20px;
-      height: 20px;
-      opacity: .75;
-      transition: opacity .25s ease, transform .25s ease;
+      width: 22px;
+      height: 22px;
+      opacity: .7;
+      transition: opacity .20s ease, transform .20s ease;
     }
 
     .tab-label {
-      font-size: 12px;
-      opacity: 0;
-      transform: translateY(6px);
-      transition: .25s ease;
+      font-size: 13px;
+      opacity: .75;
+      transition: opacity .20s ease;
     }
 
     .tab.active {
+      background: rgba(56,189,248,0.25); /* light blue */
+      transform: translateY(-1px);
       color: #e5e7eb;
     }
 
     .tab.active .tab-icon {
       opacity: 1;
-      transform: translateY(-2px);
+      transform: scale(1.05);
     }
 
     .tab.active .tab-label {
       opacity: 1;
-      transform: translateY(0);
-    }
-
-    .tab-indicator {
-      position: absolute;
-      bottom: 4px;
-      height: 3px;
-      width: 26px;
-      background: #38bdf8;
-      border-radius: 999px;
-      transition: transform .25s ease;
-      z-index: 1;
-      transform: translateX(0px);
+      font-weight: 600;
     }
     /* ------------------------------------------------ */
 
@@ -362,7 +351,7 @@
     <span id="headerStatus">Offline</span>
   </div>
 
-  <!-- TABS MIT ICONS -->
+  <!-- NEUE FLAT-TABS MIT ICONS -->
   <div class="tabs">
     <!-- Te reja – Glocke -->
     <div class="tab active" data-target="tab-new">
@@ -387,8 +376,6 @@
       </svg>
       <span class="tab-label">Bilanci</span>
     </div>
-
-    <div class="tab-indicator"></div>
   </div>
 
   <!-- LOGIN -->
@@ -469,31 +456,15 @@
   const headerStatus = document.getElementById("headerStatus");
   const balanceBox = document.getElementById("balanceBox");
 
-  /* ---------------- TAB LOGIK ------------------- */
+  /* ---------------- TAB LOGIK (FLAT-TABS) ------------------- */
 
   const tabs = document.querySelectorAll(".tab");
-  const indicator = document.querySelector(".tab-indicator");
-
-  function moveIndicator(el) {
-    if (!el || !indicator) return;
-    const rect = el.getBoundingClientRect();
-    const parentRect = el.parentNode.getBoundingClientRect();
-    const x = rect.left - parentRect.left + rect.width / 2 - 13; // 26px / 2
-    indicator.style.transform = `translateX(${x}px)`;
-  }
-
-  // direkt nach DOM-Load (Script ist am Ende des body)
-  const initialActive = document.querySelector(".tab.active");
-  if (initialActive) {
-    moveIndicator(initialActive);
-  }
 
   tabs.forEach(t => {
     t.addEventListener("click", () => {
       const currentActive = document.querySelector(".tab.active");
       if (currentActive) currentActive.classList.remove("active");
       t.classList.add("active");
-      moveIndicator(t);
 
       const target = t.dataset.target;
 

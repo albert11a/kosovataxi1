@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="sq">
+<html lang="sq" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <title>Shoferi - Thirr Taxi</title>
@@ -27,15 +27,56 @@
 
   <style>
     /********************************************
+     * THEME VARIABLES (Light / Dark)
+     ********************************************/
+    :root {
+      --bg: #020617;
+      --bg-elevated: rgba(15,23,42,0.90);
+      --bg-soft: rgba(15,23,42,0.85);
+      --border-subtle: rgba(148,163,184,0.28);
+      --border-strong: rgba(51,65,85,0.9);
+      --text-primary: #e5e7eb;
+      --text-secondary: #9ca3af;
+      --text-muted: #6b7280;
+      --accent: #0ea5e9;
+      --accent-soft: rgba(56,189,248,0.14);
+      --accent-green: #22c55e;
+      --shadow-soft: 0 4px 14px rgba(0,0,0,0.35);
+      --shadow-chip: 0 2px 6px rgba(15,23,42,0.5);
+      --chip-bg: rgba(15,23,42,0.96);
+      --tab-bg: rgba(15,23,42,0.98);
+      --tab-pill-bg: rgba(15,23,42,1);
+    }
+
+    [data-theme="light"] {
+      --bg: #f3f4f6;
+      --bg-elevated: rgba(255,255,255,0.96);
+      --bg-soft: rgba(255,255,255,0.94);
+      --border-subtle: rgba(148,163,184,0.35);
+      --border-strong: rgba(148,163,184,0.7);
+      --text-primary: #020617;
+      --text-secondary: #4b5563;
+      --text-muted: #9ca3af;
+      --accent: #0ea5e9;
+      --accent-soft: rgba(14,165,233,0.08);
+      --accent-green: #16a34a;
+      --shadow-soft: 0 8px 22px rgba(15,23,42,0.20);
+      --shadow-chip: 0 4px 10px rgba(148,163,184,0.35);
+      --chip-bg: rgba(249,250,251,0.96);
+      --tab-bg: rgba(229,231,235,0.98);
+      --tab-pill-bg: rgba(255,255,255,1);
+    }
+
+    /********************************************
      * GLOBAL LAYOUT
      ********************************************/
     html, body {
       margin: 0;
       padding: 0;
       height: 100%;
-      background: #020617;
       font-family: -apple-system, system-ui, sans-serif;
-      color: #e5e7eb;
+      color: var(--text-primary);
+      background: var(--bg);
     }
 
     body::before {
@@ -43,10 +84,18 @@
       position: fixed;
       inset: 0;
       background:
-        radial-gradient(circle at 10% 0%, #0f172a 0, transparent 45%),
-        radial-gradient(circle at 90% 0%, #1e293b 0, transparent 50%),
-        radial-gradient(circle at 50% 100%, #020617 0, #020617 60%);
+        radial-gradient(circle at 10% 0%, rgba(148,163,184,0.25) 0, transparent 45%),
+        radial-gradient(circle at 90% 0%, rgba(96,165,250,0.25) 0, transparent 50%),
+        radial-gradient(circle at 50% 100%, rgba(15,23,42,0.9) 0, var(--bg) 55%);
       z-index: -1;
+      pointer-events: none;
+    }
+
+    [data-theme="light"] body::before {
+      background:
+        radial-gradient(circle at 10% 0%, rgba(191,219,254,0.5) 0, transparent 45%),
+        radial-gradient(circle at 90% 0%, rgba(216,180,254,0.4) 0, transparent 50%),
+        radial-gradient(circle at 50% 100%, rgba(209,213,219,0.9) 0, var(--bg) 55%);
     }
 
     body {
@@ -57,7 +106,7 @@
     .frame {
       max-width: 520px;
       margin: 0 auto;
-      padding: 0 15px 0 15px; /* <- 15px links/rechts */
+      padding: 0 15px 0 15px; /* 15px links/rechts */
     }
 
     /********************************************
@@ -80,6 +129,7 @@
       display: flex;
       align-items: center;
       gap: 6px;
+      font-size: 14px;
     }
 
     .dot {
@@ -92,19 +142,49 @@
 
     .header-status {
       font-size: 12px;
-      color: #9ca3af;
+      color: var(--text-secondary);
+    }
+
+    .theme-toggle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: var(--tab-bg);
+      border: 1px solid var(--border-subtle);
+      cursor: pointer;
+      font-size: 11px;
+      box-shadow: var(--shadow-chip);
+      min-width: 60px;
+    }
+
+    .theme-toggle span {
+      opacity: .7;
+    }
+
+    .theme-toggle .thumb {
+      width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
     }
 
     /********************************************
-     * TABS (Segmented / iOS Style)
+     * TABS (Hauptnavigation)
      ********************************************/
     .tabs {
       display: flex;
       gap: 6px;
       padding: 4px;
       border-radius: 999px;
-      background: rgba(15,23,42,0.98);
-      border: 1px solid rgba(148,163,184,0.35);
+      background: var(--tab-bg);
+      border: 1px solid var(--border-subtle);
       backdrop-filter: blur(18px);
       margin-bottom: 14px;
     }
@@ -117,28 +197,28 @@
       font-size: 13px;
       font-weight: 500;
       background: transparent;
-      color: #9ca3af;
+      color: var(--text-secondary);
       cursor: pointer;
       transition: all .18s ease;
     }
 
     .tab-btn.active {
-      background: rgba(15,23,42,1);
-      color: #e5e7eb;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.30);
+      background: var(--tab-pill-bg);
+      color: var(--text-primary);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.20);
     }
 
     /********************************************
      * CARD BASE
      ********************************************/
     .card {
-      background: rgba(15,23,42,0.80);
+      background: var(--bg-elevated);
       border-radius: 24px;
       padding: 16px 18px 18px;
       margin-bottom: 18px;
-      border: 1px solid rgba(148,163,184,0.28);
+      border: 1px solid var(--border-subtle);
       backdrop-filter: blur(22px);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.32); /* dezent */
+      box-shadow: var(--shadow-soft);
     }
 
     .section-title {
@@ -149,7 +229,7 @@
 
     .section-sub {
       font-size: 12px;
-      color: #9ca3af;
+      color: var(--text-secondary);
       margin-bottom: 10px;
     }
 
@@ -167,15 +247,15 @@
       padding: 10px 12px;
       margin-top: 4px;
       border-radius: 16px;
-      background: rgba(15,23,42,0.94);
-      border: 1px solid rgba(148,163,184,0.35);
-      color: #e5e7eb;
+      background: var(--bg-soft);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-primary);
       font-size: 15px;
       outline: none;
     }
 
     input:focus {
-      border-color: #38bdf8;
+      border-color: var(--accent);
       box-shadow: 0 0 0 1px rgba(56,189,248,0.45);
     }
 
@@ -188,7 +268,7 @@
       font-size: 15px;
       font-weight: 600;
       cursor: pointer;
-      box-shadow: 0 2px 7px rgba(0,0,0,0.30);
+      box-shadow: 0 2px 7px rgba(0,0,0,0.25);
     }
 
     .btn-primary {
@@ -216,22 +296,30 @@
 
     .empty-text {
       font-size: 12px;
-      color: #6b7280;
+      color: var(--text-muted);
       text-align: center;
       margin-top: 6px;
     }
 
     /********************************************
-     * KËRKESAT / VOZITJET CARDS
+     * KËRKESAT CARDS
      ********************************************/
     .order-card {
-      background: radial-gradient(circle at top left, rgba(59,130,246,0.18), rgba(15,23,42,0.98));
+      background: radial-gradient(circle at top left,
+        rgba(56,189,248,0.18),
+        rgba(15,23,42,0.96));
       border-radius: 20px;
-      border: 1px solid rgba(148,163,184,0.35);
+      border: 1px solid var(--border-subtle);
       padding: 12px 12px 14px;
       margin-top: 10px;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.32);
+      box-shadow: 0 3px 10px rgba(0,0,0,0.25);
       backdrop-filter: blur(18px);
+    }
+
+    [data-theme="light"] .order-card {
+      background: radial-gradient(circle at top left,
+        rgba(56,189,248,0.12),
+        rgba(255,255,255,0.98));
     }
 
     .order-header {
@@ -254,12 +342,17 @@
 
     .order-phone {
       font-size: 13px;
+      color: var(--text-primary);
       opacity: .9;
     }
 
     .order-address {
       font-size: 12px;
       color: #cbd5f5;
+    }
+
+    [data-theme="light"] .order-address {
+      color: #1f2937;
     }
 
     .badge {
@@ -281,22 +374,107 @@
 
     .mini-map {
       width: 100%;
-      height: 130px;
+      height: 140px;
       border-radius: 14px;
       overflow: hidden;
       margin-top: 8px;
-      border: 1px solid rgba(15,23,42,0.9);
+      border: 1px solid var(--border-strong);
       background: #020617;
     }
 
     .info-line {
       font-size: 12px;
-      color: #9ca3af;
+      color: var(--text-secondary);
       margin-top: 6px;
     }
 
     /********************************************
-     * BILANCI: PERFORMANCE + STATS + HISTORY
+     * VOZITJET – INNERE TABS + GROSSE KARTE
+     ********************************************/
+    .subtabs {
+      display: flex;
+      gap: 6px;
+      padding: 4px;
+      border-radius: 999px;
+      background: var(--bg-soft);
+      border: 1px solid var(--border-subtle);
+      margin-bottom: 12px;
+    }
+
+    .subtab-btn {
+      flex: 1;
+      border-radius: 999px;
+      border: none;
+      padding: 7px 0;
+      font-size: 12px;
+      font-weight: 500;
+      background: transparent;
+      color: var(--text-secondary);
+      cursor: pointer;
+    }
+
+    .subtab-btn.active {
+      background: var(--tab-pill-bg);
+      color: var(--text-primary);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+    }
+
+    .big-map-card {
+      background: var(--bg-soft);
+      border-radius: 22px;
+      padding: 12px 12px 14px;
+      border: 1px solid var(--border-subtle);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .big-map-header {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      margin-bottom: 10px;
+    }
+
+    .big-map-name {
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .big-map-phone {
+      font-size: 13px;
+      color: var(--text-primary);
+      opacity: .9;
+    }
+
+    .big-map-address {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .big-map-container {
+      width: 100%;
+      height: 42vh; /* passt sich an Bildschirm an */
+      min-height: 220px;
+      border-radius: 18px;
+      overflow: hidden;
+      border: 1px solid var(--border-strong);
+      background: #020617;
+      margin-bottom: 10px;
+    }
+
+    .big-map-footer-text {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+
+    .big-map-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    /********************************************
+     * BILANCI – PERFORMANCA + HISTORY
      ********************************************/
     .perf-wrapper {
       margin-top: 4px;
@@ -313,14 +491,15 @@
       flex: 1;
       padding: 8px 8px;
       border-radius: 14px;
-      border: 1px solid rgba(148,163,184,0.4);
-      background: rgba(15,23,42,0.96);
+      border: 1px solid var(--border-subtle);
+      background: var(--chip-bg);
       text-align: center;
       font-size: 11px;
+      box-shadow: var(--shadow-chip);
     }
 
     .perf-chip .label {
-      color: #9ca3af;
+      color: var(--text-secondary);
       margin-bottom: 2px;
     }
 
@@ -332,7 +511,7 @@
     .balance-summary {
       font-size: 14px;
       text-align: center;
-      margin-top: 6px;
+      margin-top: 10px;
     }
 
     .balance-summary strong {
@@ -342,7 +521,7 @@
 
     .balance-meta {
       font-size: 11px;
-      color: #9ca3af;
+      color: var(--text-secondary);
       text-align: center;
       margin-top: 4px;
     }
@@ -355,8 +534,8 @@
       padding: 9px 10px;
       border-radius: 14px;
       margin-top: 8px;
-      background: rgba(15,23,42,0.98);
-      border: 1px solid rgba(51,65,85,0.9);
+      background: var(--bg-soft);
+      border: 1px solid var(--border-strong);
     }
 
     .balance-entry-main {
@@ -372,7 +551,7 @@
 
     .balance-entry-time {
       font-size: 11px;
-      color: #9ca3af;
+      color: var(--text-secondary);
     }
 
     .balance-entry-amount {
@@ -385,7 +564,7 @@
 
     .balance-empty {
       font-size: 12px;
-      color: #6b7280;
+      color: var(--text-muted);
       margin-top: 8px;
       text-align: center;
     }
@@ -398,11 +577,17 @@
   <!-- HEADER -->
   <div class="header">
     <div class="header-left">Thirr Taxi</div>
+
     <div class="header-center">
       <div class="dot"></div>
       <span id="headerDriverName">Shoferi</span>
     </div>
-    <span id="headerStatus" class="header-status">Offline</span>
+
+    <div class="theme-toggle" id="themeToggle">
+      <span>☀︎</span>
+      <div class="thumb">◐</div>
+      <span>☾</span>
+    </div>
   </div>
 
   <!-- LOGIN -->
@@ -421,6 +606,16 @@
 
   <!-- CONTENT NACH LOGIN -->
   <div id="content" style="display:none;">
+
+    <!-- STATUS -->
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+      <div style="font-size:12px;color:var(--text-secondary);">
+        Gjendja: <span id="headerStatus">Offline</span>
+      </div>
+      <div style="font-size:11px;color:var(--text-secondary);">
+        Sistemi i shoferëve Thirr Taxi
+      </div>
+    </div>
 
     <!-- TABS -->
     <div class="tabs">
@@ -443,11 +638,42 @@
     <!-- TAB: VOZITJET -->
     <div id="tab-active" class="tab-panel" style="display:none;">
       <div class="card">
-        <div class="section-title">Vozitjet e mia aktive</div>
-        <div class="section-sub">Mund të kesh vetëm një udhëtim aktiv në të njëjtën kohë.</div>
+        <div class="section-title">Vozitjet e mia</div>
+        <div class="section-sub">Udhëtimi aktual dhe historiku i fundit.</div>
 
-        <div id="myOrders"></div>
-        <div id="noMine" class="empty-text"></div>
+        <!-- Subtabs -->
+        <div class="subtabs">
+          <button class="subtab-btn active" data-subtab="sub-active">Aktuale</button>
+          <button class="subtab-btn" data-subtab="sub-history">Historiku</button>
+        </div>
+
+        <!-- Aktuale: 1 große Karte + Buttons -->
+        <div id="sub-active" class="subtab-panel" style="display:block;">
+          <div id="activeRideContainer" class="big-map-card" style="display:none;">
+            <div class="big-map-header">
+              <div class="big-map-name" id="activeName">Klienti</div>
+              <div class="big-map-phone" id="activePhone"></div>
+              <div class="big-map-address" id="activeAddress"></div>
+            </div>
+
+            <div id="activeMap" class="big-map-container"></div>
+
+            <div class="big-map-footer-text" id="activeInfo"></div>
+
+            <div class="big-map-actions">
+              <button id="finishActiveBtn" class="btn-secondary">✅ Përfundo udhëtimin</button>
+              <button id="cancelActiveBtn" class="btn-danger">✖ Anulo udhëtimin</button>
+            </div>
+          </div>
+
+          <div id="noActiveRide" class="empty-text">Për momentin nuk ke vozitje aktive.</div>
+        </div>
+
+        <!-- Historiku: Liste der letzten eigenen Fahrten (fertige) -->
+        <div id="sub-history" class="subtab-panel" style="display:none;">
+          <div id="myOrdersHistory"></div>
+          <div id="noHistory" class="empty-text"></div>
+        </div>
       </div>
     </div>
 
@@ -479,6 +705,7 @@
         <div id="balanceSummary" class="balance-summary"></div>
         <div id="balanceMeta" class="balance-meta"></div>
 
+        <!-- History -->
         <div id="balanceHistoryList"></div>
         <div id="balanceHistoryEmpty" class="balance-empty"></div>
       </div>
@@ -520,7 +747,10 @@
   const maps = {};
   let geoWatchId = null;
 
-  // DOM references
+  // DOM
+  const rootEl = document.documentElement;
+  const themeToggle = document.getElementById("themeToggle");
+
   const loginCard = document.getElementById("loginCard");
   const content = document.getElementById("content");
   const loginBtn = document.getElementById("loginBtn");
@@ -532,9 +762,10 @@
   const tabPanels = document.querySelectorAll(".tab-panel");
 
   const ordersBox = document.getElementById("orders");
-  const myOrdersBox = document.getElementById("myOrders");
+  const myOrdersHistoryBox = document.getElementById("myOrdersHistory");
   const noOpen = document.getElementById("noOpen");
-  const noMine = document.getElementById("noMine");
+  const noMine = document.getElementById("noActiveRide");
+  const noHistory = document.getElementById("noHistory");
 
   const balanceSummary = document.getElementById("balanceSummary");
   const balanceMeta = document.getElementById("balanceMeta");
@@ -545,8 +776,39 @@
   const perfWeek = document.getElementById("perfWeek");
   const perfMonth = document.getElementById("perfMonth");
 
-  /************ HELPERS ************/
+  const activeRideContainer = document.getElementById("activeRideContainer");
+  const activeName = document.getElementById("activeName");
+  const activePhone = document.getElementById("activePhone");
+  const activeAddress = document.getElementById("activeAddress");
+  const activeInfo = document.getElementById("activeInfo");
+  const finishActiveBtn = document.getElementById("finishActiveBtn");
+  const cancelActiveBtn = document.getElementById("cancelActiveBtn");
 
+  let activeOrderId = null;
+
+  /************ THEME: auto + toggle ************/
+  function applyTheme(theme) {
+    rootEl.setAttribute("data-theme", theme);
+  }
+
+  (function initTheme() {
+    const stored = localStorage.getItem("tt_theme");
+    if (stored === "light" || stored === "dark") {
+      applyTheme(stored);
+      return;
+    }
+    const hour = new Date().getHours();
+    const autoTheme = (hour >= 7 && hour < 20) ? "light" : "dark";
+    applyTheme(autoTheme);
+  })();
+
+  themeToggle.addEventListener("click", () => {
+    const current = rootEl.getAttribute("data-theme") === "dark" ? "light" : "dark";
+    applyTheme(current);
+    localStorage.setItem("tt_theme", current);
+  });
+
+  /************ HELPERS ************/
   function cleanAddress(a) {
     if (!a) return "";
     const lower = a.toLowerCase();
@@ -554,12 +816,12 @@
     return a.trim();
   }
 
-  // Holt Adresse aus verschiedenen möglichen Feldern
+  // Holt Adresse aus typischen Feldern – wichtigste zuerst:
   function extractAddress(o) {
     const candidates = [
-      o.addressStreet,
-      o.address,
-      o.addressFull,
+      o.addressStreet,    // DEIN ursprüngliches Feld
+      o.address,          // oft genutzt
+      o.addressFull,      // gespeicherte Volladresse
       o.locationAddress,
       o.street,
       o.streetName,
@@ -574,7 +836,7 @@
     return "";
   }
 
-  function shortenAddress(address, maxLen = 30) {
+  function shortenAddress(address, maxLen = 32) {
     if (!address) return "";
     const t = address.trim();
     if (t.length <= maxLen) return t;
@@ -682,7 +944,6 @@
   }
 
   /************ TABS ************/
-
   tabButtons.forEach(btn => {
     btn.addEventListener("click", () => {
       const target = btn.dataset.tab;
@@ -693,8 +954,20 @@
     });
   });
 
-  /************ LOGIN / AUTO-LOGIN ************/
+  // Subtabs in Vozitjet
+  const subtabButtons = document.querySelectorAll(".subtab-btn");
+  const subtabPanels = document.querySelectorAll(".subtab-panel");
+  subtabButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const target = btn.dataset.subtab;
+      subtabButtons.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      subtabPanels.forEach(p => p.style.display = (p.id === target ? "block" : "none"));
+      invalidateAllMaps();
+    });
+  });
 
+  /************ LOGIN / AUTO-LOGIN ************/
   function afterLoginSetup() {
     if (!currentDriver) return;
     if (window.__driverInitialized) return;
@@ -755,7 +1028,6 @@
   }
 
   /************ ORDERS ************/
-
   function subscribeOrders() {
     const ordersRef = ref(db, "orders");
 
@@ -763,16 +1035,21 @@
       const data = snap.val() || {};
 
       ordersBox.innerHTML = "";
-      myOrdersBox.innerHTML = "";
+      myOrdersHistoryBox.innerHTML = "";
       let openCount = 0;
-      let mineCount = 0;
+      let historyCount = 0;
       hasActiveRide = false;
+      activeOrderId = null;
 
       recalcStats(data);
 
+      // Reset Active UI
+      activeRideContainer.style.display = "none";
+      noMine.textContent = "Për momentin nuk ke vozitje aktive.";
+
       Object.entries(data).forEach(([id, o]) => {
         const safeIdOpen = "map_open_" + id.replace(/[^a-zA-Z0-9_-]/g, "");
-        const safeIdMine = "map_mine_" + id.replace(/[^a-zA-Z0-9_-]/g, "");
+        const safeIdActive = "map_active_" + id.replace(/[^a-zA-Z0-9_-]/g, "");
 
         const rawAdr = extractAddress(o);
         const addressFull = cleanAddress(rawAdr);
@@ -811,7 +1088,7 @@
               current.takenByDriverId = currentDriver.id;
               current.takenByCompany = currentDriver.company || "Thirr Taxi";
               current.takenAt = Date.now();
-              current.addressFull = addressFull;
+              current.addressFull = addressFull || extractAddress(current);
               return current;
             }).then(() => {
               const activeBtn = document.querySelector('.tab-btn[data-tab="tab-active"]');
@@ -826,52 +1103,44 @@
           }
         }
 
-        /* VOZITJET (TAKEN BY ME) */
+        /* AKTIV (TAKEN BY ME) */
         if (o.status === "taken" && o.takenByDriverId === currentDriver?.id) {
-          mineCount++;
           hasActiveRide = true;
+          activeOrderId = id;
 
-          const wrapper = document.createElement("div");
-          wrapper.className = "order-card";
+          activeRideContainer.style.display = "block";
+          noMine.textContent = "";
+
+          activeName.textContent = o.name || "Klienti";
+          activePhone.textContent = o.phone || "";
+          activeAddress.textContent = addressShort || "Pa adresë";
 
           const timeText = formatMinutesSince(o.takenAt);
+          activeInfo.textContent = "Udhëtimi është pranuar: " + timeText + " më parë";
 
-          wrapper.innerHTML = `
-            <div class="order-header">
-              <div class="order-main">
-                <div class="order-name">${o.name || "Klienti"}</div>
-                <div class="order-phone">${o.phone || ""}</div>
-                ${addressShort ? `<div class="order-address">${addressShort}</div>` : ""}
-              </div>
-              <span class="badge badge-active">Aktive</span>
-            </div>
-            <div id="${safeIdMine}" class="mini-map"></div>
-            <div class="info-line">Udhëtimi është pranuar: ${timeText} më parë</div>
-            <button class="btn-secondary finish-btn">✅ Përfundo udhëtimin</button>
-            <button class="btn-danger cancel-btn">✖ Anulo udhëtimin</button>
-          `;
+          if (typeof o.lat === "number" && typeof o.lng === "number") {
+            setTimeout(() => createOrUpdateMap("activeMap", o.lat, o.lng), 120);
+          }
 
-          const finishBtn = wrapper.querySelector(".finish-btn");
-          const cancelBtn = wrapper.querySelector(".cancel-btn");
-
-          finishBtn.onclick = () => {
+          finishActiveBtn.onclick = () => {
             const thisOrder = ref(db, "orders/" + id);
             runTransaction(thisOrder, (current) => {
               if (!current || current.status !== "taken") return current;
               current.status = "done";
               current.completedAt = Date.now();
-              current.addressFull = addressFull;
+              current.addressFull = current.addressFull || addressFull || extractAddress(current);
               return current;
             }).then(() => {
               const balRef = ref(db, "balances/" + currentDriver.id);
               runTransaction(balRef, (cur) => {
                 const ts = Date.now();
+                const fullAdr = cleanAddress(extractAddress(o)) || addressFull;
                 const entry = {
                   amount: 0.25,
                   orderId: id,
                   timestamp: ts,
                   type: "ride",
-                  address: addressFull
+                  address: fullAdr
                 };
                 if (!cur) {
                   return {
@@ -891,7 +1160,7 @@
             });
           };
 
-          cancelBtn.onclick = () => {
+          cancelActiveBtn.onclick = () => {
             const reason = prompt("Shkruaj arsyen e anulimit:");
             if (!reason) return;
             const thisOrder = ref(db, "orders/" + id);
@@ -903,26 +1172,44 @@
               return current;
             });
           };
+        }
 
-          myOrdersBox.appendChild(wrapper);
+        /* HISTORY (DONE BY ME) – für sub-history */
+        if (o.status === "done" && o.takenByDriverId === currentDriver?.id) {
+          historyCount++;
+          const histAdr = shortenAddress(cleanAddress(extractAddress(o)) || o.addressFull || addressFull);
+          const row = document.createElement("div");
+          row.className = "balance-row"; // gleiche Optik
 
-          if (typeof o.lat === "number" && typeof o.lng === "number") {
-            setTimeout(() => createOrUpdateMap(safeIdMine, o.lat, o.lng), 120);
-          }
+          const d = o.completedAt ? new Date(o.completedAt).toLocaleString() : "-";
+
+          row.innerHTML = `
+            <div class="balance-entry-main">
+              <div class="balance-entry-address">${histAdr || "Pa adresë"}</div>
+              <div class="balance-entry-time">${d}</div>
+            </div>
+            <div class="balance-entry-amount">+0.25 €</div>
+          `;
+          myOrdersHistoryBox.appendChild(row);
         }
       });
 
       noOpen.textContent =
         openCount === 0 ? "Për momentin nuk ka kërkesa të reja." : "";
-      noMine.textContent =
-        mineCount === 0 ? "Për momentin nuk ke vozitje aktive." : "";
+
+      if (!hasActiveRide) {
+        activeRideContainer.style.display = "none";
+        noMine.textContent = "Për momentin nuk ke vozitje aktive.";
+      }
+
+      noHistory.textContent =
+        historyCount === 0 ? "Ende nuk ka historik të përfunduar." : "";
 
       invalidateAllMaps();
     });
   }
 
   /************ BILANCI ************/
-
   function subscribeBalance() {
     const balRef = ref(db, "balances/" + currentDriver.id);
     onValue(balRef, (snap) => {

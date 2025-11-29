@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <title>Shoferi - KosovaTaxi</title>
 
-  <!-- iOS / Mobile: Vollbild, kein Zoom -->
+  <!-- iOS FULLSCREEN FIX -->
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -29,7 +29,7 @@
   />
 
   <style>
-    /* iOS FIX – kein Weiß / kein Balken oben */
+    /* iOS FIX – kein Weiß, kein Balken oben */
     html, body {
       margin: 0;
       padding: 0;
@@ -38,7 +38,6 @@
       background-color: #020617 !important;
     }
 
-    /* Hintergrund fixiert */
     body::before {
       content: "";
       position: fixed;
@@ -53,34 +52,30 @@
       --accent: #38bdf8;
       --border-radius-xl: 24px;
       --shadow-soft: 0 20px 60px rgba(0, 0, 0, 0.65);
-      --accent-soft: rgba(56,189,248,0.18);
-      --danger: #ef4444;
-      --success: #22c55e;
-      --muted: #9ca3af;
     }
 
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
 
     body {
       font-family: system-ui, -apple-system, sans-serif;
       margin: 0;
-      padding: 18px 12px 60px; /* extra padding unten für Scroll */
+      padding: 18px 12px 80px; /* extra bottom padding zum Scrollen */
       background: var(--bg);
       color: #e5e7eb;
+      min-height: 100vh;
     }
 
-    .frame {
-      max-width: 460px;
-      margin: 0 auto 40px;
-    }
+    .frame { max-width: 440px; margin: 0 auto; }
 
     .header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 6px 4px 18px;
+      padding: 4px 4px 14px;
       font-size: 13px;
-      color: var(--muted);
+      color: #9ca3af;
     }
 
     .header-center {
@@ -95,6 +90,12 @@
       width:6px;
       height:6px;
       border-radius:999px;
+      background:#ef4444; /* rot = offline, wird per JS grün bei online */
+      box-shadow:0 0 0 5px rgba(239,68,68,0.25);
+      transition: background 0.2s, box-shadow 0.2s;
+    }
+
+    .dot.online {
       background:#22c55e;
       box-shadow:0 0 0 5px rgba(34,197,94,0.25);
     }
@@ -102,7 +103,7 @@
     .card {
       background: var(--card-bg);
       border-radius: var(--border-radius-xl);
-      padding: 18px 16px 18px;
+      padding: 16px 16px 18px;
       box-shadow: var(--shadow-soft);
       border: 1px solid rgba(148,163,184,0.22);
       backdrop-filter: blur(22px);
@@ -111,22 +112,21 @@
     }
 
     .card-title {
-      font-size: 20px;
+      font-size: 19px;
       font-weight: 600;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
     }
 
     .card-subtitle {
       font-size: 13px;
       color: #9ca3af;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
     }
 
     label {
       display:block;
       margin-top:8px;
       font-size:13px;
-      color:#cbd5f5;
     }
 
     input {
@@ -138,7 +138,7 @@
       color: #e5e7eb;
       font-size: 15px;
       outline: none;
-      margin-top: 5px;
+      margin-top: 4px;
     }
 
     input:focus {
@@ -153,17 +153,11 @@
       font-weight:600;
       padding:11px 12px;
       cursor:pointer;
-      transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
-    }
-
-    button:active {
-      transform: translateY(1px) scale(0.995);
-      filter: brightness(0.97);
     }
 
     .btn-primary {
       width:100%;
-      margin-top:14px;
+      margin-top:12px;
       background: linear-gradient(135deg,#22c55e,#4ade80);
       color:#022c22;
       box-shadow:0 14px 38px rgba(34,197,94,0.4);
@@ -174,7 +168,7 @@
       color:#111827;
       box-shadow:0 10px 28px rgba(250,204,21,0.4);
       font-size:14px;
-      padding:9px 10px;
+      padding:8px 10px;
       width:100%;
       margin-top:8px;
     }
@@ -183,97 +177,30 @@
       background:#ef4444;
       color:white;
       font-size:13px;
-      padding:8px 10px;
+      padding:7px 10px;
       width:100%;
-      margin-top:8px;
-      box-shadow:0 8px 22px rgba(239,68,68,0.6);
+      margin-top:6px;
+      box-shadow:0 6px 22px rgba(239,68,68,0.55);
     }
 
     .login-error {
       margin-top:8px;
       font-size:12px;
       color:#f97373;
-      min-height:16px;
     }
 
     .section-title {
-      font-size:15px;
-      font-weight:600;
-      margin-top:2px;
+      font-size:14px;
+      font-weight:500;
       margin-bottom:4px;
     }
 
     .section-sub {
-      font-size:11.5px;
-      color:#9ca3af;
-      margin-bottom:6px;
-    }
-
-    /* STATISTIK CARD */
-    .stats-header {
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      margin-bottom:10px;
-    }
-
-    .stats-title {
-      font-size:15px;
-      font-weight:600;
-    }
-
-    .stats-tabs {
-      display:flex;
-      gap:6px;
-      background:rgba(15,23,42,0.9);
-      border-radius:999px;
-      padding:3px;
-      border:1px solid rgba(51,65,85,0.8);
-    }
-
-    .tab-btn {
-      border:none;
-      background:transparent;
-      color:#9ca3af;
-      font-size:11px;
-      padding:4px 9px;
-      border-radius:999px;
-      cursor:pointer;
-    }
-
-    .tab-btn.active {
-      background:rgba(37,99,235,0.3);
-      color:#e5e7eb;
-    }
-
-    .stats-grid {
-      display:grid;
-      grid-template-columns: repeat(3, minmax(0,1fr));
-      gap:8px;
-      margin-top:4px;
-    }
-
-    .stat-box {
-      background:rgba(15,23,42,0.9);
-      border-radius:16px;
-      padding:7px 8px 8px;
-      border:1px solid rgba(55,65,81,0.9);
       font-size:11px;
       color:#9ca3af;
+      margin-bottom:8px;
     }
 
-    .stat-value {
-      font-size:16px;
-      font-weight:600;
-      color:#e5e7eb;
-      margin-top:3px;
-    }
-
-    .stat-label {
-      font-size:11px;
-    }
-
-    /* ORDERS */
     .order-card {
       background: radial-gradient(circle at top left, rgba(59,130,246,.22), rgba(15,23,42,.96));
       border-radius: 22px;
@@ -286,31 +213,20 @@
     .order-header {
       display: flex;
       justify-content: space-between;
-      align-items: flex-start;
+      align-items: center;
       margin-bottom: 6px;
-      gap:8px;
-    }
-
-    .order-main {
-      display:flex;
-      flex-direction:column;
-      gap:1px;
+      gap: 10px;
     }
 
     .order-name { font-size: 15px; font-weight: 600; }
     .order-phone { font-size: 13px; opacity: .9; }
-    .order-address {
-      font-size: 12px;
-      color: #cbd5e1;
-      opacity: 0.95;
-      margin-top: 2px;
-    }
+    .order-address { font-size: 12px; color:#cbd5f5; margin-top:2px; }
 
     .badge {
       font-size:11px;
       padding:4px 8px;
       border-radius:999px;
-      white-space:nowrap;
+      white-space: nowrap;
     }
 
     .badge-active { background:rgba(34,197,94,0.18); color:#bbf7d0; }
@@ -324,6 +240,7 @@
       margin-top: 8px;
       border: 1px solid rgba(15, 23, 42, .9);
     }
+
     .mini-map.leaflet-container { background:#020617; }
 
     .order-footer {
@@ -353,108 +270,147 @@
       margin-top:4px;
     }
 
-    /* BALANCE */
-    .balance-text {
-      font-size:13px;
-      line-height:1.4;
-    }
-
-    .balance-meta {
-      font-size:11px;
-      color:#9ca3af;
-      margin-top:4px;
-    }
-
-    /* MODAL für Anulimi */
-    .modal-backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(15,23,42,0.8);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 50;
-    }
-
-    .modal-backdrop.visible {
+    /* STATS CARD */
+    .stats-header {
       display:flex;
-    }
-
-    .modal {
-      width: 100%;
-      max-width: 420px;
-      background: rgba(15,23,42,0.98);
-      border-radius: 20px;
-      padding: 16px 16px 14px;
-      border: 1px solid rgba(148,163,184,0.4);
-      box-shadow: 0 24px 60px rgba(0,0,0,0.85);
-    }
-
-    .modal-title {
-      font-size:16px;
-      font-weight:600;
-      margin-bottom:4px;
-    }
-
-    .modal-sub {
-      font-size:12px;
-      color:#9ca3af;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:10px;
       margin-bottom:8px;
     }
 
-    .modal textarea {
-      width:100%;
-      min-height:80px;
-      border-radius:14px;
-      border:1px solid rgba(148,163,184,0.5);
-      background:rgba(15,23,42,0.95);
-      color:#e5e7eb;
-      padding:8px 10px;
-      font-size:13px;
-      outline:none;
-      resize:vertical;
-    }
-
-    .modal textarea:focus {
-      border-color:var(--accent);
-      box-shadow:0 0 0 1px rgba(56,189,248,0.4);
-    }
-
-    .modal-actions {
+    .stats-tabs {
       display:flex;
-      gap:8px;
-      margin-top:10px;
+      gap:6px;
     }
 
-    .btn-light {
-      flex:1;
+    .stats-tab {
       border-radius:999px;
-      padding:9px 10px;
-      border:1px solid rgba(148,163,184,0.5);
+      border:1px solid transparent;
       background:rgba(15,23,42,0.9);
-      color:#e5e7eb;
-      font-size:13px;
-      font-weight:500;
+      color:#9ca3af;
+      font-size:11px;
+      padding:4px 10px;
+      cursor:pointer;
     }
 
-    .btn-modal-danger {
-      flex:1;
+    .stats-tab.active {
+      border-color:rgba(56,189,248,0.7);
+      background:rgba(37,99,235,0.25);
+      color:#e5e7eb;
+    }
+
+    .stats-body {
+      margin-top:4px;
+    }
+
+    .stats-number {
+      font-size:26px;
+      font-weight:700;
+      margin-bottom:2px;
+    }
+
+    .stats-label {
+      font-size:12px;
+      color:#9ca3af;
+    }
+
+    .stats-subline {
+      font-size:11px;
+      color:#6b7280;
+      margin-top:4px;
+    }
+
+    /* BALANCE LIST */
+    .balance-summary {
+      font-size:14px;
+      margin-bottom:8px;
+    }
+
+    .balance-history-title {
+      font-size:12px;
+      font-weight:500;
+      margin-top:6px;
+      margin-bottom:4px;
+      color:#cbd5f5;
+    }
+
+    .balance-history-list {
+      max-height:150px;
+      overflow-y:auto;
+      padding-right:4px;
+    }
+
+    .balance-row {
+      font-size:11px;
+      display:flex;
+      justify-content:space-between;
+      padding:4px 0;
+      border-bottom:1px dashed rgba(55,65,81,0.7);
+    }
+
+    .balance-row:last-child {
+      border-bottom:none;
+    }
+
+    /* LOGOUT SLIDER */
+    .logout-wrapper {
+      max-width:440px;
+      margin: 0 auto 10px;
+      padding: 0 4px 20px;
+      display:none; /* wird per JS sichtbar nach Login */
+    }
+
+    .logout-label {
+      font-size:12px;
+      color:#9ca3af;
+      margin-bottom:6px;
+      text-align:center;
+    }
+
+    .logout-slider {
+      position:relative;
+      background:rgba(15,23,42,0.96);
       border-radius:999px;
-      padding:9px 10px;
-      border:none;
-      background:#ef4444;
-      color:#fef2f2;
+      padding:8px;
+      border:1px solid rgba(148,163,184,0.35);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+      user-select:none;
+    }
+
+    .logout-knob {
+      position:absolute;
+      left:4px;
+      top:4px;
+      width:44px;
+      height:44px;
+      border-radius:999px;
+      background: linear-gradient(135deg,#ef4444,#f97316);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:18px;
+      color:#fff;
+      box-shadow:0 10px 28px rgba(239,68,68,0.55);
+      touch-action:none;
+      transition: left 0.18s ease;
+    }
+
+    .logout-text {
       font-size:13px;
-      font-weight:600;
-      box-shadow:0 8px 28px rgba(239,68,68,0.7);
+      color:#e5e7eb;
+      opacity:0.9;
     }
 
     @media (max-width: 360px) {
-      .stats-grid {
-        grid-template-columns: 1fr;
-      }
+      .card { padding: 14px 12px 16px; }
+      .order-name { font-size:14px; }
+      .order-phone, .order-address { font-size:11px; }
+      .mini-map { height:130px; }
     }
-
   </style>
 </head>
 
@@ -464,7 +420,7 @@
   <div class="header">
     <span>KosovaTaxi</span>
     <div class="header-center">
-      <div class="dot"></div>
+      <div id="headerDot" class="dot"></div>
       <span id="headerDriverName">Shoferi</span>
     </div>
     <span id="headerStatus">Offline</span>
@@ -487,44 +443,38 @@
   <!-- DASHBOARD -->
   <div id="content" style="display:none;">
 
-    <!-- STATISTIKEN -->
+    <!-- KARTE 0: PERFORMANCA IME -->
     <div class="card">
       <div class="stats-header">
-        <div class="stats-title">Performanca ime</div>
+        <div>
+          <div class="section-title">Performanca ime</div>
+          <div class="section-sub">Sa udhëtime ke përfunduar sot, këtë javë dhe këtë muaj.</div>
+        </div>
         <div class="stats-tabs">
-          <button class="tab-btn active" data-tab="sot">Sot</button>
-          <button class="tab-btn" data-tab="java">Java</button>
-          <button class="tab-btn" data-tab="muaji">Muaji</button>
+          <button class="stats-tab active" data-range="today">Sot</button>
+          <button class="stats-tab" data-range="week">Java</button>
+          <button class="stats-tab" data-range="month">Muaji</button>
         </div>
       </div>
-      <div class="stats-grid">
-        <div class="stat-box">
-          <div class="stat-label">Vozitje të përfunduara</div>
-          <div class="stat-value" id="statCount">0</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-label">Të ardhurat për kompaninë</div>
-          <div class="stat-value" id="statMoney">0.00€</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-label">Kohë e vlerësuar në rrugë</div>
-          <div class="stat-value" id="statTime">0</div>
-        </div>
+      <div class="stats-body">
+        <div id="statsDone" class="stats-number">0</div>
+        <div id="statsLabel" class="stats-label">Udhëtime të përfunduara sot</div>
+        <div id="statsCanceled" class="stats-subline">Anulime: 0</div>
       </div>
     </div>
 
-    <!-- KARTE 1: VOZITJET E MIA AKTIVE -->
+    <!-- KARTE 1: UDHËTIMET E MIA AKTIVE -->
     <div class="card">
-      <div class="section-title">Vozitjet e mia aktive</div>
-      <div class="section-sub">Mund të kesh vetëm një vozitje aktive në të njëjtën kohë.</div>
+      <div class="section-title">Udhëtimet e mia aktive</div>
+      <div class="section-sub">Mund të kesh vetëm një udhëtim aktiv në të njëjtën kohë.</div>
 
       <div id="myOrders"></div>
       <div id="noMine" class="empty-text"></div>
     </div>
 
-    <!-- KARTE 2: VOZITJET NË PRITJE -->
+    <!-- KARTE 2: KËRKESAT E REJA -->
     <div class="card">
-      <div class="section-title">Vozitje në pritje</div>
+      <div class="section-title">Kërkesa të reja nga klientët</div>
       <div class="section-sub">Këto janë kërkesa të hapura që mund t’i pranosh.</div>
 
       <div id="orders"></div>
@@ -534,25 +484,21 @@
     <!-- KARTE 3: BARAZIMI IM -->
     <div class="card">
       <div class="section-title">Barazimi im</div>
-      <div id="balanceBox" class="balance-text"></div>
-      <div id="balanceMeta" class="balance-meta"></div>
+      <div id="balanceBox" class="balance-summary"></div>
+
+      <div class="balance-history-title">Lëvizjet e fundit</div>
+      <div id="balanceHistory" class="balance-history-list"></div>
     </div>
 
   </div>
 </div>
 
-<!-- MODAL: Anulo vozitjen me arsye -->
-<div id="cancelModalBackdrop" class="modal-backdrop">
-  <div class="modal">
-    <div class="modal-title">Anulo vozitjen</div>
-    <div class="modal-sub">
-      Shkruaj shkurt pse po e anulon këtë vozitje. Arsyeja do të ruhet te sistemi.
-    </div>
-    <textarea id="cancelReasonInput" placeholder="p.sh. Klienti nuk u përgjigj në telefon..."></textarea>
-    <div class="modal-actions">
-      <button id="cancelModalClose" class="btn-light">Mbylle</button>
-      <button id="cancelModalConfirm" class="btn-modal-danger">Konfirmo anulimin</button>
-    </div>
+<!-- LOGOUT SLIDER -->
+<div id="logoutWrapper" class="logout-wrapper">
+  <div class="logout-label">Për të dalë nga llogaria, lësho drejt djathtas.</div>
+  <div id="logoutSlider" class="logout-slider">
+    <div id="logoutKnob" class="logout-knob">⇾</div>
+    <span id="logoutText" class="logout-text">Slide për t'u shkëputur</span>
   </div>
 </div>
 
@@ -563,7 +509,7 @@
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
-  import { getDatabase, ref, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-database.js";
+  import { getDatabase, ref, onValue, runTransaction, set } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-database.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyCgCxp8M9XGOKFSIfaU9nM48rxtFQP-Kvs",
@@ -581,8 +527,15 @@
 
   let currentDriver = null;
   let hasActiveRide = false;
+  let watchId = null;
 
-  let cancelOrderId = null;
+  // Stats
+  let stats = {
+    today: { done: 0, canceled: 0 },
+    week: { done: 0, canceled: 0 },
+    month: { done: 0, canceled: 0 }
+  };
+  let currentStatsRange = "today";
 
   const loginCard = document.getElementById("loginCard");
   const content = document.getElementById("content");
@@ -590,66 +543,188 @@
   const loginMsg = document.getElementById("loginMsg");
   const headerDriverName = document.getElementById("headerDriverName");
   const headerStatus = document.getElementById("headerStatus");
+  const headerDot = document.getElementById("headerDot");
   const balanceBox = document.getElementById("balanceBox");
-  const balanceMeta = document.getElementById("balanceMeta");
+  const balanceHistoryEl = document.getElementById("balanceHistory");
 
-  const cancelModalBackdrop = document.getElementById("cancelModalBackdrop");
-  const cancelReasonInput = document.getElementById("cancelReasonInput");
-  const cancelModalClose = document.getElementById("cancelModalClose");
-  const cancelModalConfirm = document.getElementById("cancelModalConfirm");
+  const logoutWrapper = document.getElementById("logoutWrapper");
+  const logoutSlider = document.getElementById("logoutSlider");
+  const logoutKnob = document.getElementById("logoutKnob");
 
-  function openCancelModal(orderId) {
-    cancelOrderId = orderId;
-    cancelReasonInput.value = "";
-    cancelModalBackdrop.classList.add("visible");
+  /* -----------------------
+   * DATUM-HELFER
+   * ----------------------- */
+  function startOfDay(d) {
+    const n = new Date(d); n.setHours(0,0,0,0); return n;
+  }
+  function endOfDay(d) {
+    const n = startOfDay(d); n.setDate(n.getDate() + 1); return n;
+  }
+  function startOfWeek(d) {
+    const n = startOfDay(d);
+    const day = n.getDay(); // 0=So, 1=Mo
+    const diff = (day === 0 ? -6 : 1 - day);
+    n.setDate(n.getDate() + diff);
+    return n;
+  }
+  function endOfWeek(d) {
+    const s = startOfWeek(d);
+    const e = new Date(s);
+    e.setDate(e.getDate() + 7);
+    return e;
+  }
+  function startOfMonth(d) {
+    const n = startOfDay(d);
+    return new Date(n.getFullYear(), n.getMonth(), 1);
+  }
+  function endOfMonth(d) {
+    const s = startOfMonth(d);
+    return new Date(s.getFullYear(), s.getMonth() + 1, 1);
   }
 
-  function closeCancelModal() {
-    cancelOrderId = null;
-    cancelModalBackdrop.classList.remove("visible");
+  function formatMinutesSince(timestamp) {
+    if (!timestamp) return "-";
+    const diffMs = Date.now() - timestamp;
+    const mins = Math.floor(diffMs / 60000);
+    if (mins <= 0) return "më pak se 1 min";
+    if (mins === 1) return "1 minutë";
+    return mins + " minuta";
   }
 
-  cancelModalClose.onclick = closeCancelModal;
+  function extractStreet(o) {
+    const full = o.address || o.street || "";
+    if (!full) return "";
+    return full.split(",")[0].trim();
+  }
 
-  cancelModalConfirm.onclick = () => {
-    const reason = cancelReasonInput.value.trim();
-    if (!reason) {
-      alert("Ju lutem shkruani arsyen e anulimit.");
-      return;
+  /* -----------------------
+   * GEO-TRACKING
+   * ----------------------- */
+  function startLocationTracking() {
+    if (!navigator.geolocation || !currentDriver) return;
+
+    if (watchId !== null) {
+      navigator.geolocation.clearWatch(watchId);
+      watchId = null;
     }
-    if (!cancelOrderId) return;
 
-    const thisOrder = ref(db, "orders/" + cancelOrderId);
-    runTransaction(thisOrder, (current) => {
-      if (!current || current.status !== "taken") return current;
-      current.status = "canceled";
-      current.canceledAt = Date.now();
-      current.canceledReason = reason;
-      return current;
-    }).then(() => {
-      closeCancelModal();
-    });
-  };
-
-  function formatDateTime(ts) {
-    if (!ts) return "-";
-    const d = new Date(ts);
-    return d.toLocaleString();
+    watchId = navigator.geolocation.watchPosition(
+      (pos) => {
+        const { latitude, longitude, heading, speed } = pos.coords;
+        const locRef = ref(db, "driverLocations/" + currentDriver.id);
+        set(locRef, {
+          lat: latitude,
+          lng: longitude,
+          heading: heading ?? null,
+          speed: speed ?? null,
+          updatedAt: Date.now()
+        }).catch(console.error);
+      },
+      (err) => {
+        console.error("Geo error:", err);
+      },
+      {
+        enableHighAccuracy: true,
+        maximumAge: 5000,
+        timeout: 10000
+      }
+    );
   }
 
-  /* Reverse Geocoding für Adresse */
-  async function getAddress(lat, lng) {
+  function stopLocationTracking() {
+    if (watchId !== null && navigator.geolocation) {
+      navigator.geolocation.clearWatch(watchId);
+      watchId = null;
+    }
+  }
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible" && currentDriver) {
+      startLocationTracking();
+    }
+  });
+
+  /* -----------------------
+   * STATISTIK-UI
+   * ----------------------- */
+  const statsDoneEl = document.getElementById("statsDone");
+  const statsLabelEl = document.getElementById("statsLabel");
+  const statsCanceledEl = document.getElementById("statsCanceled");
+
+  function renderStats() {
+    const m = stats[currentStatsRange] || { done:0, canceled:0 };
+    statsDoneEl.textContent = m.done;
+
+    if (currentStatsRange === "today") {
+      statsLabelEl.textContent = "Udhëtime të përfunduara sot";
+    } else if (currentStatsRange === "week") {
+      statsLabelEl.textContent = "Udhëtime të përfunduara këtë javë";
+    } else {
+      statsLabelEl.textContent = "Udhëtime të përfunduara këtë muaj";
+    }
+
+    statsCanceledEl.textContent = "Anulime: " + (m.canceled || 0);
+  }
+
+  document.querySelectorAll(".stats-tab").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".stats-tab").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      currentStatsRange = btn.dataset.range;
+      renderStats();
+    });
+  });
+
+  /* -----------------------
+   * LOGIN / AUTO-LOGIN
+   * ----------------------- */
+  function setOnlineUI(isOnline) {
+    if (isOnline) {
+      headerStatus.textContent = "Online";
+      headerDot.classList.add("online");
+    } else {
+      headerStatus.textContent = "Offline";
+      headerDot.classList.remove("online");
+    }
+  }
+
+  function initDriverSession(driver) {
+    currentDriver = driver;
+    headerDriverName.textContent = driver.name || "Shoferi";
+    setOnlineUI(true);
+    loginCard.style.display = "none";
+    content.style.display = "block";
+    logoutWrapper.style.display = "block";
+
+    subscribeOrders();
+    subscribeBalance();
+    startLocationTracking();
+  }
+
+  function saveDriverToLocal(driver) {
     try {
-      const url = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`;
-      const res = await fetch(url, {
-        headers: {
-          "Accept": "application/json"
-        }
-      });
-      const data = await res.json();
-      return data.display_name || "Adresa nuk u gjet";
+      localStorage.setItem("driverId", driver.id);
     } catch (e) {
-      return "Adresa nuk u gjet";
+      console.warn("localStorage not available", e);
+    }
+  }
+
+  function tryAutoLogin() {
+    try {
+      const savedId = localStorage.getItem("driverId");
+      if (!savedId) return;
+      const drvRef = ref(db, "drivers/" + savedId);
+      onValue(drvRef, (snap) => {
+        const d = snap.val();
+        if (!d || d.approved !== true || d.active === false) {
+          // ungültig -> löschen
+          localStorage.removeItem("driverId");
+          return;
+        }
+        initDriverSession({ id: savedId, ...d });
+      }, { onlyOnce: true });
+    } catch (e) {
+      console.error(e);
     }
   }
 
@@ -683,20 +758,17 @@
         }
 
         if (!currentDriver) {
-          currentDriver = found;
-          headerDriverName.textContent = found.name || "Shoferi";
-          headerStatus.textContent = "Online";
-          loginCard.style.display = "none";
-          content.style.display = "block";
-          subscribeOrders();
-          subscribeBalance();
-          updateStatistics("sot");
+          saveDriverToLocal(found);
+          initDriverSession(found);
         }
       },
       { onlyOnce: true }
     );
   };
 
+  /* -----------------------
+   * LEAFLET MINI-MAPS
+   * ----------------------- */
   function createMiniMap(containerId, lat, lng) {
     const container = document.getElementById(containerId);
     if (!container) return;
@@ -713,15 +785,9 @@
     L.marker([lat, lng]).addTo(map);
   }
 
-  function formatMinutesSince(timestamp) {
-    if (!timestamp) return "-";
-    const diffMs = Date.now() - timestamp;
-    const mins = Math.floor(diffMs / 60000);
-    if (mins <= 0) return "më pak se 1 min";
-    if (mins === 1) return "1 minutë";
-    return mins + " minuta";
-  }
-
+  /* -----------------------
+   * ORDERS
+   * ----------------------- */
   function subscribeOrders() {
     const ordersRef = ref(db, "orders");
 
@@ -738,38 +804,69 @@
       let mineCount = 0;
       hasActiveRide = false;
 
+      // Stats zurücksetzen
+      stats.today = { done:0, canceled:0 };
+      stats.week = { done:0, canceled:0 };
+      stats.month = { done:0, canceled:0 };
+
+      const now = new Date();
+      const dayStart = +startOfDay(now);
+      const dayEnd = +endOfDay(now);
+      const weekStart = +startOfWeek(now);
+      const weekEnd = +endOfWeek(now);
+      const monthStart = +startOfMonth(now);
+      const monthEnd = +endOfMonth(now);
+
       Object.entries(data).forEach(([id, o]) => {
         const safeIdOpen = "map_open_" + id.replace(/[^a-zA-Z0-9_-]/g, "");
         const safeIdMine = "map_mine_" + id.replace(/[^a-zA-Z0-9_-]/g, "");
 
-        /* VOZITJE NË PRITJE */
+        // STATISTIK: nur erledigte / stornierte Fahrten
+        if (o.completedAt && o.status === "done") {
+          const t = o.completedAt;
+          if (t >= dayStart && t < dayEnd) stats.today.done++;
+          if (t >= weekStart && t < weekEnd) stats.week.done++;
+          if (t >= monthStart && t < monthEnd) stats.month.done++;
+        }
+        if (o.canceledAt && o.status === "canceled") {
+          const t = o.canceledAt;
+          if (t >= dayStart && t < dayEnd) stats.today.canceled++;
+          if (t >= weekStart && t < weekEnd) stats.week.canceled++;
+          if (t >= monthStart && t < monthEnd) stats.month.canceled++;
+        }
+
+        /* --------------------
+         * KËRKESA TË REJA
+         * -------------------- */
         if (o.status === "open") {
           openCount++;
           const wrapper = document.createElement("div");
           wrapper.className = "order-card";
 
+          const street = extractStreet(o);
+
           wrapper.innerHTML = `
             <div class="order-header">
-              <div class="order-main">
+              <div>
                 <div class="order-name">${o.name}</div>
                 <div class="order-phone">${o.phone}</div>
-                <div class="order-address" id="addr_open_${id}">Duke u ngarkuar adresa…</div>
+                ${street ? `<div class="order-address">${street}</div>` : ""}
               </div>
-              <span class="badge badge-open">Vozitje në pritje</span>
+              <span class="badge badge-open">Kërkesë e re</span>
             </div>
             <div id="${safeIdOpen}" class="mini-map"></div>
             <div class="order-footer">
-              <span>Kliko për ta pranuar këtë vozitje.</span>
+              <span>Zgjidhe dhe prano udhëtimin.</span>
               <a href="https://maps.google.com/?q=${o.lat},${o.lng}" target="_blank">Google Maps</a>
             </div>
           `;
 
           const acceptBtn = document.createElement("button");
           acceptBtn.className = "btn-secondary";
-          acceptBtn.textContent = "✅ Prano vozitjen";
+          acceptBtn.textContent = "✅ Prano udhëtimin";
           acceptBtn.onclick = () => {
             if (hasActiveRide) {
-              alert("Nuk mund të pranoni më shumë se një vozitje.");
+              alert("Nuk mund të pranoni më shumë se një udhëtim.");
               return;
             }
             const thisOrder = ref(db, "orders/" + id);
@@ -786,17 +883,12 @@
 
           wrapper.appendChild(acceptBtn);
           openBox.appendChild(wrapper);
-
-          setTimeout(() => {
-            createMiniMap(safeIdOpen, o.lat, o.lng);
-            getAddress(o.lat, o.lng).then(a => {
-              const el = document.getElementById("addr_open_" + id);
-              if (el) el.textContent = a;
-            });
-          }, 80);
+          setTimeout(() => createMiniMap(safeIdOpen, o.lat, o.lng), 50);
         }
 
-        /* VOZITJET E MIA (ACTIVE) */
+        /* --------------------
+         * UDHËTIMET E MIA
+         * -------------------- */
         if (
           o.status === "taken" &&
           o.takenByDriverId === currentDriver?.id
@@ -808,26 +900,28 @@
           wrapper.className = "order-card";
 
           const timeText = formatMinutesSince(o.takenAt);
+          const street = extractStreet(o);
 
           wrapper.innerHTML = `
             <div class="order-header">
-              <div class="order-main">
+              <div>
                 <div class="order-name">${o.name}</div>
                 <div class="order-phone">${o.phone}</div>
-                <div class="order-address" id="addr_mine_${id}">Duke u ngarkuar adresa…</div>
+                ${street ? `<div class="order-address">${street}</div>` : ""}
               </div>
               <span class="badge badge-active">Aktive</span>
             </div>
             <div id="${safeIdMine}" class="mini-map"></div>
             <div class="order-footer">
-              <span class="timer">Vozitja: ${timeText} më parë</span>
+              <span class="timer">Udhëtimi është pranuar: ${timeText} më parë</span>
               <a href="https://maps.google.com/?q=${o.lat},${o.lng}" target="_blank">Google Maps</a>
             </div>
           `;
 
+          /* Perfundo */
           const finishBtn = document.createElement("button");
           finishBtn.className = "btn-secondary";
-          finishBtn.textContent = "✅ Perfundo vozitjen";
+          finishBtn.textContent = "✅ Perfundo udhëtimin";
           finishBtn.onclick = () => {
             const thisOrder = ref(db, "orders/" + id);
 
@@ -837,135 +931,218 @@
               current.completedAt = Date.now();
               return current;
             }).then(() => {
+              // Update balance
               const balRef = ref(db, "balances/" + currentDriver.id);
               runTransaction(balRef, (cur) => {
-                const now = Date.now();
+                const nowTs = Date.now();
                 if (!cur) {
                   return {
                     total: 0.25,
                     status: "open",
-                    lastUpdate: now
+                    lastUpdate: nowTs,
+                    history: {
+                      [id]: {
+                        amount: 0.25,
+                        orderId: id,
+                        timestamp: nowTs
+                      }
+                    }
                   };
                 }
                 cur.total = (cur.total || 0) + 0.25;
                 cur.status = "open";
-                cur.lastUpdate = now;
+                cur.lastUpdate = nowTs;
+                if (!cur.history) cur.history = {};
+                cur.history[id] = {
+                  amount: 0.25,
+                  orderId: id,
+                  timestamp: nowTs
+                };
                 return cur;
               });
             });
           };
 
+          /* Anulo */
           const cancelBtn = document.createElement("button");
           cancelBtn.className = "btn-danger";
-          cancelBtn.textContent = "✖ Anulo vozitjen";
+          cancelBtn.textContent = "✖ Anulo udhëtimin";
           cancelBtn.onclick = () => {
-            openCancelModal(id);
+            let reason = prompt("Shkruaj arsyen e anulimit (e detyrueshme):");
+            if (!reason || !reason.trim()) {
+              alert("Arsyeja e anulimit është e detyrueshme.");
+              return;
+            }
+            reason = reason.trim();
+            const thisOrder = ref(db, "orders/" + id);
+            runTransaction(thisOrder, (current) => {
+              if (!current || current.status !== "taken") return current;
+              current.status = "canceled";
+              current.canceledAt = Date.now();
+              current.canceledReason = reason;
+              return current;
+            });
           };
 
           wrapper.appendChild(finishBtn);
           wrapper.appendChild(cancelBtn);
           mineBox.appendChild(wrapper);
 
-          setTimeout(() => {
-            createMiniMap(safeIdMine, o.lat, o.lng);
-            getAddress(o.lat, o.lng).then(a => {
-              const el = document.getElementById("addr_mine_" + id);
-              if (el) el.textContent = a;
-            });
-          }, 80);
+          setTimeout(() => createMiniMap(safeIdMine, o.lat, o.lng), 50);
         }
       });
 
       noOpen.textContent =
-        openCount === 0 ? "Për momentin nuk ka vozitje në pritje." : "";
+        openCount === 0 ? "Për momentin nuk ka kërkesa të reja." : "";
       noMine.textContent =
-        mineCount === 0 ? "Për momentin nuk keni vozitje aktive." : "";
+        mineCount === 0 ? "Për momentin nuk ke udhëtime aktive." : "";
+
+      // Stats UI updaten
+      renderStats();
     });
   }
 
+  /* -----------------------
+   * BALANCE
+   * ----------------------- */
   function subscribeBalance() {
     const balRef = ref(db, "balances/" + currentDriver.id);
     onValue(balRef, (snap) => {
       const data = snap.val();
+      balanceHistoryEl.innerHTML = "";
+
       if (!data) {
         balanceBox.innerHTML = "Nuk ka barazim aktual.";
-        balanceMeta.textContent = "";
         return;
       }
 
       if (data.status === "open") {
         balanceBox.innerHTML = `
           <strong>Barazim i hapur:</strong> ${ (data.total || 0).toFixed(2) } €<br>
-          <span>Kjo shumë i takon kompanisë. Ju lutem barazohuni me administratën.</span>
+          <small>Shuma që aktualisht i takon kompanisë.</small>
         `;
       } else {
         balanceBox.innerHTML = `
           <strong>Barazim i përfunduar ✔</strong><br>
-          <span>Aktualisht nuk keni borxh të hapur.</span>
+          <small>Aktualisht nuk keni borxh të hapur.</small>
         `;
       }
 
-      balanceMeta.textContent =
-        "Përditësuar: " + formatDateTime(data.lastUpdate);
+      const history = data.history || {};
+      const entries = Object.entries(history)
+        .sort((a,b) => (b[1].timestamp || 0) - (a[1].timestamp || 0))
+        .slice(0, 20); // vetëm 20 të fundit
+
+      if (entries.length === 0) {
+        balanceHistoryEl.innerHTML = "<div class='empty-text'>Nuk ka lëvizje të regjistruara ende.</div>";
+        return;
+      }
+
+      entries.forEach(([orderId, h]) => {
+        const row = document.createElement("div");
+        row.className = "balance-row";
+
+        const date = h.timestamp ? new Date(h.timestamp).toLocaleString() : "-";
+        row.innerHTML = `
+          <span>${date}</span>
+          <span>${(h.amount || 0).toFixed(2)} €</span>
+        `;
+        balanceHistoryEl.appendChild(row);
+      });
     });
   }
 
-  function filterByDate(order, type) {
-    if (!order.completedAt) return false;
-    const created = new Date(order.completedAt);
-    const now = new Date();
-
-    if (type === "sot") {
-      return created.toDateString() === now.toDateString();
-    }
-
-    if (type === "java") {
-      const diff = now - created;
-      return diff <= 7 * 24 * 60 * 60 * 1000;
-    }
-
-    if (type === "muaji") {
-      return created.getMonth() === now.getMonth() &&
-             created.getFullYear() === now.getFullYear();
-    }
-
-    return false;
+  /* -----------------------
+   * LOGOUT SLIDER
+   * ----------------------- */
+  function logoutDriver() {
+    stopLocationTracking();
+    try {
+      localStorage.removeItem("driverId");
+    } catch (e) {}
+    currentDriver = null;
+    hasActiveRide = false;
+    headerDriverName.textContent = "Shoferi";
+    setOnlineUI(false);
+    content.style.display = "none";
+    loginCard.style.display = "block";
+    logoutWrapper.style.display = "none";
+    // Knopf zurücksetzen
+    logoutKnob.style.left = "4px";
   }
 
-  function updateStatistics(tab = "sot") {
-    const ordersRef = ref(db, "orders");
+  (function initLogoutSlider() {
+    let dragging = false;
+    let startX = 0;
+    let startLeft = 4;
 
-    onValue(ordersRef, (snap) => {
-      const data = snap.val() || {};
-      let count = 0;
-      let money = 0;
-      let minutes = 0;
+    function getClientX(e) {
+      if (e.touches && e.touches.length > 0) return e.touches[0].clientX;
+      return e.clientX;
+    }
 
-      Object.values(data).forEach((o) => {
-        if (o.takenByDriverId === currentDriver?.id && o.status === "done") {
-          if (filterByDate(o, tab)) {
-            count++;
-            money += 0.25;
-            minutes += 6; // Beispiel: 6 min pro Fahrt
-          }
-        }
-      });
+    function onStart(e) {
+      if (!currentDriver) return;
+      dragging = true;
+      startX = getClientX(e);
+      const rect = logoutKnob.getBoundingClientRect();
+      const sliderRect = logoutSlider.getBoundingClientRect();
+      startLeft = rect.left - sliderRect.left;
+      logoutKnob.style.transition = "none";
+      e.preventDefault();
+    }
 
-      document.getElementById("statCount").textContent = count;
-      document.getElementById("statMoney").textContent = money.toFixed(2) + "€";
-      document.getElementById("statTime").textContent = minutes;
-    }, { onlyOnce: true });
-  }
+    function onMove(e) {
+      if (!dragging) return;
+      const sliderRect = logoutSlider.getBoundingClientRect();
+      const knobRect = logoutKnob.getBoundingClientRect();
+      const dx = getClientX(e) - startX;
+      let newLeft = startLeft + dx;
+      const minLeft = 4;
+      const maxLeft = sliderRect.width - knobRect.width - 4;
+      if (newLeft < minLeft) newLeft = minLeft;
+      if (newLeft > maxLeft) newLeft = maxLeft;
+      logoutKnob.style.left = newLeft + "px";
+    }
 
-  document.querySelectorAll(".tab-btn").forEach((btn) => {
-    btn.onclick = () => {
-      document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-      const type = btn.dataset.tab;
-      updateStatistics(type);
-    };
-  });
+    function onEnd() {
+      if (!dragging) return;
+      dragging = false;
+      const sliderRect = logoutSlider.getBoundingClientRect();
+      const knobRect = logoutKnob.getBoundingClientRect();
+      const left = knobRect.left - sliderRect.left;
+      const maxLeft = sliderRect.width - knobRect.width - 4;
+      const progress = left / maxLeft;
 
+      logoutKnob.style.transition = "left 0.18s ease";
+
+      if (progress > 0.6) {
+        // Voller Logout
+        logoutKnob.style.left = maxLeft + "px";
+        setTimeout(() => {
+          logoutDriver();
+        }, 160);
+      } else {
+        // Zurückspringen
+        logoutKnob.style.left = "4px";
+      }
+    }
+
+    logoutKnob.addEventListener("mousedown", onStart);
+    logoutKnob.addEventListener("touchstart", onStart, { passive:false });
+
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("touchmove", onMove, { passive:false });
+
+    window.addEventListener("mouseup", onEnd);
+    window.addEventListener("touchend", onEnd);
+    window.addEventListener("touchcancel", onEnd);
+  })();
+
+  /* -----------------------
+   * INIT
+   * ----------------------- */
+  tryAutoLogin();
 </script>
 
 </body>

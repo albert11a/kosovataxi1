@@ -2,9 +2,9 @@
 <html lang="sq">
 <head>
   <meta charset="UTF-8">
-  <title>Shoferi - KosovaTaxi</title>
+  <title>Shoferi - Thirr Taxi</title>
 
-  <!-- iOS FULLSCREEN FIX -->
+  <!-- iOS FULLSCREEN / MOBILE -->
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -29,7 +29,7 @@
   />
 
   <style>
-    /* iOS FIX – kein Weiß, kein Balken oben */
+    /* iOS / Safari: kein Weiß, kein komischer Balken */
     html, body {
       margin: 0;
       padding: 0;
@@ -52,25 +52,25 @@
       --accent: #38bdf8;
       --accent-soft: rgba(56,189,248,0.25);
       --border-radius-xl: 24px;
-      --shadow-soft: 0 20px 60px rgba(0, 0, 0, 0.65);
-      --danger: #ef4444;
-      --success: #22c55e;
-      --text-subtle: #9ca3af;
+      --shadow-soft: 0 22px 60px rgba(0, 0, 0, 0.75);
+      --tab-bg: rgba(15,23,42,0.98);
+      --tab-pill: rgba(15,23,42,1);
     }
 
     * { box-sizing: border-box; }
 
     body {
-      font-family: system-ui, -apple-system, -apple-system-font, "SF Pro Text", sans-serif;
+      font-family: system-ui, -apple-system, "SF Pro Text", sans-serif;
       margin: 0;
-      padding: 18px 12px 90px; /* unten extra Platz zum Scrollen */
+      padding: 18px 12px 40px;
       background: var(--bg);
       color: #e5e7eb;
     }
 
     .frame {
-      max-width: 460px;
+      max-width: 480px;
       margin: 0 auto;
+      padding-bottom: 40px; /* damit man immer ein bisschen scrollen kann */
     }
 
     /* HEADER */
@@ -80,12 +80,13 @@
       align-items: center;
       padding: 4px 4px 14px;
       font-size: 13px;
-      color: var(--text-subtle);
+      color: #9ca3af;
     }
 
     .header-left {
       font-weight: 600;
-      letter-spacing: 0.02em;
+      letter-spacing: 0.03em;
+      font-size: 14px;
       color: #e5e7eb;
     }
 
@@ -106,55 +107,57 @@
     }
 
     .header-status {
-      font-size: 12px;
-      padding: 3px 9px;
-      border-radius: 999px;
-      background: rgba(15,23,42,0.9);
-      border: 1px solid rgba(148,163,184,0.4);
-      color: var(--text-subtle);
+      font-size:12px;
+      color:#9ca3af;
     }
 
-    /* TABS */
-    .tab-bar {
+    /* TABS oben (Kërkesa / Aktive / Bilanci) */
+    .tabs {
+      background: var(--tab-bg);
+      border-radius: 999px;
+      padding: 4px;
       display: flex;
-      gap: 8px;
+      gap: 4px;
       margin-bottom: 14px;
-      padding: 2px 2px 4px;
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
+      border: 1px solid rgba(148,163,184,0.35);
+      box-shadow: 0 12px 40px rgba(15,23,42,0.9);
     }
 
     .tab-btn {
       flex: 1;
-      min-width: 90px;
+      border: none;
       border-radius: 999px;
-      border: 1px solid transparent;
-      background: rgba(15,23,42,0.96);
+      padding: 7px 4px;
+      background: transparent;
       color: #9ca3af;
-      font-size: 13px;
-      padding: 7px 10px;
-      text-align: center;
+      font-size: 12px;
       font-weight: 500;
       cursor: pointer;
-      white-space: nowrap;
+      position: relative;
+      transition: color 0.16s ease, transform 0.12s ease;
+    }
+
+    .tab-btn span {
+      position: relative;
+      z-index: 2;
     }
 
     .tab-btn.active {
-      background: linear-gradient(135deg,#22c55e,#4ade80);
-      color: #022c22;
-      box-shadow: 0 12px 30px rgba(34,197,94,0.4);
-      border-color: rgba(34,197,94,0.7);
+      color: #e5e7eb;
+      transform: translateY(-0.5px);
     }
 
-    .tab-panel {
-      display: none;
+    .tab-btn.active::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 999px;
+      background: radial-gradient(circle at top left, rgba(34,197,94,0.18), rgba(37,99,235,0.35));
+      box-shadow: 0 10px 30px rgba(52,211,153,0.45);
+      z-index: 1;
     }
 
-    .tab-panel.active {
-      display: block;
-    }
-
-    /* CARD */
+    /* Karten / Cards */
     .card {
       background: var(--card-bg);
       border-radius: var(--border-radius-xl);
@@ -163,7 +166,7 @@
       border: 1px solid rgba(148,163,184,0.22);
       backdrop-filter: blur(22px);
       -webkit-backdrop-filter: blur(22px);
-      margin-bottom: 16px;
+      margin-bottom: 18px;
     }
 
     .card-title {
@@ -174,7 +177,7 @@
 
     .card-subtitle {
       font-size: 13px;
-      color: var(--text-subtle);
+      color: #9ca3af;
       margin-bottom: 10px;
     }
 
@@ -182,7 +185,6 @@
       display:block;
       margin-top:8px;
       font-size:13px;
-      color:#e5e7eb;
     }
 
     input {
@@ -220,22 +222,22 @@
     }
 
     .btn-secondary {
-      background: linear-gradient(135deg,#facc15,#f97316);
-      color:#111827;
-      box-shadow:0 10px 28px rgba(250,204,21,0.4);
+      background: linear-gradient(135deg,#0ea5e9,#22c55e);
+      color:#022c22;
+      box-shadow:0 10px 28px rgba(34,197,94,0.5);
       font-size:14px;
-      padding:9px 11px;
+      padding:9px 10px;
       width:100%;
-      margin-top:10px;
+      margin-top:8px;
     }
 
     .btn-danger {
-      background:var(--danger);
+      background:#ef4444;
       color:white;
       font-size:13px;
-      padding:8px 11px;
+      padding:8px 10px;
       width:100%;
-      margin-top:8px;
+      margin-top:6px;
       box-shadow:0 6px 22px rgba(239,68,68,0.55);
     }
 
@@ -246,19 +248,18 @@
     }
 
     .section-title {
-      font-size:15px;
-      font-weight:600;
-      margin-top:4px;
+      font-size:14px;
+      font-weight:500;
       margin-bottom:4px;
     }
 
     .section-sub {
-      font-size:12px;
-      color:var(--text-subtle);
+      font-size:11px;
+      color:#9ca3af;
       margin-bottom:6px;
     }
 
-    /* ORDER CARD */
+    /* Order-Karte */
     .order-card {
       background: radial-gradient(circle at top left, rgba(59,130,246,.22), rgba(15,23,42,.96));
       border-radius: 22px;
@@ -272,13 +273,19 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
       gap: 8px;
+    }
+
+    .order-main {
+      display:flex;
+      flex-direction:column;
+      gap:2px;
     }
 
     .order-name { font-size: 15px; font-weight: 600; }
     .order-phone { font-size: 13px; opacity: .9; }
-    .order-address { font-size: 12px; color: #cbd5f5; margin-top: 2px; }
+    .order-address { font-size: 12px; color:#cbd5f5; }
 
     .badge {
       font-size:11px;
@@ -297,20 +304,17 @@
       overflow: hidden;
       margin-top: 8px;
       border: 1px solid rgba(15, 23, 42, .9);
-    }
-    .mini-map.leaflet-container {
       background:#020617;
     }
 
     .order-footer {
-      margin-top: 8px;
+      margin-top: 7px;
       font-size: 11.5px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       color: #9ca3af;
       gap:8px;
-      flex-wrap: wrap;
     }
 
     .order-footer a {
@@ -330,162 +334,97 @@
       margin-top:4px;
     }
 
-    /* STATS / BALANCE */
-    .stats-toggle {
-      display: inline-flex;
-      padding: 3px;
-      border-radius: 999px;
-      background: rgba(15,23,42,0.96);
-      border: 1px solid rgba(55,65,81,0.9);
-      margin: 6px 0 10px;
-    }
-
-    .stats-chip {
-      border-radius: 999px;
-      border: none;
-      font-size: 12px;
-      padding: 5px 10px;
-      background: transparent;
-      color: #9ca3af;
-      cursor: pointer;
-    }
-
-    .stats-chip.active {
-      background: rgba(34,197,94,0.16);
-      color: #bbf7d0;
-    }
-
-    .stats-box {
-      border-radius: 18px;
-      background: rgba(15,23,42,0.96);
-      border: 1px solid rgba(55,65,81,0.9);
-      padding: 10px 12px;
-      font-size: 13px;
-    }
-
-    .stat-row {
+    /* STATS CARD */
+    .stat-toggle {
       display:flex;
-      justify-content:space-between;
-      align-items:center;
-      padding: 3px 0;
-      color:#e5e7eb;
+      gap:6px;
+      margin-bottom:8px;
+      margin-top:4px;
     }
 
-    .stat-row span:last-child {
+    .stat-pill {
+      flex:1;
+      border-radius:999px;
+      border:none;
+      padding:5px 4px;
+      background:rgba(15,23,42,0.95);
+      color:#9ca3af;
+      font-size:11px;
+      cursor:pointer;
+    }
+
+    .stat-pill.active {
+      background:rgba(37,99,235,0.35);
+      color:#e5e7eb;
+      box-shadow:0 8px 26px rgba(37,99,235,0.65);
+    }
+
+    .stat-main {
+      margin-top:4px;
+    }
+
+    .stat-number {
+      font-size:24px;
       font-weight:600;
     }
 
-    .balance-box {
-      border-radius: 16px;
-      background: rgba(15,23,42,0.96);
-      border: 1px solid rgba(55,65,81,0.9);
-      padding: 10px 12px;
-      font-size: 13px;
-      margin-top: 8px;
-      line-height: 1.4;
+    .stat-label {
+      font-size:12px;
+      color:#9ca3af;
+      margin-top:2px;
     }
 
-    .balance-status {
-      font-size: 12px;
-      color: #9ca3af;
-      margin-top: 4px;
+    /* Bilanci – brenda tab-it */
+    .balance-summary {
+      font-size:14px;
+      margin-top:4px;
     }
 
-    /* HISTORY */
-    .history-item {
-      border-radius: 18px;
-      background: rgba(15,23,42,0.96);
-      border: 1px solid rgba(55,65,81,0.9);
-      padding: 8px 10px;
-      margin-top: 8px;
-      font-size: 12px;
+    .balance-summary strong {
+      font-weight:600;
     }
 
-    .history-top {
+    .balance-meta {
+      font-size:11px;
+      color:#9ca3af;
+      margin-top:4px;
+    }
+
+    .balance-toggle {
+      margin-top:12px;
+      display:flex;
+      gap:6px;
+    }
+
+    .balance-tab-btn {
+      flex:1;
+      border-radius:12px;
+      border:none;
+      padding:6px 6px;
+      background:rgba(15,23,42,0.95);
+      color:#9ca3af;
+      font-size:11px;
+      cursor:pointer;
+    }
+
+    .balance-tab-btn.active {
+      background:rgba(56,189,248,0.28);
+      color:#e5e7eb;
+      box-shadow:0 10px 30px rgba(56,189,248,0.6);
+    }
+
+    .balance-panel { margin-top:10px; font-size:12px; }
+    .balance-row {
       display:flex;
       justify-content:space-between;
-      align-items:center;
-      margin-bottom: 2px;
+      padding:4px 0;
+      border-bottom:1px dashed rgba(55,65,81,0.8);
     }
+    .balance-row:last-child { border-bottom:none; }
 
-    .history-title {
-      font-weight:500;
-      font-size:13px;
-    }
-
-    .history-type-done {
-      color:#bbf7d0;
-    }
-
-    .history-type-canceled {
-      color:#fecaca;
-    }
-
-    /* LOGOUT SLIDER */
-    .logout-wrap {
-      margin-top: 18px;
-      text-align: center;
-      font-size: 12px;
-      color: #9ca3af;
-    }
-
-    .logout-label {
-      margin-bottom: 6px;
-    }
-
-    .logout-slider {
-      position: relative;
-      width: 100%;
-      max-width: 360px;
-      height: 44px;
-      margin: 0 auto;
-      border-radius: 999px;
-      background: rgba(15,23,42,0.96);
-      border: 1px solid rgba(55,65,81,0.9);
-      overflow: hidden;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-    }
-
-    .logout-slider-text {
-      font-size: 13px;
-      color: #9ca3af;
-      pointer-events: none;
-    }
-
-    .logout-thumb {
-      position: absolute;
-      left: 4px;
-      top: 3px;
-      bottom: 3px;
-      width: 74px;
-      border-radius: 999px;
-      background: linear-gradient(135deg,#ef4444,#f97316);
-      box-shadow: 0 10px 30px rgba(239,68,68,0.5);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-size: 18px;
-      color:#fef2f2;
-      touch-action: none;
-      cursor: pointer;
-    }
-
-    .logout-slider.done {
-      opacity: 0.85;
-    }
-
-    @media (max-width: 380px) {
-      .card {
-        padding: 14px 12px 16px;
-      }
-      .order-card {
-        padding: 10px 10px 12px;
-      }
-      .mini-map {
-        height: 130px;
-      }
+    .small-muted {
+      font-size:11px;
+      color:#6b7280;
     }
   </style>
 </head>
@@ -494,40 +433,66 @@
 <div class="frame">
   <!-- HEADER -->
   <div class="header">
-    <div class="header-left">KosovaTaxi • Shofer</div>
+    <div class="header-left">Thirr Taxi</div>
     <div class="header-center">
       <div class="dot"></div>
       <span id="headerDriverName">Shoferi</span>
     </div>
-    <div id="headerStatus" class="header-status">Offline</div>
+    <span id="headerStatus" class="header-status">Offline</span>
   </div>
 
   <!-- LOGIN CARD -->
   <div id="loginCard" class="card">
     <div class="card-title">Hyr si shofer</div>
     <div class="card-subtitle">
-      Shkruaj vetëm PIN-in që të ka dhënë admini. Emri dhe kompania merren automatikisht.
+      Shkruaj vetëm PIN-in që ta ka dhënë administratori. Emri dhe kompania merren automatikisht.
     </div>
 
     <label>PIN</label>
-    <input id="loginPin" placeholder="p.sh. 4829">
+    <input id="loginPin" inputmode="numeric" placeholder="p.sh. 4829">
 
     <button id="loginBtn" class="btn-primary">Hyr online</button>
     <div id="loginMsg" class="login-error"></div>
   </div>
 
-  <!-- DASHBOARD -->
+  <!-- CONTENT NACH LOGIN -->
   <div id="content" style="display:none;">
-    <!-- TABS -->
-    <div class="tab-bar">
-      <button class="tab-btn active" data-tab="tab-active">Aktive</button>
-      <button class="tab-btn" data-tab="tab-open">Kërkesa</button>
-      <button class="tab-btn" data-tab="tab-balance">Bilanci</button>
-      <button class="tab-btn" data-tab="tab-history">Lëvizjet</button>
+
+    <!-- TOP TABS -->
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="tab-requests"><span>Kërkesa</span></button>
+      <button class="tab-btn" data-tab="tab-active"><span>Udhëtimet e mia</span></button>
+      <button class="tab-btn" data-tab="tab-balance"><span>Bilanci</span></button>
+    </div>
+
+    <!-- STATS CARD -->
+    <div class="card">
+      <div class="section-title">Performanca ime</div>
+      <div class="section-sub">Sa udhëtime ke përfunduar si shofer.</div>
+      <div class="stat-toggle">
+        <button class="stat-pill active" data-range="day">Sot</button>
+        <button class="stat-pill" data-range="week">Java</button>
+        <button class="stat-pill" data-range="month">Muaji</button>
+      </div>
+      <div class="stat-main">
+        <div id="statRidesCount" class="stat-number">0</div>
+        <div id="statRidesLabel" class="stat-label">Udhëtime të përfunduara sot</div>
+      </div>
+    </div>
+
+    <!-- TAB: KËRKESA -->
+    <div id="tab-requests" class="tab-panel" style="display:block;">
+      <div class="card">
+        <div class="section-title">Kërkesa të reja</div>
+        <div class="section-sub">Këto janë udhëtimet që mund t’i pranosh.</div>
+
+        <div id="orders"></div>
+        <div id="noOpen" class="empty-text"></div>
+      </div>
     </div>
 
     <!-- TAB: AKTIVE -->
-    <div id="tab-active" class="tab-panel active">
+    <div id="tab-active" class="tab-panel" style="display:none;">
       <div class="card">
         <div class="section-title">Udhëtimet e mia aktive</div>
         <div class="section-sub">Mund të kesh vetëm një udhëtim aktiv në të njëjtën kohë.</div>
@@ -537,68 +502,33 @@
       </div>
     </div>
 
-    <!-- TAB: KËRKESA (OPEN) -->
-    <div id="tab-open" class="tab-panel">
+    <!-- TAB: BILANCI -->
+    <div id="tab-balance" class="tab-panel" style="display:none;">
       <div class="card">
-        <div class="section-title">Kërkesa në pritje</div>
-        <div class="section-sub">Këto janë udhëtime që mund t’i pranosh.</div>
+        <div class="section-title">Bilanci im</div>
+        <div class="section-sub">Sa ke për t’u barazuar dhe levizjet e fundit.</div>
 
-        <div id="orders"></div>
-        <div id="noOpen" class="empty-text"></div>
-      </div>
-    </div>
+        <div id="balanceSummary" class="balance-summary"></div>
+        <div id="balanceMeta" class="balance-meta"></div>
 
-    <!-- TAB: BILANCI / PERFORMANCA -->
-    <div id="tab-balance" class="tab-panel">
-      <div class="card">
-        <div class="section-title">Performanca ime</div>
-        <div class="section-sub">Shiko udhëtimet e përfunduara dhe anulimet për sot, javën dhe muajin.</div>
-
-        <div class="stats-toggle">
-          <button class="stats-chip active" data-range="day">Sot</button>
-          <button class="stats-chip" data-range="week">Java</button>
-          <button class="stats-chip" data-range="month">Muaji</button>
+        <div class="balance-toggle">
+          <button class="balance-tab-btn active" data-btab="b-summary">Përmbledhje</button>
+          <button class="balance-tab-btn" data-btab="b-history">Levizjet e fundit</button>
         </div>
 
-        <div class="stats-box">
-          <div class="stat-row">
-            <span>Udhëtime të përfunduara</span>
-            <span id="statDone">0</span>
-          </div>
-          <div class="stat-row">
-            <span>Anulime</span>
-            <span id="statCanceled">0</span>
-          </div>
+        <div id="b-summary" class="balance-panel">
+          <!-- mbushet nga JS -->
         </div>
-
-        <div class="section-title" style="margin-top:14px;">Barazimi im</div>
-        <div id="balanceBox" class="balance-box"></div>
+        <div id="b-history" class="balance-panel" style="display:none;">
+          <div id="balanceHistoryList"></div>
+          <div id="balanceHistoryEmpty" class="small-muted"></div>
+        </div>
       </div>
     </div>
 
-    <!-- TAB: LËVIZJET -->
-    <div id="tab-history" class="tab-panel">
-      <div class="card">
-        <div class="section-title">Lëvizjet e fundit</div>
-        <div class="section-sub">Lista e udhëtimeve të fundit të përfunduara dhe anulimeve.</div>
+  </div> <!-- /content -->
+</div> <!-- /frame -->
 
-        <div id="historyList"></div>
-        <div id="noHistory" class="empty-text"></div>
-      </div>
-    </div>
-
-    <!-- LOGOUT SLIDER -->
-    <div class="logout-wrap">
-      <div class="logout-label">Për t'u çkyçur nga llogaria:</div>
-      <div class="logout-slider" id="logoutSlider">
-        <div class="logout-slider-text">Slide për t'u çkyçur</div>
-        <div class="logout-thumb" id="logoutThumb">⇢</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Leaflet JS -->
 <script
   src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
   crossorigin=""
@@ -606,7 +536,7 @@
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
-  import { getDatabase, ref, onValue, runTransaction, set } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-database.js";
+  import { getDatabase, ref, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-database.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyCgCxp8M9XGOKFSIfaU9nM48rxtFQP-Kvs",
@@ -622,9 +552,14 @@
   const app = initializeApp(firebaseConfig);
   const db = getDatabase(app);
 
+  const LS_KEY = "thirrTaxiDriverId";
+
   let currentDriver = null;
   let hasActiveRide = false;
-  let locWatchId = null;
+  let activeStatRange = "day";
+  const stats = { day: 0, week: 0, month: 0 };
+  const maps = {};
+  let geoWatchId = null;
 
   const loginCard = document.getElementById("loginCard");
   const content = document.getElementById("content");
@@ -632,102 +567,213 @@
   const loginMsg = document.getElementById("loginMsg");
   const headerDriverName = document.getElementById("headerDriverName");
   const headerStatus = document.getElementById("headerStatus");
-  const balanceBox = document.getElementById("balanceBox");
 
   const tabButtons = document.querySelectorAll(".tab-btn");
   const tabPanels = document.querySelectorAll(".tab-panel");
 
-  const statDoneEl = document.getElementById("statDone");
-  const statCanceledEl = document.getElementById("statCanceled");
-  const statsChips = document.querySelectorAll(".stats-chip");
-  let currentStatsRange = "day";
+  const statPills = document.querySelectorAll(".stat-pill");
+  const statRidesCount = document.getElementById("statRidesCount");
+  const statRidesLabel = document.getElementById("statRidesLabel");
 
-  // Stats cache
-  const driverStats = {
-    day: { done: 0, canceled: 0 },
-    week: { done: 0, canceled: 0 },
-    month: { done: 0, canceled: 0 }
+  const balanceSummary = document.getElementById("balanceSummary");
+  const balanceMeta = document.getElementById("balanceMeta");
+  const balanceTabBtns = document.querySelectorAll(".balance-tab-btn");
+  const balancePanels = {
+    "b-summary": document.getElementById("b-summary"),
+    "b-history": document.getElementById("b-history")
   };
+  const balanceHistoryList = document.getElementById("balanceHistoryList");
+  const balanceHistoryEmpty = document.getElementById("balanceHistoryEmpty");
 
-  // Helpers for dates
-  function startOfDay(d) {
-    const n = new Date(d); n.setHours(0,0,0,0); return n.getTime();
+  const ordersBox = document.getElementById("orders");
+  const myOrdersBox = document.getElementById("myOrders");
+  const noOpen = document.getElementById("noOpen");
+  const noMine = document.getElementById("noMine");
+
+  /* ---------- HELFER ---------- */
+
+  function cleanAddress(a) {
+    if (!a) return "";
+    const lower = a.toLowerCase();
+    if (lower.includes("nuk") && lower.includes("përcaktuar")) return "";
+    return a;
   }
-  function endOfDay(d) {
-    return startOfDay(d) + 24*60*60*1000;
+
+  function formatMinutesSince(timestamp) {
+    if (!timestamp) return "-";
+    const diffMs = Date.now() - timestamp;
+    const mins = Math.floor(diffMs / 60000);
+    if (mins <= 0) return "më pak se 1 min";
+    if (mins === 1) return "1 minutë";
+    return mins + " minuta";
+  }
+
+  function startOfDay(d) {
+    const n = new Date(d); n.setHours(0,0,0,0); return n;
   }
   function startOfWeek(d) {
-    const n = new Date(d);
-    n.setHours(0,0,0,0);
+    const n = startOfDay(d);
     const day = n.getDay();
     const diff = (day === 0 ? -6 : 1 - day);
     n.setDate(n.getDate() + diff);
-    return n.getTime();
-  }
-  function endOfWeek(d) {
-    return startOfWeek(d) + 7*24*60*60*1000;
+    return n;
   }
   function startOfMonth(d) {
-    const n = new Date(d);
-    return new Date(n.getFullYear(), n.getMonth(), 1).getTime();
-  }
-  function endOfMonth(d) {
-    const n = new Date(d);
-    return new Date(n.getFullYear(), n.getMonth()+1, 1).getTime();
+    const n = startOfDay(d);
+    return new Date(n.getFullYear(), n.getMonth(), 1);
   }
 
-  /* ---------- SESSION / LOGIN ---------- */
+  function createOrUpdateMap(containerId, lat, lng) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
 
-  function applyLoggedInUI(driver) {
-    currentDriver = driver;
-    headerDriverName.textContent = driver.name || "Shoferi";
+    if (maps[containerId]) {
+      maps[containerId].setView([lat, lng], 16);
+      setTimeout(() => maps[containerId].invalidateSize(), 200);
+      return;
+    }
+
+    const map = L.map(containerId, {
+      zoomControl: false,
+      attributionControl: false,
+    }).setView([lat, lng], 16);
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 19,
+    }).addTo(map);
+
+    L.marker([lat, lng]).addTo(map);
+    maps[containerId] = map;
+
+    setTimeout(() => map.invalidateSize(), 200);
+  }
+
+  function invalidateAllMaps() {
+    setTimeout(() => {
+      Object.values(maps).forEach(m => {
+        try { m.invalidateSize(); } catch(e) {}
+      });
+    }, 220);
+  }
+
+  function updateStatUI() {
+    const value = stats[activeStatRange] || 0;
+    statRidesCount.textContent = value;
+
+    let label = "Udhëtime të përfunduara sot";
+    if (activeStatRange === "week") label = "Udhëtime të përfunduara këtë javë";
+    if (activeStatRange === "month") label = "Udhëtime të përfunduara këtë muaj";
+    statRidesLabel.textContent = label;
+  }
+
+  function recalcStats(allOrders) {
+    stats.day = 0;
+    stats.week = 0;
+    stats.month = 0;
+    if (!currentDriver) return;
+
+    const now = new Date();
+    const dDay = startOfDay(now);
+    const dWeek = startOfWeek(now);
+    const dMonth = startOfMonth(now);
+
+    Object.values(allOrders).forEach(o => {
+      if (o.takenByDriverId !== currentDriver.id || o.status !== "done") return;
+      const t = o.completedAt || o.takenAt || o.createdAt;
+      if (!t) return;
+      const dt = new Date(t);
+
+      if (dt >= dDay) stats.day++;
+      if (dt >= dWeek) stats.week++;
+      if (dt >= dMonth) stats.month++;
+    });
+
+    updateStatUI();
+  }
+
+  function startLocationTracking() {
+    if (!navigator.geolocation || !currentDriver) return;
+    if (geoWatchId !== null) return;
+
+    geoWatchId = navigator.geolocation.watchPosition(
+      (pos) => {
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+        const locRef = ref(db, "driverLocations/" + currentDriver.id);
+        // sehr kleines Payload – reicht
+        runTransaction(locRef, () => ({
+          lat,
+          lng,
+          updatedAt: Date.now()
+        }));
+      },
+      (err) => {
+        console.warn("Geolocation error:", err);
+      },
+      {
+        enableHighAccuracy: true,
+        maximumAge: 5000,
+        timeout: 15000
+      }
+    );
+  }
+
+  /* ---------- TAB LOGIK ---------- */
+
+  tabButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const target = btn.dataset.tab;
+
+      tabButtons.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+
+      tabPanels.forEach(p => {
+        p.style.display = (p.id === target) ? "block" : "none";
+      });
+
+      invalidateAllMaps();
+    });
+  });
+
+  statPills.forEach(pill => {
+    pill.addEventListener("click", () => {
+      const r = pill.dataset.range;
+      if (!r) return;
+      activeStatRange = r;
+      statPills.forEach(p => p.classList.remove("active"));
+      pill.classList.add("active");
+      updateStatUI();
+    });
+  });
+
+  balanceTabBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const target = btn.dataset.btab;
+      balanceTabBtns.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+
+      Object.entries(balancePanels).forEach(([id, el]) => {
+        el.style.display = (id === target) ? "block" : "none";
+      });
+    });
+  });
+
+  /* ---------- LOGIN / AUTO-LOGIN ---------- */
+
+  function afterLoginSetup() {
+    if (!currentDriver) return;
+    if (window.__driverInitialized) return;
+    window.__driverInitialized = true;
+
+    headerDriverName.textContent = currentDriver.name || "Shoferi";
     headerStatus.textContent = "Online";
+
     loginCard.style.display = "none";
     content.style.display = "block";
-    startLocationTracking();
+
     subscribeOrders();
     subscribeBalance();
-  }
-
-  function saveSession(driverId) {
-    try {
-      localStorage.setItem("shoferSession", JSON.stringify({ id: driverId }));
-    } catch (e) {
-      console.warn("Nuk u ruajt sesioni", e);
-    }
-  }
-
-  function clearSession() {
-    try {
-      localStorage.removeItem("shoferSession");
-    } catch (e) {}
-  }
-
-  function bootstrapSession() {
-    let raw = null;
-    try {
-      raw = localStorage.getItem("shoferSession");
-    } catch (e) {}
-    if (!raw) return;
-
-    let parsed = null;
-    try {
-      parsed = JSON.parse(raw);
-    } catch (e) { return; }
-
-    if (!parsed || !parsed.id) return;
-
-    const drvRef = ref(db, "drivers/" + parsed.id);
-    onValue(drvRef, (snap) => {
-      const d = snap.val();
-      if (!d || d.approved !== true || d.active === false) {
-        clearSession();
-        return;
-      }
-      if (!currentDriver) {
-        applyLoggedInUI({ id: parsed.id, ...d });
-      }
-    }, { onlyOnce: true });
+    startLocationTracking();
   }
 
   loginBtn.onclick = () => {
@@ -759,204 +805,74 @@
           return;
         }
 
-        if (!currentDriver) {
-          saveSession(found.id);
-          applyLoggedInUI(found);
-        }
+        currentDriver = found;
+        localStorage.setItem(LS_KEY, currentDriver.id);
+        afterLoginSetup();
       },
       { onlyOnce: true }
     );
   };
 
-  /* ---------- GEO TRACKING ---------- */
-
-  function startLocationTracking() {
-    if (!navigator.geolocation || !currentDriver) return;
-    if (locWatchId !== null) return;
-
-    locWatchId = navigator.geolocation.watchPosition(
-      (pos) => {
-        const lat = pos.coords.latitude;
-        const lng = pos.coords.longitude;
-        const acc = pos.coords.accuracy;
-        const speed = pos.coords.speed;
-        const heading = pos.coords.heading;
-
-        const locRef = ref(db, "driverLocations/" + currentDriver.id);
-        set(locRef, {
-          lat,
-          lng,
-          accuracy: acc,
-          speed: speed || null,
-          heading: heading || null,
-          updatedAt: Date.now(),
-          name: currentDriver.name || null,
-          company: currentDriver.company || null,
-          online: true
-        });
+  // Auto-Login nach Reload
+  const savedId = localStorage.getItem(LS_KEY);
+  if (savedId) {
+    const drvRef = ref(db, "drivers/" + savedId);
+    onValue(
+      drvRef,
+      (snap) => {
+        const d = snap.val();
+        if (d && d.approved === true && (d.active !== false)) {
+          currentDriver = { id: savedId, ...d };
+          afterLoginSetup();
+        } else {
+          localStorage.removeItem(LS_KEY);
+        }
       },
-      (err) => {
-        console.warn("Geo error", err);
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 20000,
-        maximumAge: 10000
-      }
+      { onlyOnce: true }
     );
   }
 
-  function stopLocationTracking() {
-    if (locWatchId !== null && navigator.geolocation) {
-      navigator.geolocation.clearWatch(locWatchId);
-      locWatchId = null;
-    }
-    if (currentDriver) {
-      const locRef = ref(db, "driverLocations/" + currentDriver.id);
-      set(locRef, {
-        online: false,
-        updatedAt: Date.now()
-      }).catch(() => {});
-    }
-  }
-
-  /* ---------- MAP & HELPERS ---------- */
-
-  function createMiniMap(containerId, lat, lng) {
-    const container = document.getElementById(containerId);
-    if (!container) return;
-    container.innerHTML = "";
-    const map = L.map(containerId, {
-      zoomControl: false,
-      attributionControl: false,
-    }).setView([lat, lng], 16);
-
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      maxZoom: 19,
-    }).addTo(map);
-
-    L.marker([lat, lng]).addTo(map);
-  }
-
-  function formatMinutesSince(timestamp) {
-    if (!timestamp) return "-";
-    const diffMs = Date.now() - timestamp;
-    const mins = Math.floor(diffMs / 60000);
-    if (mins <= 0) return "më pak se 1 min";
-    if (mins === 1) return "1 minutë";
-    return mins + " minuta";
-  }
-
-  function extractStreet(address) {
-    if (!address) return "Adresa nuk është e përcaktuar";
-    const parts = String(address).split(",");
-    return parts[0].trim() || "Adresa nuk është e përcaktuar";
-  }
-
-  /* ---------- ORDERS / UI ---------- */
+  /* ---------- ORDERS / REALTIME ---------- */
 
   function subscribeOrders() {
     const ordersRef = ref(db, "orders");
 
     onValue(ordersRef, (snap) => {
       const data = snap.val() || {};
-      const openBox = document.getElementById("orders");
-      const mineBox = document.getElementById("myOrders");
-      const noOpen = document.getElementById("noOpen");
-      const noMine = document.getElementById("noMine");
-      const historyList = document.getElementById("historyList");
-      const noHistory = document.getElementById("noHistory");
 
-      openBox.innerHTML = "";
-      mineBox.innerHTML = "";
-      historyList.innerHTML = "";
-
+      ordersBox.innerHTML = "";
+      myOrdersBox.innerHTML = "";
       let openCount = 0;
       let mineCount = 0;
       hasActiveRide = false;
 
-      // Reset stats
-      driverStats.day.done = 0;
-      driverStats.day.canceled = 0;
-      driverStats.week.done = 0;
-      driverStats.week.canceled = 0;
-      driverStats.month.done = 0;
-      driverStats.month.canceled = 0;
-
-      const now = Date.now();
-      const dayStart = startOfDay(now);
-      const dayEnd = endOfDay(now);
-      const weekStart = startOfWeek(now);
-      const weekEnd = endOfWeek(now);
-      const monthStart = startOfMonth(now);
-      const monthEnd = endOfMonth(now);
-
-      const historyArr = [];
+      recalcStats(data);
 
       Object.entries(data).forEach(([id, o]) => {
         const safeIdOpen = "map_open_" + id.replace(/[^a-zA-Z0-9_-]/g, "");
         const safeIdMine = "map_mine_" + id.replace(/[^a-zA-Z0-9_-]/g, "");
 
-        const isMine = (o.takenByDriverId === currentDriver?.id);
+        const rawAdr = o.addressStreet || o.address;
+        const addressText = cleanAddress(rawAdr);
 
-        const completedTime = o.completedAt || o.createdAt || null;
-        const canceledTime = o.canceledAt || null;
-
-        // Stats for THIS driver
-        if (isMine) {
-          if (o.status === "done" && completedTime) {
-            const t = completedTime;
-            if (t >= dayStart && t < dayEnd) driverStats.day.done++;
-            if (t >= weekStart && t < weekEnd) driverStats.week.done++;
-            if (t >= monthStart && t < monthEnd) driverStats.month.done++;
-
-            historyArr.push({
-              type: "done",
-              name: o.name,
-              phone: o.phone,
-              address: extractStreet(o.address),
-              time: t
-            });
-          }
-
-          if (o.status === "canceled" && canceledTime) {
-            const t = canceledTime;
-            if (t >= dayStart && t < dayEnd) driverStats.day.canceled++;
-            if (t >= weekStart && t < weekEnd) driverStats.week.canceled++;
-            if (t >= monthStart && t < monthEnd) driverStats.month.canceled++;
-
-            historyArr.push({
-              type: "canceled",
-              name: o.name,
-              phone: o.phone,
-              address: extractStreet(o.address),
-              time: t
-            });
-          }
-        }
-
-        /* --------------------
-         * KËRKESA NË PRITJE
-         * -------------------- */
+        /* KËRKESA TË REJA */
         if (o.status === "open") {
           openCount++;
           const wrapper = document.createElement("div");
           wrapper.className = "order-card";
 
-          const street = extractStreet(o.address);
-
           wrapper.innerHTML = `
             <div class="order-header">
-              <div>
-                <div class="order-name">${o.name}</div>
-                <div class="order-phone">${o.phone}</div>
-                <div class="order-address">${street}</div>
+              <div class="order-main">
+                <div class="order-name">${o.name || "Klienti"}</div>
+                <div class="order-phone">${o.phone || ""}</div>
+                ${addressText ? `<div class="order-address">${addressText}</div>` : ""}
               </div>
-              <span class="badge badge-open">Në pritje</span>
+              <span class="badge badge-open">Kërkesë e re</span>
             </div>
             <div id="${safeIdOpen}" class="mini-map"></div>
             <div class="order-footer">
-              <span>Kliko “Prano udhëtimin” për ta marrë këtë klient.</span>
+              <span>Preke butonin për ta pranuar këtë udhëtim.</span>
               <a href="https://maps.google.com/?q=${o.lat},${o.lng}" target="_blank">Google Maps</a>
             </div>
           `;
@@ -966,7 +882,7 @@
           acceptBtn.textContent = "✅ Prano udhëtimin";
           acceptBtn.onclick = () => {
             if (hasActiveRide) {
-              alert("Nuk mund të pranoni më shumë se një udhëtim.");
+              alert("Nuk mund të pranosh më shumë se një udhëtim në të njëjtën kohë.");
               return;
             }
             const thisOrder = ref(db, "orders/" + id);
@@ -974,24 +890,29 @@
               if (!current || current.status !== "open") return current;
               current.status = "taken";
               current.takenByName = currentDriver.name;
-              current.takenByCompany = currentDriver.company || "KosovaTaxi";
+              current.takenByCompany = currentDriver.company || "Thirr Taxi";
               current.takenByDriverId = currentDriver.id;
               current.takenAt = Date.now();
               return current;
+            }).then(() => {
+              // Direkt auf Tab "Aktive" wechseln
+              const activeBtn = document.querySelector('.tab-btn[data-tab="tab-active"]');
+              if (activeBtn) activeBtn.click();
             });
           };
 
           wrapper.appendChild(acceptBtn);
-          openBox.appendChild(wrapper);
-          setTimeout(() => createMiniMap(safeIdOpen, o.lat, o.lng), 80);
+          ordersBox.appendChild(wrapper);
+
+          if (typeof o.lat === "number" && typeof o.lng === "number") {
+            setTimeout(() => createOrUpdateMap(safeIdOpen, o.lat, o.lng), 50);
+          }
         }
 
-        /* --------------------
-         * UDHËTIMET E MIA AKTIVE
-         * -------------------- */
+        /* UDHËTIMET E MIJA AKTIVE */
         if (
           o.status === "taken" &&
-          isMine
+          o.takenByDriverId === currentDriver?.id
         ) {
           mineCount++;
           hasActiveRide = true;
@@ -1000,14 +921,13 @@
           wrapper.className = "order-card";
 
           const timeText = formatMinutesSince(o.takenAt);
-          const street = extractStreet(o.address);
 
           wrapper.innerHTML = `
             <div class="order-header">
-              <div>
-                <div class="order-name">${o.name}</div>
-                <div class="order-phone">${o.phone}</div>
-                <div class="order-address">${street}</div>
+              <div class="order-main">
+                <div class="order-name">${o.name || "Klienti"}</div>
+                <div class="order-phone">${o.phone || ""}</div>
+                ${addressText ? `<div class="order-address">${addressText}</div>` : ""}
               </div>
               <span class="badge badge-active">Aktive</span>
             </div>
@@ -1018,38 +938,50 @@
             </div>
           `;
 
-          /* Perfundo */
           const finishBtn = document.createElement("button");
           finishBtn.className = "btn-secondary";
           finishBtn.textContent = "✅ Përfundo udhëtimin";
           finishBtn.onclick = () => {
             const thisOrder = ref(db, "orders/" + id);
-
             runTransaction(thisOrder, (current) => {
               if (!current || current.status !== "taken") return current;
               current.status = "done";
               current.completedAt = Date.now();
               return current;
             }).then(() => {
-              // Update balance (0.25 € për kompaninë)
               const balRef = ref(db, "balances/" + currentDriver.id);
               runTransaction(balRef, (cur) => {
+                const ts = Date.now();
                 if (!cur) {
                   return {
                     total: 0.25,
                     status: "open",
-                    lastUpdate: Date.now()
+                    lastUpdate: ts,
+                    history: {
+                      [id]: {
+                        amount: 0.25,
+                        orderId: id,
+                        timestamp: ts,
+                        type: "ride"
+                      }
+                    }
                   };
                 }
                 cur.total = (cur.total || 0) + 0.25;
                 cur.status = "open";
-                cur.lastUpdate = Date.now();
+                cur.lastUpdate = ts;
+                if (!cur.history) cur.history = {};
+                cur.history[id] = {
+                  amount: 0.25,
+                  orderId: id,
+                  timestamp: ts,
+                  type: "ride"
+                };
                 return cur;
               });
             });
           };
 
-          /* Anulo */
           const cancelBtn = document.createElement("button");
           cancelBtn.className = "btn-danger";
           cancelBtn.textContent = "✖ Anulo udhëtimin";
@@ -1068,184 +1000,90 @@
 
           wrapper.appendChild(finishBtn);
           wrapper.appendChild(cancelBtn);
-          mineBox.appendChild(wrapper);
+          myOrdersBox.appendChild(wrapper);
 
-          setTimeout(() => createMiniMap(safeIdMine, o.lat, o.lng), 80);
+          if (typeof o.lat === "number" && typeof o.lng === "number") {
+            setTimeout(() => createOrUpdateMap(safeIdMine, o.lat, o.lng), 50);
+          }
         }
       });
 
       noOpen.textContent =
-        openCount === 0 ? "Për momentin nuk ka kërkesa në pritje." : "";
+        openCount === 0 ? "Për momentin nuk ka kërkesa të reja." : "";
       noMine.textContent =
-        mineCount === 0 ? "Për momentin nuk ke udhëtim aktiv." : "";
+        mineCount === 0 ? "Për momentin nuk ke udhëtime aktive." : "";
 
-      // History (done + canceled, recent)
-      if (historyArr.length === 0) {
-        noHistory.textContent = "Ende nuk ka lëvizje të regjistruara.";
-      } else {
-        noHistory.textContent = "";
-        historyArr
-          .sort((a, b) => b.time - a.time)
-          .slice(0, 15)
-          .forEach((h) => {
-            const div = document.createElement("div");
-            div.className = "history-item";
-            const dt = new Date(h.time);
-            const timeStr = dt.toLocaleString();
-            const typeClass = h.type === "done" ? "history-type-done" : "history-type-canceled";
-            const label = h.type === "done" ? "Udhëtim i përfunduar" : "Udhëtim i anuluar";
-
-            div.innerHTML = `
-              <div class="history-top">
-                <span class="history-title ${typeClass}">${label}</span>
-                <span>${timeStr}</span>
-              </div>
-              <div>${h.name} • ${h.phone}</div>
-              <div style="color:#9ca3af;font-size:11px;margin-top:2px;">${h.address}</div>
-            `;
-            historyList.appendChild(div);
-          });
-      }
-
-      updateStatsUI();
+      invalidateAllMaps();
     });
   }
 
-  function updateStatsUI() {
-    const st = driverStats[currentStatsRange];
-    if (!st) return;
-    statDoneEl.textContent = st.done;
-    statCanceledEl.textContent = st.canceled;
-  }
-
-  /* ---------- BALANCE ---------- */
+  /* ---------- BILANCI / REALTIME ---------- */
 
   function subscribeBalance() {
     const balRef = ref(db, "balances/" + currentDriver.id);
     onValue(balRef, (snap) => {
       const data = snap.val();
       if (!data) {
-        balanceBox.innerHTML = "Nuk ka barazim aktual.";
+        balanceSummary.innerHTML = "Nuk ka ende asnjë bilanc.";
+        balanceMeta.textContent = "";
+        balancePanels["b-summary"].innerHTML = "";
+        balanceHistoryList.innerHTML = "";
+        balanceHistoryEmpty.textContent = "Ende nuk ka levizje.";
         return;
       }
 
-      const total = (data.total || 0).toFixed(2);
-      const dateStr = data.lastUpdate ? new Date(data.lastUpdate).toLocaleString() : "-";
+      const total = data.total || 0;
+      const statusOpen = data.status !== "closed";
 
-      if (data.status === "open") {
-        balanceBox.innerHTML = `
-          <strong>Detyrim aktual:</strong> ${total} €<br>
-          <div class="balance-status">
-            Ky është borxhi aktual ndaj kompanisë. Herën e fundit u përditësua: ${dateStr}.
-          </div>
+      if (statusOpen) {
+        balanceSummary.innerHTML = `
+          <strong>Bilanc i hapur:</strong> ${total.toFixed(2)} €
+        `;
+        balancePanels["b-summary"].innerHTML = `
+          <p>Ky është bilanci yt aktual për t’u barazuar me kompaninë.</p>
         `;
       } else {
-        balanceBox.innerHTML = `
-          <strong>Barazim i përfunduar ✔</strong><br>
-          <div class="balance-status">
-            Aktualisht nuk ke borxh aktiv. Përditësimi i fundit: ${dateStr}.
-          </div>
+        balanceSummary.innerHTML = `
+          <strong>Bilanc i përfunduar ✔</strong>
         `;
+        balancePanels["b-summary"].innerHTML = `
+          <p>Aktualisht nuk ke borxh të hapur ndaj kompanisë.</p>
+        `;
+      }
+
+      if (data.lastUpdate) {
+        const d = new Date(data.lastUpdate);
+        balanceMeta.textContent = "Përditësimi i fundit: " + d.toLocaleString();
+      } else {
+        balanceMeta.textContent = "";
+      }
+
+      balanceHistoryList.innerHTML = "";
+      balanceHistoryEmpty.textContent = "";
+
+      const history = data.history || {};
+      const entries = Object.entries(history)
+        .map(([key, h]) => ({ key, ...h }))
+        .sort((a,b) => (b.timestamp || 0) - (a.timestamp || 0))
+        .slice(0, 15);
+
+      if (entries.length === 0) {
+        balanceHistoryEmpty.textContent = "Ende nuk ka levizje në histori.";
+      } else {
+        entries.forEach(h => {
+          const row = document.createElement("div");
+          row.className = "balance-row";
+          const d = h.timestamp ? new Date(h.timestamp).toLocaleString() : "-";
+          const typeText = h.type === "ride" ? "Udhëtim" : "Levizje";
+          row.innerHTML = `
+            <span>${typeText} (${h.orderId || ""})</span>
+            <span>+${(h.amount || 0).toFixed(2)} € · ${d}</span>
+          `;
+          balanceHistoryList.appendChild(row);
+        });
       }
     });
   }
-
-  /* ---------- TABS ---------- */
-
-  tabButtons.forEach(btn => {
-    btn.addEventListener("click", () => {
-      tabButtons.forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-      const target = btn.dataset.tab;
-      tabPanels.forEach(p => {
-        p.classList.toggle("active", p.id === target);
-      });
-    });
-  });
-
-  /* ---------- STATS RANGE TOGGLE ---------- */
-
-  statsChips.forEach(chip => {
-    chip.addEventListener("click", () => {
-      statsChips.forEach(c => c.classList.remove("active"));
-      chip.classList.add("active");
-      currentStatsRange = chip.dataset.range || "day";
-      updateStatsUI();
-    });
-  });
-
-  /* ---------- LOGOUT SLIDER ---------- */
-
-  const logoutSlider = document.getElementById("logoutSlider");
-  const logoutThumb = document.getElementById("logoutThumb");
-
-  let sliding = false;
-  let startX = 0;
-  let thumbStart = 0;
-
-  function logout() {
-    stopLocationTracking();
-    clearSession();
-    currentDriver = null;
-    headerDriverName.textContent = "Shoferi";
-    headerStatus.textContent = "Offline";
-    content.style.display = "none";
-    loginCard.style.display = "block";
-    logoutThumb.style.left = "4px";
-    logoutSlider.classList.remove("done");
-  }
-
-  function onSlideStart(e) {
-    e.preventDefault();
-    sliding = true;
-    startX = e.touches ? e.touches[0].clientX : e.clientX;
-    thumbStart = logoutThumb.offsetLeft;
-
-    document.addEventListener("touchmove", onSlideMove);
-    document.addEventListener("touchend", onSlideEnd);
-    document.addEventListener("mousemove", onSlideMove);
-    document.addEventListener("mouseup", onSlideEnd);
-  }
-
-  function onSlideMove(e) {
-    if (!sliding) return;
-    const x = e.touches ? e.touches[0].clientX : e.clientX;
-    const delta = x - startX;
-
-    const sliderRect = logoutSlider.getBoundingClientRect();
-    const maxLeft = sliderRect.width - logoutThumb.offsetWidth - 4;
-    let newLeft = thumbStart + delta;
-    if (newLeft < 4) newLeft = 4;
-    if (newLeft > maxLeft) newLeft = maxLeft;
-
-    logoutThumb.style.left = newLeft + "px";
-
-    if (newLeft > sliderRect.width * 0.6) {
-      sliding = false;
-      logoutSlider.classList.add("done");
-      document.removeEventListener("touchmove", onSlideMove);
-      document.removeEventListener("touchend", onSlideEnd);
-      document.removeEventListener("mousemove", onSlideMove);
-      document.removeEventListener("mouseup", onSlideEnd);
-      setTimeout(logout, 160);
-    }
-  }
-
-  function onSlideEnd() {
-    if (!sliding) return;
-    sliding = false;
-    logoutThumb.style.left = "4px";
-    document.removeEventListener("touchmove", onSlideMove);
-    document.removeEventListener("touchend", onSlideEnd);
-    document.removeEventListener("mousemove", onSlideMove);
-    document.removeEventListener("mouseup", onSlideEnd);
-  }
-
-  logoutThumb.addEventListener("touchstart", onSlideStart);
-  logoutThumb.addEventListener("mousedown", onSlideStart);
-
-  /* ---------- AUTO-SESSION ---------- */
-  bootstrapSession();
 </script>
 
 </body>

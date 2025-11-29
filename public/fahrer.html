@@ -4,344 +4,77 @@
   <meta charset="UTF-8">
   <title>Shoferi - KosovaTaxi</title>
 
-  <!-- iOS / Mobile Viewport -->
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#020617">
 
-  <!-- PWA -->
   <link rel="manifest" href="/manifest-shofer.json">
   <link rel="apple-touch-icon" href="/icon-shofer-192.png">
 
   <script>
     if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("/sw-shofer.js")
-        .catch(console.error);
+      navigator.serviceWorker.register("/sw-shofer.js").catch(console.error);
     }
   </script>
 
-  <!-- Leaflet -->
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    crossorigin=""
-  />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
 
   <style>
-    /* Base layout */
-    html, body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      overscroll-behavior: none;
-      background-color: #020617 !important;
-      -webkit-font-smoothing: antialiased;
-      overflow-x: hidden;
+    /* BASE LAYOUT */
+    html, body { margin:0; padding:0; height:100%; background:#020617; overscroll-behavior:none; }
+    body::before { content:""; position:fixed; inset:0; z-index:-1;
+      background: radial-gradient(circle at top,#020617,#020617 60%,#020617); }
+    body { font-family:system-ui; padding:calc(14px + env(safe-area-inset-top)) 10px calc(22px + env(safe-area-inset-bottom));
+      overflow-y:auto; color:#e5e7eb; }
+    .frame { max-width:440px; margin:auto; display:flex; flex-direction:column; gap:12px; }
+
+    .header { display:flex; justify-content:space-between; padding:2px 4px 10px; font-size:13px; color:#9ca3af; }
+    .header-center { display:flex; gap:6px; align-items:center; font-weight:500; color:#e5e7eb; }
+    .dot { width:6px; height:6px; border-radius:999px; background:#22c55e; box-shadow:0 0 0 5px rgba(34,197,94,0.25); }
+
+    .card { background:rgba(15,23,42,0.9); border-radius:24px; padding:16px 18px;
+      border:1px solid rgba(148,163,184,0.22); backdrop-filter:blur(22px); margin-bottom:8px; }
+
+    /* FLAT TABS */
+    .tabs { display:flex; gap:8px; width:100%; margin-bottom:12px; }
+    .tab { flex:1; background:rgba(255,255,255,0.05); border-radius:14px; padding:10px 0;
+      display:flex; flex-direction:column; gap:6px; align-items:center; cursor:pointer;
+      color:#9ca3af; transition:.2s; }
+    .tab.active { background:rgba(56,189,248,0.25); color:#e5e7eb; transform:translateY(-1px); }
+    .tab-icon { width:22px; opacity:.7; }
+    .tab.active .tab-icon { opacity:1; transform:scale(1.05); }
+    .tab-label { font-size:13px; opacity:.75; }
+    .tab.active .tab-label { opacity:1; font-weight:600; }
+
+    /* ⭐ NEUE INFO-CARD */
+    .info-card {
+      background: rgba(15,23,42,0.9);
+      border: 1px solid rgba(148,163,184,0.25);
+      border-radius: 20px;
+      padding: 16px 18px;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+      margin-top: -4px;
     }
+    .info-header { display:flex; justify-content:space-between; align-items:center; }
+    .info-title { font-size:12.5px; font-weight:600; opacity:.85; }
+    .notif {
+      background:#ef4444; color:white;
+      font-size:12px; font-weight:700;
+      padding:3px 9px; border-radius:999px;
+      line-height:1; }
+    .info-desc { margin-top:5px; font-size:11px; color:#9ca3af; opacity:.8; }
 
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      z-index: -1;
-      background: radial-gradient(circle at top, #020617, #020617 60%, #020617);
-    }
+    .section-title { font-size:14px; font-weight:500; margin-top:4px; margin-bottom:6px; }
+    .section-sub { font-size:11px; color:#9ca3af; }
 
-    :root {
-      --bg: radial-gradient(circle at top, #020617, #020617 60%, #020617);
-      --card-bg: rgba(15, 23, 42, 0.9);
-      --accent: #38bdf8;
-      --border-radius-xl: 24px;
-      --shadow-soft: 0 20px 60px rgba(0, 0, 0, 0.65);
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: system-ui, -apple-system, sans-serif;
-      margin: 0;
-      padding: calc(14px + env(safe-area-inset-top, 0px)) 10px calc(22px + env(safe-area-inset-bottom, 0px));
-      background: var(--bg);
-      color: #e5e7eb;
-      overflow-y: auto;
-    }
-
-    .frame {
-      max-width: 440px;
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      min-height: calc(100vh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 36px);
-    }
-
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 2px 4px 10px;
-      font-size: 13px;
-      color: #9ca3af;
-    }
-
-    .header-center {
-      display:flex;
-      align-items:center;
-      gap:6px;
-      font-weight:500;
-      color:#e5e7eb;
-    }
-
-    .dot {
-      width:6px;
-      height:6px;
-      border-radius:999px;
-      background:#22c55e;
-      box-shadow:0 0 0 5px rgba(34,197,94,0.25);
-    }
-
-    .card {
-      background: var(--card-bg);
-      border-radius: var(--border-radius-xl);
-      padding: 16px 16px 18px;
-      box-shadow: var(--shadow-soft);
-      border: 1px solid rgba(148,163,184,0.22);
-      backdrop-filter: blur(22px);
-      -webkit-backdrop-filter: blur(22px);
-      margin-bottom: 8px;
-    }
-
-    .card-title {
-      font-size: 19px;
-      font-weight: 600;
-      margin-bottom: 4px;
-    }
-
-    .card-subtitle {
-      font-size: 13px;
-      color: #9ca3af;
-      margin-bottom: 10px;
-    }
-
-    label {
-      display:block;
-      margin-top:8px;
-      font-size:13px;
-    }
-
-    input {
-      width: 100%;
-      padding: 10px 12px;
-      border-radius: 16px;
-      border: 1px solid rgba(148,163,184,0.35);
-      background: rgba(15,23,42,0.94);
-      color: #e5e7eb;
-      font-size: 16px; /* 16px, damit iOS NICHT reinzoomt */
-      outline: none;
-      margin-top: 4px;
-      transition: border 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
-    }
-
-    input:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 1px rgba(56,189,248,0.45);
-      background: rgba(15,23,42,0.98);
-    }
-
-    button {
-      border-radius:999px;
-      border:none;
-      font-size:15px;
-      font-weight:600;
-      padding:11px 12px;
-      cursor:pointer;
-      transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
-    }
-
-    button:active {
-      transform: translateY(1px) scale(0.99);
-      filter: brightness(0.97);
-    }
-
-    .btn-primary {
-      width:100%;
-      margin-top:12px;
-      background: linear-gradient(135deg,#22c55e,#4ade80);
-      color:#022c22;
-      box-shadow:0 14px 38px rgba(34,197,94,0.4);
-    }
-
-    .btn-secondary {
-      background: linear-gradient(135deg,#facc15,#f97316);
-      color:#111827;
-      box-shadow:0 10px 28px rgba(250,204,21,0.4);
-      font-size:14px;
-      padding:8px 10px;
-      width:100%;
-      margin-top:6px;
-    }
-
-    .btn-danger {
-      background:#ef4444;
-      color:white;
-      font-size:13px;
-      padding:7px 10px;
-      width:100%;
-      margin-top:6px;
-      box-shadow:0 6px 22px rgba(239,68,68,0.55);
-    }
-
-    .login-error {
-      margin-top:8px;
-      font-size:12px;
-      color:#f97373;
-    }
-
-    .section-title {
-      font-size:14px;
-      font-weight:500;
-      margin-top:4px;
-      margin-bottom:6px;
-    }
-
-    .section-sub {
-      font-size:11px;
-      color:#9ca3af;
-      margin-bottom:4px;
-    }
-
-    .empty-text {
-      font-size:12px;
-      color:#6b7280;
-      margin-top:4px;
-    }
-
-    /* ---------- NEUE FLAT-TABS (jede Tab eigene Fläche) ---------- */
-    .tabs {
-      display: flex;
-      gap: 8px;
-      width: 100%;
-      margin-bottom: 12px;
-    }
-
-    .tab {
-      flex: 1;
-      background: rgba(255,255,255,0.05);
-      border-radius: 14px;
-      padding: 10px 0;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      gap: 6px;
-      cursor: pointer;
-      transition:
-        background .25s ease,
-        transform .20s ease;
-      user-select: none;
-      color: #9ca3af;
-    }
-
-    .tab-icon {
-      width: 22px;
-      height: 22px;
-      opacity: .7;
-      transition: opacity .20s ease, transform .20s ease;
-    }
-
-    .tab-label {
-      font-size: 13px;
-      opacity: .75;
-      transition: opacity .20s ease;
-    }
-
-    .tab.active {
-      background: rgba(56,189,248,0.25); /* light blue */
-      transform: translateY(-1px);
-      color: #e5e7eb;
-    }
-
-    .tab.active .tab-icon {
-      opacity: 1;
-      transform: scale(1.05);
-    }
-
-    .tab.active .tab-label {
-      opacity: 1;
-      font-weight: 600;
-    }
-    /* ------------------------------------------------ */
-
-    .order-card {
-      background: radial-gradient(circle at top left, rgba(59,130,246,.22), rgba(15,23,42,.96));
-      border-radius: 22px;
-      padding: 12px 12px 14px;
-      margin-top: 10px;
-      border: 1px solid rgba(55, 65, 81, 0.9);
-      box-shadow: 0 18px 48px rgba(15, 23, 42, 0.95);
-      cursor: default;
-    }
-
-    .order-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 6px;
-      gap: 8px;
-    }
-
-    .order-name { font-size: 15px; font-weight: 600; }
-    .order-phone { font-size: 13px; opacity: .9; }
-
-    .badge {
-      font-size:11px;
-      padding:4px 8px;
-      border-radius:999px;
-      white-space: nowrap;
-    }
-
-    .badge-active { background:rgba(34,197,94,0.18); color:#bbf7d0; }
-    .badge-open { background:rgba(251,191,36,0.18); color:#facc15; }
-
-    .mini-map {
-      width: 100%;
-      height: 140px;
-      border-radius: 16px;
-      overflow: hidden;
-      margin-top: 8px;
-      border: 1px solid rgba(15, 23, 42, .9);
-    }
-
-    .timer {
-      font-size:11px;
-      color:#e5e7eb;
-    }
-
-    @media (max-width: 400px) {
-      body {
-        padding: calc(10px + env(safe-area-inset-top, 0px)) 8px calc(18px + env(safe-area-inset-bottom, 0px));
-      }
-      .card {
-        padding: 14px 12px 16px;
-        border-radius: 20px;
-      }
-      .card-title {
-        font-size: 18px;
-      }
-      .order-name {
-        font-size: 14px;
-      }
-    }
   </style>
 </head>
 
 <body>
-
 <div class="frame">
 
+  <!-- HEADER -->
   <div class="header">
     <span>KosovaTaxi</span>
     <div class="header-center">
@@ -351,39 +84,37 @@
     <span id="headerStatus">Offline</span>
   </div>
 
-  <!-- NEUE FLAT-TABS MIT ICONS -->
+  <!-- TABS -->
   <div class="tabs">
-    <!-- Te reja – Glocke -->
     <div class="tab active" data-target="tab-new">
-      <svg class="tab-icon" viewBox="0 0 24 24">
-        <path fill="white" d="M12 2a6 6 0 0 0-6 6v3.586l-.707.707A1 1 0 0 0 6 14h12a1 1 0 0 0 .707-1.707L18 11.586V8a6 6 0 0 0-6-6zm0 20a3 3 0 0 0 3-3H9a3 3 0 0 0 3 3z"/>
-      </svg>
+      <svg class="tab-icon" viewBox="0 0 24 24"><path fill="white" d="M12 2a6 6 0 0 0-6 6v3.586l-.707.707A1 1 0 0 0 6 14h12a1 1 0 0 0 .707-1.707L18 11.586V8a6 6 0 0 0-6-6zm0 20a3 3 0 0 0 3-3H9a3 3 0 0 0 3 3z"/></svg>
       <span class="tab-label">Te reja</span>
     </div>
 
-    <!-- Aktiv – Blitz -->
     <div class="tab" data-target="tab-active">
-      <svg class="tab-icon" viewBox="0 0 24 24">
-        <path fill="white" d="M13 2L3 14h7v8l10-12h-7z"/>
-      </svg>
+      <svg class="tab-icon" viewBox="0 0 24 24"><path fill="white" d="M13 2L3 14h7v8l10-12h-7z"/></svg>
       <span class="tab-label">Aktiv</span>
     </div>
 
-    <!-- Bilanci – Euro -->
     <div class="tab" data-target="tab-balance">
-      <svg class="tab-icon" viewBox="0 0 24 24">
-        <path fill="white" d="M15 4H9a7 7 0 0 0 0 14h6a1 1 0 1 0 0-2H9a5 5 0 0 1-4.9-4h3.02a1 1 0 0 0 0-2H4.1A5 5 0 0 1 9 6h6a1 1 0 1 0 0-2z"/>
-      </svg>
+      <svg class="tab-icon" viewBox="0 0 24 24"><path fill="white" d="M15 4H9a7 7 0 0 0 0 14h6a1 1 0 1 0 0-2H9a5 5 0 0 1-4.9-4h3.02a1 1 0 0 0 0-2H4.1A5 5 0 0 1 9 6h6a1 1 0 1 0 0-2z"/></svg>
       <span class="tab-label">Bilanci</span>
     </div>
+  </div>
+
+  <!-- ⭐ NEUE INFO-CARD (NUR TE REJA) -->
+  <div id="infoCard" class="info-card" style="display:block;">
+    <div class="info-header">
+      <div class="info-title">Klientët që presin taksi</div>
+      <div class="notif" id="notifCount">0</div>
+    </div>
+    <div class="info-desc">Kliko "Prano" për ta marrë klientin.</div>
   </div>
 
   <!-- LOGIN -->
   <div id="loginCard" class="card">
     <div class="card-title">Hyr si shofer</div>
-    <div class="card-subtitle">
-      Shkruaj vetëm PIN-in që të ka dhënë admini. Emri dhe kompania merren automatikisht.
-    </div>
+    <div class="card-subtitle">Shkruaj vetëm PIN-in që të ka dhënë admini.</div>
 
     <label>PIN</label>
     <input id="loginPin" placeholder="p.sh. 4829">
@@ -391,41 +122,9 @@
     <button id="loginBtn" class="btn-primary">Hyr online</button>
     <div id="loginMsg" class="login-error"></div>
   </div>
+</div> <!-- END FRAME -->
 
-  <!-- DASHBOARD -->
-  <div id="content" style="display:none;">
-
-    <!-- TAB 1: TE REJA / OPEN ORDERS -->
-    <div id="tab-new-content" class="card">
-      <div class="section-title">Vozitje në pritje</div>
-      <div class="section-sub">Këto janë kërkesa të hapura që mund t’i pranosh.</div>
-
-      <div id="orders"></div>
-      <div id="noOpen" class="empty-text"></div>
-    </div>
-
-    <!-- TAB 2: AKTIV -->
-    <div id="tab-active-content" class="card" style="display:none;">
-      <div class="section-title">Vozitjet e mia aktive</div>
-      <div class="section-sub">Mund të kesh vetëm një vozitje aktive në të njëjtën kohë.</div>
-
-      <div id="myOrders"></div>
-      <div id="noMine" class="empty-text"></div>
-    </div>
-
-    <!-- TAB 3: BILANCI -->
-    <div id="tab-balance-content" class="card" style="display:none;">
-      <div class="section-title">Barazimi im</div>
-      <div id="balanceBox" style="font-size:14px; color:#e5e7eb;"></div>
-    </div>
-
-  </div>
-</div>
-
-<script
-  src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-  crossorigin=""
-></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
@@ -456,14 +155,15 @@
   const headerStatus = document.getElementById("headerStatus");
   const balanceBox = document.getElementById("balanceBox");
 
-  /* ---------------- TAB LOGIK (FLAT-TABS) ------------------- */
+  const infoCard = document.getElementById("infoCard");
+  const notifCount = document.getElementById("notifCount");
 
+  /* ---------------- TABS ---------------- */
   const tabs = document.querySelectorAll(".tab");
 
   tabs.forEach(t => {
     t.addEventListener("click", () => {
-      const currentActive = document.querySelector(".tab.active");
-      if (currentActive) currentActive.classList.remove("active");
+      document.querySelector(".tab.active")?.classList.remove("active");
       t.classList.add("active");
 
       const target = t.dataset.target;
@@ -476,11 +176,13 @@
 
       document.getElementById("tab-balance-content").style.display =
         target === "tab-balance" ? "block" : "none";
+
+      /* ⭐ Info-Card nur bei TE REJA anzeigen */
+      infoCard.style.display = target === "tab-new" ? "block" : "none";
     });
   });
 
-  /* ----------------------------------------------- */
-
+  /* ---------------- LOGIN ---------------- */
   loginBtn.onclick = () => {
     loginMsg.textContent = "";
     const pin = document.getElementById("loginPin").value.trim();
@@ -490,43 +192,39 @@
     }
 
     const driversRef = ref(db, "drivers");
-    onValue(
-      driversRef,
-      (snap) => {
-        const data = snap.val() || {};
-        let found = null;
-        Object.entries(data).forEach(([id, d]) => {
-          if (
-            String(d.pin) === String(pin) &&
-            d.approved === true &&
-            (d.active !== false)
-          ) {
-            found = { id, ...d };
-          }
-        });
 
-        if (!found) {
-          loginMsg.textContent = "PIN i pavlefshëm ose shoferi nuk është aktiv.";
-          return;
-        }
+    onValue(driversRef, snap => {
+      const data = snap.val() || {};
+      let found = null;
 
-        if (!currentDriver) {
-          currentDriver = found;
-          headerDriverName.textContent = found.name || "Shoferi";
-          headerStatus.textContent = "Online";
-          loginCard.style.display = "none";
-          content.style.display = "block";
-          subscribeOrders();
-          subscribeBalance();
+      Object.entries(data).forEach(([id, d]) => {
+        if (String(d.pin) === pin && d.approved && d.active !== false) {
+          found = { id, ...d };
         }
-      },
-      { onlyOnce: true }
-    );
+      });
+
+      if (!found) {
+        loginMsg.textContent = "PIN i pavlefshëm ose shoferi nuk është aktiv.";
+        return;
+      }
+
+      currentDriver = found;
+      headerDriverName.textContent = found.name;
+      headerStatus.textContent = "Online";
+
+      loginCard.style.display = "none";
+      content.style.display = "block";
+
+      subscribeOrders();
+      subscribeBalance();
+    }, { onlyOnce: true });
   };
 
+  /* ---------------- MINI-MAP ---------------- */
   function createMiniMap(containerId, lat, lng) {
     const container = document.getElementById(containerId);
     if (!container) return;
+
     container.innerHTML = "";
     const map = L.map(containerId, {
       zoomControl: false,
@@ -540,19 +238,11 @@
     L.marker([lat, lng]).addTo(map);
   }
 
-  function formatMinutesSince(timestamp) {
-    if (!timestamp) return "-";
-    const diffMs = Date.now() - timestamp;
-    const mins = Math.floor(diffMs / 60000);
-    if (mins <= 0) return "më pak se 1 min";
-    if (mins === 1) return "1 minutë";
-    return mins + " minuta";
-  }
-
+  /* ---------------- ORDERS ---------------- */
   function subscribeOrders() {
     const ordersRef = ref(db, "orders");
 
-    onValue(ordersRef, (snap) => {
+    onValue(ordersRef, snap => {
       const data = snap.val() || {};
       const openBox = document.getElementById("orders");
       const mineBox = document.getElementById("myOrders");
@@ -561,17 +251,19 @@
 
       openBox.innerHTML = "";
       mineBox.innerHTML = "";
-      let openCount = 0;
+
+      let openCountValue = 0;
       let mineCount = 0;
       hasActiveRide = false;
 
       Object.entries(data).forEach(([id, o]) => {
-        const safeIdOpen = "map_open_" + id.replace(/[^a-zA-Z0-9_-]/g, "");
-        const safeIdMine = "map_mine_" + id.replace(/[^a-zA-Z0-9_-]/g, "");
+        const safeOpenId = "map_open_" + id.replace(/[^a-zA-Z0-9_-]/g, "");
+        const safeMineId = "map_mine_" + id.replace(/[^a-zA-Z0-9_-]/g, "");
 
-        /* VOZITJE NË PRITJE */
+        /* ⭐ OPEN ORDERS */
         if (o.status === "open") {
-          openCount++;
+          openCountValue++;
+
           const wrapper = document.createElement("div");
           wrapper.className = "order-card";
 
@@ -583,10 +275,13 @@
               </div>
               <span class="badge badge-open">Vozitje në pritje</span>
             </div>
-            <div id="${safeIdOpen}" class="mini-map"></div>
-            <div class="order-footer" style="display:flex; justify-content:space-between; margin-top:6px; font-size:12px;">
+
+            <div id="${safeOpenId}" class="mini-map"></div>
+
+            <div style="display:flex; justify-content:space-between; margin-top:6px; font-size:12px;">
               <span>Kliko për ta pranuar.</span>
-              <a href="https://maps.google.com/?q=${o.lat},${o.lng}" target="_blank" style="color:#38bdf8;">Google Maps</a>
+              <a href="https://maps.google.com/?q=${o.lat},${o.lng}" target="_blank"
+                style="color:#38bdf8;">Google Maps</a>
             </div>
           `;
 
@@ -595,34 +290,32 @@
               alert("Nuk mund të pranoni më shumë se një vozitje.");
               return;
             }
-            const thisOrder = ref(db, "orders/" + id);
-            runTransaction(thisOrder, (current) => {
+
+            const orderRef = ref(db, "orders/" + id);
+            runTransaction(orderRef, current => {
               if (!current || current.status !== "open") return current;
               current.status = "taken";
-              current.takenByName = currentDriver.name;
-              current.takenByCompany = currentDriver.company || "KosovaTaxi";
               current.takenByDriverId = currentDriver.id;
+              current.takenByName = currentDriver.name;
               current.takenAt = Date.now();
               return current;
             });
           };
 
           openBox.appendChild(wrapper);
-          setTimeout(() => createMiniMap(safeIdOpen, o.lat, o.lng), 50);
+          setTimeout(() => createMiniMap(safeOpenId, o.lat, o.lng), 50);
         }
 
-        /* VOZITJET E MIA (AKTIVE) */
-        if (
-          o.status === "taken" &&
-          o.takenByDriverId === currentDriver?.id
-        ) {
+        /* ⭐ ACTIVE RIDES */
+        if (o.status === "taken" && o.takenByDriverId === currentDriver?.id) {
           mineCount++;
           hasActiveRide = true;
 
+          const t = Math.floor((Date.now() - o.takenAt) / 60000);
+          const timeText = t <= 0 ? "më pak se 1 min" : `${t} minuta`;
+
           const wrapper = document.createElement("div");
           wrapper.className = "order-card";
-
-          const timeText = formatMinutesSince(o.takenAt);
 
           wrapper.innerHTML = `
             <div class="order-header">
@@ -632,34 +325,35 @@
               </div>
               <span class="badge badge-active">Aktive</span>
             </div>
-            <div id="${safeIdMine}" class="mini-map"></div>
+
+            <div id="${safeMineId}" class="mini-map"></div>
+
             <div style="display:flex; justify-content:space-between; margin-top:8px; font-size:12px;">
-              <span class="timer">Vozitja: ${timeText} më parë</span>
-              <a href="https://maps.google.com/?q=${o.lat},${o.lng}" target="_blank" style="color:#38bdf8;">Google Maps</a>
+              <span>Vozitja: ${timeText}</span>
+              <a href="https://maps.google.com/?q=${o.lat},${o.lng}" target="_blank"
+                style="color:#38bdf8;">Google Maps</a>
             </div>
           `;
 
+          /* Finish */
           const finishBtn = document.createElement("button");
           finishBtn.className = "btn-secondary";
           finishBtn.textContent = "✅ Perfundo vozitjen";
           finishBtn.onclick = () => {
-            const thisOrder = ref(db, "orders/" + id);
+            const orderRef = ref(db, "orders/" + id);
 
-            runTransaction(thisOrder, (current) => {
+            runTransaction(orderRef, current => {
               if (!current || current.status !== "taken") return current;
               current.status = "done";
               current.completedAt = Date.now();
               return current;
             }).then(() => {
-              // Update balance (+0.25 € für jede Fahrt)
+              /* Update balance */
               const balRef = ref(db, "balances/" + currentDriver.id);
-              runTransaction(balRef, (cur) => {
+
+              runTransaction(balRef, cur => {
                 if (!cur) {
-                  return {
-                    total: 0.25,
-                    status: "open",
-                    lastUpdate: Date.now()
-                  };
+                  return { total: 0.25, status: "open", lastUpdate: Date.now() };
                 }
                 cur.total = (cur.total || 0) + 0.25;
                 cur.status = "open";
@@ -669,55 +363,63 @@
             });
           };
 
+          /* Cancel */
           const cancelBtn = document.createElement("button");
           cancelBtn.className = "btn-danger";
-          cancelBtn.textContent = "✖ Anulo vozitjen";
+          cancelBtn.textContent = "✖ Anulo";
           cancelBtn.onclick = () => {
             const reason = prompt("Shkruaj arsyen:");
             if (!reason) return;
-            const thisOrder = ref(db, "orders/" + id);
-            runTransaction(thisOrder, (current) => {
+
+            const orderRef = ref(db, "orders/" + id);
+            runTransaction(orderRef, current => {
               if (!current || current.status !== "taken") return current;
               current.status = "canceled";
-              current.canceledAt = Date.now();
               current.canceledReason = reason;
+              current.canceledAt = Date.now();
               return current;
             });
           };
 
           wrapper.appendChild(finishBtn);
           wrapper.appendChild(cancelBtn);
-          mineBox.appendChild(wrapper);
 
-          setTimeout(() => createMiniMap(safeIdMine, o.lat, o.lng), 50);
+          mineBox.appendChild(wrapper);
+          setTimeout(() => createMiniMap(safeMineId, o.lat, o.lng), 50);
         }
       });
 
+      /* ---------------- DYNAMIC INFO-CARD UPDATE ---------------- */
+      notifCount.textContent = openCountValue;
+
       noOpen.textContent =
-        openCount === 0 ? "Për momentin nuk ka vozitje në pritje." : "";
+        openCountValue === 0 ? "Për momentin nuk ka vozitje." : "";
       noMine.textContent =
-        mineCount === 0 ? "Për momentin nuk keni vozitje aktive." : "";
+        mineCount === 0 ? "Nuk keni vozitje aktive." : "";
     });
   }
 
+  /* ---------------- BALANCE ---------------- */
   function subscribeBalance() {
     const balRef = ref(db, "balances/" + currentDriver.id);
-    onValue(balRef, (snap) => {
+
+    onValue(balRef, snap => {
       const data = snap.val();
+
       if (!data) {
-        balanceBox.innerHTML = "Nuk ka barazim aktual.";
+        balanceBox.innerHTML = "Nuk ka barazim.";
         return;
       }
 
       if (data.status === "open") {
         balanceBox.innerHTML = `
           <strong>Barazim i hapur:</strong> ${data.total.toFixed(2)} €<br>
-          <small>Ju lutem barazohuni me administratën.</small>
+          <small>Ju lutem barazohuni.</small>
         `;
       } else {
         balanceBox.innerHTML = `
           <strong>Barazim i përfunduar ✔</strong><br>
-          <small>Aktualisht nuk keni borxh.</small>
+          <small>Nuk keni borxh.</small>
         `;
       }
     });

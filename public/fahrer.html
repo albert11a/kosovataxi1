@@ -103,23 +103,28 @@
       border-radius: 999px;
       backdrop-filter: blur(20px);
       border: 1px solid rgba(255,255,255,0.08);
+      position: sticky;
+      top: 0;
+      z-index: 40;
     }
 
     .tab-btn {
       flex: 1;
-      padding: 8px 0;
+      padding: 10px 0;
       border: none;
       border-radius: 999px;
       background: transparent;
-      font-size: 13px;
+      font-size: 14px;
       font-weight: 500;
       color: #94a3b8;
       cursor: pointer;
+      touch-action: manipulation;
     }
 
     .tab-btn.active {
-      background: rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.12);
       color: #e5e7eb;
+      box-shadow: 0 2px 8px rgba(15,23,42,0.6);
     }
 
     /*********************************************
@@ -182,6 +187,7 @@
       margin-top: 10px;
       cursor: pointer;
       box-shadow: 0 2px 6px rgba(0,0,0,0.28);
+      touch-action: manipulation;
     }
 
     .btn-primary {
@@ -264,6 +270,9 @@
     .order-address {
       font-size: 12px;
       color: #cbd5f5;
+      margin-top: 2px;
+      line-height: 1.3;
+      word-break: break-word;
     }
 
     .badge {
@@ -558,10 +567,12 @@
       const map = L.map(containerId, {
         zoomControl: false,
         attributionControl: false,
+        preferCanvas: true
       }).setView([lat, lng], 16);
 
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         maxZoom: 19,
+        updateWhenIdle: true
       }).addTo(map);
 
       L.marker([lat, lng]).addTo(map);
@@ -570,7 +581,7 @@
       maps[containerId].setView([lat, lng], 16);
     }
 
-    // Fix für schwarze Karten bei mehreren Kërkesa
+    // Fix für schwarze Karten bei Tab-Wechsel
     setTimeout(() => {
       try {
         maps[containerId].invalidateSize();
@@ -584,6 +595,16 @@
         try { m.invalidateSize(); } catch(e) {}
       });
     }, 260);
+  }
+
+  function resetAllMaps() {
+    // Verhindert schwarze Maps / verwaiste Leaflet-Container
+    Object.keys(maps).forEach(key => {
+      try {
+        maps[key].remove();
+      } catch (e) {}
+      delete maps[key];
+    });
   }
 
   function recalcStats(allOrders) {
@@ -736,6 +757,10 @@
     onValue(ordersRef, (snap) => {
       const data = snap.val() || {};
 
+      // Alle alten Leaflet-Instanzen sauber entfernen,
+      // damit neue Maps nicht schwarz werden.
+      resetAllMaps();
+
       ordersBox.innerHTML = "";
       myOrdersBox.innerHTML = "";
       let openCount = 0;
@@ -758,6 +783,7 @@
 
         const addressFull = cleanAddress(rawAdr);
         const addressShort = shortenAddress(addressFull);
+        const addressLine = addressFull || addressShort;
 
         /* KËRKESA TË REJA */
         if (o.status === "open") {
@@ -770,7 +796,7 @@
               <div class="order-main">
                 <div class="order-name">${o.name || "Klienti"}</div>
                 <div class="order-phone">${o.phone || ""}</div>
-                ${addressShort ? `<div class="order-address">${addressShort}</div>` : ""}
+                ${addressLine ? `<div class="order-address">${addressLine}</div>` : ""}
               </div>
               <span class="badge badge-open">Kërkesë</span>
             </div>
@@ -827,7 +853,7 @@
               <div class="order-main">
                 <div class="order-name">${o.name || "Klienti"}</div>
                 <div class="order-phone">${o.phone || ""}</div>
-                ${addressShort ? `<div class="order-address">${addressShort}</div>` : ""}
+                ${addressLine ? `<div class="order-address">${addressLine}</div>` : ""}
               </div>
               <span class="badge badge-active">Aktive</span>
             </div>

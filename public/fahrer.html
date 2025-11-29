@@ -26,7 +26,9 @@
         crossorigin="" />
 
   <style>
-    /* GLOBAL */
+    /********************************************
+     * GLOBAL LAYOUT
+     ********************************************/
     html, body {
       margin: 0;
       padding: 0;
@@ -48,20 +50,24 @@
     }
 
     body {
-      padding: 14px 10px 70px;
+      padding-top: 12px;
+      padding-bottom: 70px;
     }
 
     .frame {
       max-width: 520px;
       margin: 0 auto;
+      padding: 0 15px 0 15px; /* <- 15px links/rechts */
     }
 
-    /* HEADER */
+    /********************************************
+     * HEADER
+     ********************************************/
     .header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 4px 2px 14px;
+      padding: 4px 0 14px;
     }
 
     .header-left {
@@ -89,7 +95,9 @@
       color: #9ca3af;
     }
 
-    /* SEGMENTED TABS (Kerkesat / Vozitjet / Bilanci) */
+    /********************************************
+     * TABS (Segmented / iOS Style)
+     ********************************************/
     .tabs {
       display: flex;
       gap: 6px;
@@ -117,18 +125,20 @@
     .tab-btn.active {
       background: rgba(15,23,42,1);
       color: #e5e7eb;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.35);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.30);
     }
 
-    /* CARD */
+    /********************************************
+     * CARD BASE
+     ********************************************/
     .card {
-      background: rgba(15,23,42,0.78);
+      background: rgba(15,23,42,0.80);
       border-radius: 24px;
       padding: 16px 18px 18px;
       margin-bottom: 18px;
-      border: 1px solid rgba(148,163,184,0.25);
+      border: 1px solid rgba(148,163,184,0.28);
       backdrop-filter: blur(22px);
-      box-shadow: 0 4px 16px rgba(0,0,0,0.35);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.32); /* dezent */
     }
 
     .section-title {
@@ -143,7 +153,9 @@
       margin-bottom: 10px;
     }
 
-    /* LOGIN */
+    /********************************************
+     * LOGIN
+     ********************************************/
     label {
       font-size: 13px;
       margin-top: 4px;
@@ -176,26 +188,24 @@
       font-size: 15px;
       font-weight: 600;
       cursor: pointer;
+      box-shadow: 0 2px 7px rgba(0,0,0,0.30);
     }
 
     .btn-primary {
       background: linear-gradient(135deg,#22c55e,#4ade80);
       color: #022c22;
-      box-shadow: 0 2px 8px rgba(34,197,94,0.45);
     }
 
     .btn-secondary {
       background: linear-gradient(135deg,#0ea5e9,#22c55e);
       color: #022c22;
-      box-shadow: 0 2px 8px rgba(15,23,42,0.5);
       font-size: 14px;
     }
 
     .btn-danger {
-      background: #ef4444;
-      color: white;
+      background:#ef4444;
+      color:white;
       font-size: 13px;
-      box-shadow: 0 2px 7px rgba(239,68,68,0.55);
     }
 
     .login-error {
@@ -211,34 +221,16 @@
       margin-top: 6px;
     }
 
-    /* HEUTE STATS (kleine Karte) */
-    .stat-main {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      margin-top: 4px;
-    }
-
-    .stat-number {
-      font-size: 26px;
-      font-weight: 700;
-    }
-
-    .stat-right {
-      text-align: right;
-      font-size: 12px;
-      color: #9ca3af;
-    }
-
-    /* ORDER CARDS – Kerkesat / Vozitjet */
+    /********************************************
+     * KËRKESAT / VOZITJET CARDS
+     ********************************************/
     .order-card {
-      background: radial-gradient(circle at top left, rgba(59,130,246,0.18), rgba(15,23,42,0.96));
+      background: radial-gradient(circle at top left, rgba(59,130,246,0.18), rgba(15,23,42,0.98));
       border-radius: 20px;
       border: 1px solid rgba(148,163,184,0.35);
       padding: 12px 12px 14px;
       margin-top: 10px;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.35);
+      box-shadow: 0 3px 10px rgba(0,0,0,0.32);
       backdrop-filter: blur(18px);
     }
 
@@ -303,11 +295,44 @@
       margin-top: 6px;
     }
 
-    /* BILANCI – Stats & History */
+    /********************************************
+     * BILANCI: PERFORMANCE + STATS + HISTORY
+     ********************************************/
+    .perf-wrapper {
+      margin-top: 4px;
+      margin-bottom: 10px;
+    }
+
+    .perf-chips {
+      display: flex;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .perf-chip {
+      flex: 1;
+      padding: 8px 8px;
+      border-radius: 14px;
+      border: 1px solid rgba(148,163,184,0.4);
+      background: rgba(15,23,42,0.96);
+      text-align: center;
+      font-size: 11px;
+    }
+
+    .perf-chip .label {
+      color: #9ca3af;
+      margin-bottom: 2px;
+    }
+
+    .perf-chip .value {
+      font-size: 16px;
+      font-weight: 600;
+    }
+
     .balance-summary {
       font-size: 14px;
       text-align: center;
-      margin-top: 4px;
+      margin-top: 6px;
     }
 
     .balance-summary strong {
@@ -320,36 +345,6 @@
       color: #9ca3af;
       text-align: center;
       margin-top: 4px;
-    }
-
-    .balance-stats {
-      display: flex;
-      gap: 6px;
-      margin-top: 10px;
-    }
-
-    .balance-pill {
-      flex: 1;
-      padding: 8px 8px;
-      border-radius: 14px;
-      border: 1px solid rgba(148,163,184,0.4);
-      background: rgba(15,23,42,0.95);
-      font-size: 11px;
-      text-align: center;
-    }
-
-    .balance-pill span {
-      display: block;
-    }
-
-    .balance-pill .label {
-      color: #9ca3af;
-      margin-bottom: 2px;
-    }
-
-    .balance-pill .value {
-      font-size: 15px;
-      font-weight: 600;
     }
 
     .balance-row {
@@ -410,7 +405,7 @@
     <span id="headerStatus" class="header-status">Offline</span>
   </div>
 
-  <!-- LOGIN CARD -->
+  <!-- LOGIN -->
   <div id="loginCard" class="card">
     <div class="section-title">Hyr si shofer</div>
     <div class="section-sub">
@@ -424,26 +419,14 @@
     <div id="loginMsg" class="login-error"></div>
   </div>
 
-  <!-- CONTENT -->
+  <!-- CONTENT NACH LOGIN -->
   <div id="content" style="display:none;">
 
-    <!-- TOP TABS -->
+    <!-- TABS -->
     <div class="tabs">
       <button class="tab-btn active" data-tab="tab-requests">Kërkesat</button>
       <button class="tab-btn" data-tab="tab-active">Vozitjet</button>
       <button class="tab-btn" data-tab="tab-balance">Bilanci</button>
-    </div>
-
-    <!-- STATS TODAY -->
-    <div class="card">
-      <div class="section-title">Performanca ime</div>
-      <div class="section-sub">Sa udhëtime ke përfunduar sot.</div>
-      <div class="stat-main">
-        <div class="stat-number" id="statRidesCount">0</div>
-        <div class="stat-right">
-          <div>Udhëtime të përfunduara sot</div>
-        </div>
-      </div>
     </div>
 
     <!-- TAB: KËRKESAT -->
@@ -468,32 +451,34 @@
       </div>
     </div>
 
-    <!-- TAB: BILANCI -->
+    <!-- TAB: BILANCI + PERFORMANCA -->
     <div id="tab-balance" class="tab-panel" style="display:none;">
       <div class="card">
-        <div class="section-title">Bilanci im</div>
-        <div class="section-sub">Sa ke për t’u barazuar dhe lëvizjet e fundit.</div>
+        <div class="section-title">Performanca ime & bilanci</div>
+        <div class="section-sub">Statistikat e udhëtimeve dhe bilanci i kompanisë.</div>
 
-        <div id="balanceSummary" class="balance-summary"></div>
-        <div id="balanceMeta" class="balance-meta"></div>
-
-        <!-- Stats: Sot / Java / Muaji -->
-        <div class="balance-stats">
-          <div class="balance-pill">
-            <span class="label">Sot</span>
-            <span class="value" id="balStatToday">0</span>
-          </div>
-          <div class="balance-pill">
-            <span class="label">Java</span>
-            <span class="value" id="balStatWeek">0</span>
-          </div>
-          <div class="balance-pill">
-            <span class="label">Muaji</span>
-            <span class="value" id="balStatMonth">0</span>
+        <!-- Performanca ime – nur hier -->
+        <div class="perf-wrapper">
+          <div class="perf-chips">
+            <div class="perf-chip">
+              <div class="label">Sot</div>
+              <div class="value" id="perfToday">0</div>
+            </div>
+            <div class="perf-chip">
+              <div class="label">Java</div>
+              <div class="value" id="perfWeek">0</div>
+            </div>
+            <div class="perf-chip">
+              <div class="label">Muaji</div>
+              <div class="value" id="perfMonth">0</div>
+            </div>
           </div>
         </div>
 
-        <!-- History -->
+        <!-- Bilanci -->
+        <div id="balanceSummary" class="balance-summary"></div>
+        <div id="balanceMeta" class="balance-meta"></div>
+
         <div id="balanceHistoryList"></div>
         <div id="balanceHistoryEmpty" class="balance-empty"></div>
       </div>
@@ -535,7 +520,7 @@
   const maps = {};
   let geoWatchId = null;
 
-  // DOM refs
+  // DOM references
   const loginCard = document.getElementById("loginCard");
   const content = document.getElementById("content");
   const loginBtn = document.getElementById("loginBtn");
@@ -546,8 +531,6 @@
   const tabButtons = document.querySelectorAll(".tab-btn");
   const tabPanels = document.querySelectorAll(".tab-panel");
 
-  const statRidesCount = document.getElementById("statRidesCount");
-
   const ordersBox = document.getElementById("orders");
   const myOrdersBox = document.getElementById("myOrders");
   const noOpen = document.getElementById("noOpen");
@@ -557,20 +540,41 @@
   const balanceMeta = document.getElementById("balanceMeta");
   const balanceHistoryList = document.getElementById("balanceHistoryList");
   const balanceHistoryEmpty = document.getElementById("balanceHistoryEmpty");
-  const balStatToday = document.getElementById("balStatToday");
-  const balStatWeek = document.getElementById("balStatWeek");
-  const balStatMonth = document.getElementById("balStatMonth");
 
-  /* HELPERS */
+  const perfToday = document.getElementById("perfToday");
+  const perfWeek = document.getElementById("perfWeek");
+  const perfMonth = document.getElementById("perfMonth");
+
+  /************ HELPERS ************/
 
   function cleanAddress(a) {
     if (!a) return "";
     const lower = a.toLowerCase();
     if (lower.includes("nuk") && lower.includes("përcaktuar")) return "";
-    return a;
+    return a.trim();
   }
 
-  function shortenAddress(address, maxLen = 28) {
+  // Holt Adresse aus verschiedenen möglichen Feldern
+  function extractAddress(o) {
+    const candidates = [
+      o.addressStreet,
+      o.address,
+      o.addressFull,
+      o.locationAddress,
+      o.street,
+      o.streetName,
+      o.road,
+      o.route,
+      o.formattedAddress,
+      o.fullAddress
+    ];
+    for (const c of candidates) {
+      if (typeof c === "string" && c.trim()) return c.trim();
+    }
+    return "";
+  }
+
+  function shortenAddress(address, maxLen = 30) {
     if (!address) return "";
     const t = address.trim();
     if (t.length <= maxLen) return t;
@@ -651,16 +655,14 @@
       if (dt >= dMonth) stats.month++;
     });
 
-    statRidesCount.textContent = stats.day || 0;
-    balStatToday.textContent = stats.day || 0;
-    balStatWeek.textContent = stats.week || 0;
-    balStatMonth.textContent = stats.month || 0;
+    perfToday.textContent = stats.day || 0;
+    perfWeek.textContent = stats.week || 0;
+    perfMonth.textContent = stats.month || 0;
   }
 
   function startLocationTracking() {
     if (!navigator.geolocation || !currentDriver) return;
     if (geoWatchId !== null) return;
-
     geoWatchId = navigator.geolocation.watchPosition(
       (pos) => {
         const lat = pos.coords.latitude;
@@ -679,7 +681,7 @@
     );
   }
 
-  /* TABS */
+  /************ TABS ************/
 
   tabButtons.forEach(btn => {
     btn.addEventListener("click", () => {
@@ -691,7 +693,7 @@
     });
   });
 
-  /* LOGIN / AUTO-LOGIN */
+  /************ LOGIN / AUTO-LOGIN ************/
 
   function afterLoginSetup() {
     if (!currentDriver) return;
@@ -752,7 +754,7 @@
     }, { onlyOnce: true });
   }
 
-  /* ORDERS */
+  /************ ORDERS ************/
 
   function subscribeOrders() {
     const ordersRef = ref(db, "orders");
@@ -772,21 +774,11 @@
         const safeIdOpen = "map_open_" + id.replace(/[^a-zA-Z0-9_-]/g, "");
         const safeIdMine = "map_mine_" + id.replace(/[^a-zA-Z0-9_-]/g, "");
 
-        const rawAdr =
-          o.addressStreet ||
-          o.address ||
-          o.addressFull ||
-          o.locationAddress ||
-          o.street ||
-          o.streetName ||
-          o.fullAddress ||
-          o.formattedAddress ||
-          "";
-
+        const rawAdr = extractAddress(o);
         const addressFull = cleanAddress(rawAdr);
         const addressShort = shortenAddress(addressFull);
 
-        /* OPEN REQUESTS (Kërkesat) */
+        /* KËRKESAT (OPEN) */
         if (o.status === "open") {
           openCount++;
           const wrapper = document.createElement("div");
@@ -834,7 +826,7 @@
           }
         }
 
-        /* ACTIVE RIDES (Vozitjet) */
+        /* VOZITJET (TAKEN BY ME) */
         if (o.status === "taken" && o.takenByDriverId === currentDriver?.id) {
           mineCount++;
           hasActiveRide = true;
@@ -920,14 +912,16 @@
         }
       });
 
-      noOpen.textContent = openCount === 0 ? "Për momentin nuk ka kërkesa të reja." : "";
-      noMine.textContent = mineCount === 0 ? "Për momentin nuk ke vozitje aktive." : "";
+      noOpen.textContent =
+        openCount === 0 ? "Për momentin nuk ka kërkesa të reja." : "";
+      noMine.textContent =
+        mineCount === 0 ? "Për momentin nuk ke vozitje aktive." : "";
 
       invalidateAllMaps();
     });
   }
 
-  /* BILANCI */
+  /************ BILANCI ************/
 
   function subscribeBalance() {
     const balRef = ref(db, "balances/" + currentDriver.id);
@@ -937,10 +931,7 @@
         balanceSummary.textContent = "Nuk ka ende asnjë bilanc.";
         balanceMeta.textContent = "";
         balanceHistoryList.innerHTML = "";
-        balanceHistoryEmpty.textContent = "Ende nuk ka lëvizje.";
-        balStatToday.textContent = "0";
-        balStatWeek.textContent = "0";
-        balStatMonth.textContent = "0";
+        balanceHistoryEmpty.textContent = "Ende nuk ka lëvizje në histori.";
         return;
       }
 

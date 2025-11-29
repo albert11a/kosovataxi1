@@ -50,32 +50,43 @@
       --bg: radial-gradient(circle at top, #020617, #020617 60%, #020617);
       --card-bg: rgba(15, 23, 42, 0.9);
       --accent: #38bdf8;
+      --accent-soft: rgba(56,189,248,0.25);
       --border-radius-xl: 24px;
       --shadow-soft: 0 20px 60px rgba(0, 0, 0, 0.65);
+      --danger: #ef4444;
+      --success: #22c55e;
+      --text-subtle: #9ca3af;
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
-      font-family: system-ui, -apple-system, sans-serif;
+      font-family: system-ui, -apple-system, -apple-system-font, "SF Pro Text", sans-serif;
       margin: 0;
-      padding: 18px 12px 80px; /* extra bottom padding zum Scrollen */
+      padding: 18px 12px 90px; /* unten extra Platz zum Scrollen */
       background: var(--bg);
       color: #e5e7eb;
-      min-height: 100vh;
     }
 
-    .frame { max-width: 440px; margin: 0 auto; }
+    .frame {
+      max-width: 460px;
+      margin: 0 auto;
+    }
 
+    /* HEADER */
     .header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       padding: 4px 4px 14px;
       font-size: 13px;
-      color: #9ca3af;
+      color: var(--text-subtle);
+    }
+
+    .header-left {
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      color: #e5e7eb;
     }
 
     .header-center {
@@ -87,19 +98,63 @@
     }
 
     .dot {
-      width:6px;
-      height:6px;
+      width:7px;
+      height:7px;
       border-radius:999px;
-      background:#ef4444; /* rot = offline, wird per JS grün bei online */
-      box-shadow:0 0 0 5px rgba(239,68,68,0.25);
-      transition: background 0.2s, box-shadow 0.2s;
-    }
-
-    .dot.online {
       background:#22c55e;
       box-shadow:0 0 0 5px rgba(34,197,94,0.25);
     }
 
+    .header-status {
+      font-size: 12px;
+      padding: 3px 9px;
+      border-radius: 999px;
+      background: rgba(15,23,42,0.9);
+      border: 1px solid rgba(148,163,184,0.4);
+      color: var(--text-subtle);
+    }
+
+    /* TABS */
+    .tab-bar {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 14px;
+      padding: 2px 2px 4px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .tab-btn {
+      flex: 1;
+      min-width: 90px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      background: rgba(15,23,42,0.96);
+      color: #9ca3af;
+      font-size: 13px;
+      padding: 7px 10px;
+      text-align: center;
+      font-weight: 500;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .tab-btn.active {
+      background: linear-gradient(135deg,#22c55e,#4ade80);
+      color: #022c22;
+      box-shadow: 0 12px 30px rgba(34,197,94,0.4);
+      border-color: rgba(34,197,94,0.7);
+    }
+
+    .tab-panel {
+      display: none;
+    }
+
+    .tab-panel.active {
+      display: block;
+    }
+
+    /* CARD */
     .card {
       background: var(--card-bg);
       border-radius: var(--border-radius-xl);
@@ -108,18 +163,18 @@
       border: 1px solid rgba(148,163,184,0.22);
       backdrop-filter: blur(22px);
       -webkit-backdrop-filter: blur(22px);
-      margin-bottom: 18px;
+      margin-bottom: 16px;
     }
 
     .card-title {
-      font-size: 19px;
+      font-size: 18px;
       font-weight: 600;
       margin-bottom: 4px;
     }
 
     .card-subtitle {
       font-size: 13px;
-      color: #9ca3af;
+      color: var(--text-subtle);
       margin-bottom: 10px;
     }
 
@@ -127,6 +182,7 @@
       display:block;
       margin-top:8px;
       font-size:13px;
+      color:#e5e7eb;
     }
 
     input {
@@ -168,18 +224,18 @@
       color:#111827;
       box-shadow:0 10px 28px rgba(250,204,21,0.4);
       font-size:14px;
-      padding:8px 10px;
+      padding:9px 11px;
       width:100%;
-      margin-top:8px;
+      margin-top:10px;
     }
 
     .btn-danger {
-      background:#ef4444;
+      background:var(--danger);
       color:white;
       font-size:13px;
-      padding:7px 10px;
+      padding:8px 11px;
       width:100%;
-      margin-top:6px;
+      margin-top:8px;
       box-shadow:0 6px 22px rgba(239,68,68,0.55);
     }
 
@@ -190,17 +246,19 @@
     }
 
     .section-title {
-      font-size:14px;
-      font-weight:500;
+      font-size:15px;
+      font-weight:600;
+      margin-top:4px;
       margin-bottom:4px;
     }
 
     .section-sub {
-      font-size:11px;
-      color:#9ca3af;
-      margin-bottom:8px;
+      font-size:12px;
+      color:var(--text-subtle);
+      margin-bottom:6px;
     }
 
+    /* ORDER CARD */
     .order-card {
       background: radial-gradient(circle at top left, rgba(59,130,246,.22), rgba(15,23,42,.96));
       border-radius: 22px;
@@ -215,12 +273,12 @@
       justify-content: space-between;
       align-items: center;
       margin-bottom: 6px;
-      gap: 10px;
+      gap: 8px;
     }
 
     .order-name { font-size: 15px; font-weight: 600; }
     .order-phone { font-size: 13px; opacity: .9; }
-    .order-address { font-size: 12px; color:#cbd5f5; margin-top:2px; }
+    .order-address { font-size: 12px; color: #cbd5f5; margin-top: 2px; }
 
     .badge {
       font-size:11px;
@@ -240,8 +298,9 @@
       margin-top: 8px;
       border: 1px solid rgba(15, 23, 42, .9);
     }
-
-    .mini-map.leaflet-container { background:#020617; }
+    .mini-map.leaflet-container {
+      background:#020617;
+    }
 
     .order-footer {
       margin-top: 8px;
@@ -251,6 +310,7 @@
       align-items: center;
       color: #9ca3af;
       gap:8px;
+      flex-wrap: wrap;
     }
 
     .order-footer a {
@@ -270,163 +330,179 @@
       margin-top:4px;
     }
 
-    /* STATS CARD */
-    .stats-header {
+    /* STATS / BALANCE */
+    .stats-toggle {
+      display: inline-flex;
+      padding: 3px;
+      border-radius: 999px;
+      background: rgba(15,23,42,0.96);
+      border: 1px solid rgba(55,65,81,0.9);
+      margin: 6px 0 10px;
+    }
+
+    .stats-chip {
+      border-radius: 999px;
+      border: none;
+      font-size: 12px;
+      padding: 5px 10px;
+      background: transparent;
+      color: #9ca3af;
+      cursor: pointer;
+    }
+
+    .stats-chip.active {
+      background: rgba(34,197,94,0.16);
+      color: #bbf7d0;
+    }
+
+    .stats-box {
+      border-radius: 18px;
+      background: rgba(15,23,42,0.96);
+      border: 1px solid rgba(55,65,81,0.9);
+      padding: 10px 12px;
+      font-size: 13px;
+    }
+
+    .stat-row {
       display:flex;
       justify-content:space-between;
-      align-items:flex-start;
-      gap:10px;
-      margin-bottom:8px;
-    }
-
-    .stats-tabs {
-      display:flex;
-      gap:6px;
-    }
-
-    .stats-tab {
-      border-radius:999px;
-      border:1px solid transparent;
-      background:rgba(15,23,42,0.9);
-      color:#9ca3af;
-      font-size:11px;
-      padding:4px 10px;
-      cursor:pointer;
-    }
-
-    .stats-tab.active {
-      border-color:rgba(56,189,248,0.7);
-      background:rgba(37,99,235,0.25);
+      align-items:center;
+      padding: 3px 0;
       color:#e5e7eb;
     }
 
-    .stats-body {
-      margin-top:4px;
+    .stat-row span:last-child {
+      font-weight:600;
     }
 
-    .stats-number {
-      font-size:26px;
-      font-weight:700;
-      margin-bottom:2px;
+    .balance-box {
+      border-radius: 16px;
+      background: rgba(15,23,42,0.96);
+      border: 1px solid rgba(55,65,81,0.9);
+      padding: 10px 12px;
+      font-size: 13px;
+      margin-top: 8px;
+      line-height: 1.4;
     }
 
-    .stats-label {
-      font-size:12px;
-      color:#9ca3af;
+    .balance-status {
+      font-size: 12px;
+      color: #9ca3af;
+      margin-top: 4px;
     }
 
-    .stats-subline {
-      font-size:11px;
-      color:#6b7280;
-      margin-top:4px;
+    /* HISTORY */
+    .history-item {
+      border-radius: 18px;
+      background: rgba(15,23,42,0.96);
+      border: 1px solid rgba(55,65,81,0.9);
+      padding: 8px 10px;
+      margin-top: 8px;
+      font-size: 12px;
     }
 
-    /* BALANCE LIST */
-    .balance-summary {
-      font-size:14px;
-      margin-bottom:8px;
-    }
-
-    .balance-history-title {
-      font-size:12px;
-      font-weight:500;
-      margin-top:6px;
-      margin-bottom:4px;
-      color:#cbd5f5;
-    }
-
-    .balance-history-list {
-      max-height:150px;
-      overflow-y:auto;
-      padding-right:4px;
-    }
-
-    .balance-row {
-      font-size:11px;
+    .history-top {
       display:flex;
       justify-content:space-between;
-      padding:4px 0;
-      border-bottom:1px dashed rgba(55,65,81,0.7);
+      align-items:center;
+      margin-bottom: 2px;
     }
 
-    .balance-row:last-child {
-      border-bottom:none;
+    .history-title {
+      font-weight:500;
+      font-size:13px;
+    }
+
+    .history-type-done {
+      color:#bbf7d0;
+    }
+
+    .history-type-canceled {
+      color:#fecaca;
     }
 
     /* LOGOUT SLIDER */
-    .logout-wrapper {
-      max-width:440px;
-      margin: 0 auto 10px;
-      padding: 0 4px 20px;
-      display:none; /* wird per JS sichtbar nach Login */
+    .logout-wrap {
+      margin-top: 18px;
+      text-align: center;
+      font-size: 12px;
+      color: #9ca3af;
     }
 
     .logout-label {
-      font-size:12px;
-      color:#9ca3af;
-      margin-bottom:6px;
-      text-align:center;
+      margin-bottom: 6px;
     }
 
     .logout-slider {
-      position:relative;
-      background:rgba(15,23,42,0.96);
-      border-radius:999px;
-      padding:8px;
-      border:1px solid rgba(148,163,184,0.35);
+      position: relative;
+      width: 100%;
+      max-width: 360px;
+      height: 44px;
+      margin: 0 auto;
+      border-radius: 999px;
+      background: rgba(15,23,42,0.96);
+      border: 1px solid rgba(55,65,81,0.9);
+      overflow: hidden;
       display:flex;
       align-items:center;
       justify-content:center;
-      overflow:hidden;
-      user-select:none;
     }
 
-    .logout-knob {
-      position:absolute;
-      left:4px;
-      top:4px;
-      width:44px;
-      height:44px;
-      border-radius:999px;
+    .logout-slider-text {
+      font-size: 13px;
+      color: #9ca3af;
+      pointer-events: none;
+    }
+
+    .logout-thumb {
+      position: absolute;
+      left: 4px;
+      top: 3px;
+      bottom: 3px;
+      width: 74px;
+      border-radius: 999px;
       background: linear-gradient(135deg,#ef4444,#f97316);
+      box-shadow: 0 10px 30px rgba(239,68,68,0.5);
       display:flex;
       align-items:center;
       justify-content:center;
-      font-size:18px;
-      color:#fff;
-      box-shadow:0 10px 28px rgba(239,68,68,0.55);
-      touch-action:none;
-      transition: left 0.18s ease;
+      font-size: 18px;
+      color:#fef2f2;
+      touch-action: none;
+      cursor: pointer;
     }
 
-    .logout-text {
-      font-size:13px;
-      color:#e5e7eb;
-      opacity:0.9;
+    .logout-slider.done {
+      opacity: 0.85;
     }
 
-    @media (max-width: 360px) {
-      .card { padding: 14px 12px 16px; }
-      .order-name { font-size:14px; }
-      .order-phone, .order-address { font-size:11px; }
-      .mini-map { height:130px; }
+    @media (max-width: 380px) {
+      .card {
+        padding: 14px 12px 16px;
+      }
+      .order-card {
+        padding: 10px 10px 12px;
+      }
+      .mini-map {
+        height: 130px;
+      }
     }
   </style>
 </head>
 
 <body>
-
 <div class="frame">
+  <!-- HEADER -->
   <div class="header">
-    <span>KosovaTaxi</span>
+    <div class="header-left">KosovaTaxi • Shofer</div>
     <div class="header-center">
-      <div id="headerDot" class="dot"></div>
+      <div class="dot"></div>
       <span id="headerDriverName">Shoferi</span>
     </div>
-    <span id="headerStatus">Offline</span>
+    <div id="headerStatus" class="header-status">Offline</div>
   </div>
 
-  <!-- LOGIN -->
+  <!-- LOGIN CARD -->
   <div id="loginCard" class="card">
     <div class="card-title">Hyr si shofer</div>
     <div class="card-subtitle">
@@ -442,66 +518,87 @@
 
   <!-- DASHBOARD -->
   <div id="content" style="display:none;">
+    <!-- TABS -->
+    <div class="tab-bar">
+      <button class="tab-btn active" data-tab="tab-active">Aktive</button>
+      <button class="tab-btn" data-tab="tab-open">Kërkesa</button>
+      <button class="tab-btn" data-tab="tab-balance">Bilanci</button>
+      <button class="tab-btn" data-tab="tab-history">Lëvizjet</button>
+    </div>
 
-    <!-- KARTE 0: PERFORMANCA IME -->
-    <div class="card">
-      <div class="stats-header">
-        <div>
-          <div class="section-title">Performanca ime</div>
-          <div class="section-sub">Sa udhëtime ke përfunduar sot, këtë javë dhe këtë muaj.</div>
-        </div>
-        <div class="stats-tabs">
-          <button class="stats-tab active" data-range="today">Sot</button>
-          <button class="stats-tab" data-range="week">Java</button>
-          <button class="stats-tab" data-range="month">Muaji</button>
-        </div>
-      </div>
-      <div class="stats-body">
-        <div id="statsDone" class="stats-number">0</div>
-        <div id="statsLabel" class="stats-label">Udhëtime të përfunduara sot</div>
-        <div id="statsCanceled" class="stats-subline">Anulime: 0</div>
+    <!-- TAB: AKTIVE -->
+    <div id="tab-active" class="tab-panel active">
+      <div class="card">
+        <div class="section-title">Udhëtimet e mia aktive</div>
+        <div class="section-sub">Mund të kesh vetëm një udhëtim aktiv në të njëjtën kohë.</div>
+
+        <div id="myOrders"></div>
+        <div id="noMine" class="empty-text"></div>
       </div>
     </div>
 
-    <!-- KARTE 1: UDHËTIMET E MIA AKTIVE -->
-    <div class="card">
-      <div class="section-title">Udhëtimet e mia aktive</div>
-      <div class="section-sub">Mund të kesh vetëm një udhëtim aktiv në të njëjtën kohë.</div>
+    <!-- TAB: KËRKESA (OPEN) -->
+    <div id="tab-open" class="tab-panel">
+      <div class="card">
+        <div class="section-title">Kërkesa në pritje</div>
+        <div class="section-sub">Këto janë udhëtime që mund t’i pranosh.</div>
 
-      <div id="myOrders"></div>
-      <div id="noMine" class="empty-text"></div>
+        <div id="orders"></div>
+        <div id="noOpen" class="empty-text"></div>
+      </div>
     </div>
 
-    <!-- KARTE 2: KËRKESAT E REJA -->
-    <div class="card">
-      <div class="section-title">Kërkesa të reja nga klientët</div>
-      <div class="section-sub">Këto janë kërkesa të hapura që mund t’i pranosh.</div>
+    <!-- TAB: BILANCI / PERFORMANCA -->
+    <div id="tab-balance" class="tab-panel">
+      <div class="card">
+        <div class="section-title">Performanca ime</div>
+        <div class="section-sub">Shiko udhëtimet e përfunduara dhe anulimet për sot, javën dhe muajin.</div>
 
-      <div id="orders"></div>
-      <div id="noOpen" class="empty-text"></div>
+        <div class="stats-toggle">
+          <button class="stats-chip active" data-range="day">Sot</button>
+          <button class="stats-chip" data-range="week">Java</button>
+          <button class="stats-chip" data-range="month">Muaji</button>
+        </div>
+
+        <div class="stats-box">
+          <div class="stat-row">
+            <span>Udhëtime të përfunduara</span>
+            <span id="statDone">0</span>
+          </div>
+          <div class="stat-row">
+            <span>Anulime</span>
+            <span id="statCanceled">0</span>
+          </div>
+        </div>
+
+        <div class="section-title" style="margin-top:14px;">Barazimi im</div>
+        <div id="balanceBox" class="balance-box"></div>
+      </div>
     </div>
 
-    <!-- KARTE 3: BARAZIMI IM -->
-    <div class="card">
-      <div class="section-title">Barazimi im</div>
-      <div id="balanceBox" class="balance-summary"></div>
+    <!-- TAB: LËVIZJET -->
+    <div id="tab-history" class="tab-panel">
+      <div class="card">
+        <div class="section-title">Lëvizjet e fundit</div>
+        <div class="section-sub">Lista e udhëtimeve të fundit të përfunduara dhe anulimeve.</div>
 
-      <div class="balance-history-title">Lëvizjet e fundit</div>
-      <div id="balanceHistory" class="balance-history-list"></div>
+        <div id="historyList"></div>
+        <div id="noHistory" class="empty-text"></div>
+      </div>
     </div>
 
+    <!-- LOGOUT SLIDER -->
+    <div class="logout-wrap">
+      <div class="logout-label">Për t'u çkyçur nga llogaria:</div>
+      <div class="logout-slider" id="logoutSlider">
+        <div class="logout-slider-text">Slide për t'u çkyçur</div>
+        <div class="logout-thumb" id="logoutThumb">⇢</div>
+      </div>
+    </div>
   </div>
 </div>
 
-<!-- LOGOUT SLIDER -->
-<div id="logoutWrapper" class="logout-wrapper">
-  <div class="logout-label">Për të dalë nga llogaria, lësho drejt djathtas.</div>
-  <div id="logoutSlider" class="logout-slider">
-    <div id="logoutKnob" class="logout-knob">⇾</div>
-    <span id="logoutText" class="logout-text">Slide për t'u shkëputur</span>
-  </div>
-</div>
-
+<!-- Leaflet JS -->
 <script
   src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
   crossorigin=""
@@ -527,15 +624,7 @@
 
   let currentDriver = null;
   let hasActiveRide = false;
-  let watchId = null;
-
-  // Stats
-  let stats = {
-    today: { done: 0, canceled: 0 },
-    week: { done: 0, canceled: 0 },
-    month: { done: 0, canceled: 0 }
-  };
-  let currentStatsRange = "today";
+  let locWatchId = null;
 
   const loginCard = document.getElementById("loginCard");
   const content = document.getElementById("content");
@@ -543,189 +632,102 @@
   const loginMsg = document.getElementById("loginMsg");
   const headerDriverName = document.getElementById("headerDriverName");
   const headerStatus = document.getElementById("headerStatus");
-  const headerDot = document.getElementById("headerDot");
   const balanceBox = document.getElementById("balanceBox");
-  const balanceHistoryEl = document.getElementById("balanceHistory");
 
-  const logoutWrapper = document.getElementById("logoutWrapper");
-  const logoutSlider = document.getElementById("logoutSlider");
-  const logoutKnob = document.getElementById("logoutKnob");
+  const tabButtons = document.querySelectorAll(".tab-btn");
+  const tabPanels = document.querySelectorAll(".tab-panel");
 
-  /* -----------------------
-   * DATUM-HELFER
-   * ----------------------- */
+  const statDoneEl = document.getElementById("statDone");
+  const statCanceledEl = document.getElementById("statCanceled");
+  const statsChips = document.querySelectorAll(".stats-chip");
+  let currentStatsRange = "day";
+
+  // Stats cache
+  const driverStats = {
+    day: { done: 0, canceled: 0 },
+    week: { done: 0, canceled: 0 },
+    month: { done: 0, canceled: 0 }
+  };
+
+  // Helpers for dates
   function startOfDay(d) {
-    const n = new Date(d); n.setHours(0,0,0,0); return n;
+    const n = new Date(d); n.setHours(0,0,0,0); return n.getTime();
   }
   function endOfDay(d) {
-    const n = startOfDay(d); n.setDate(n.getDate() + 1); return n;
+    return startOfDay(d) + 24*60*60*1000;
   }
   function startOfWeek(d) {
-    const n = startOfDay(d);
-    const day = n.getDay(); // 0=So, 1=Mo
+    const n = new Date(d);
+    n.setHours(0,0,0,0);
+    const day = n.getDay();
     const diff = (day === 0 ? -6 : 1 - day);
     n.setDate(n.getDate() + diff);
-    return n;
+    return n.getTime();
   }
   function endOfWeek(d) {
-    const s = startOfWeek(d);
-    const e = new Date(s);
-    e.setDate(e.getDate() + 7);
-    return e;
+    return startOfWeek(d) + 7*24*60*60*1000;
   }
   function startOfMonth(d) {
-    const n = startOfDay(d);
-    return new Date(n.getFullYear(), n.getMonth(), 1);
+    const n = new Date(d);
+    return new Date(n.getFullYear(), n.getMonth(), 1).getTime();
   }
   function endOfMonth(d) {
-    const s = startOfMonth(d);
-    return new Date(s.getFullYear(), s.getMonth() + 1, 1);
+    const n = new Date(d);
+    return new Date(n.getFullYear(), n.getMonth()+1, 1).getTime();
   }
 
-  function formatMinutesSince(timestamp) {
-    if (!timestamp) return "-";
-    const diffMs = Date.now() - timestamp;
-    const mins = Math.floor(diffMs / 60000);
-    if (mins <= 0) return "më pak se 1 min";
-    if (mins === 1) return "1 minutë";
-    return mins + " minuta";
-  }
+  /* ---------- SESSION / LOGIN ---------- */
 
-  function extractStreet(o) {
-    const full = o.address || o.street || "";
-    if (!full) return "";
-    return full.split(",")[0].trim();
-  }
-
-  /* -----------------------
-   * GEO-TRACKING
-   * ----------------------- */
-  function startLocationTracking() {
-    if (!navigator.geolocation || !currentDriver) return;
-
-    if (watchId !== null) {
-      navigator.geolocation.clearWatch(watchId);
-      watchId = null;
-    }
-
-    watchId = navigator.geolocation.watchPosition(
-      (pos) => {
-        const { latitude, longitude, heading, speed } = pos.coords;
-        const locRef = ref(db, "driverLocations/" + currentDriver.id);
-        set(locRef, {
-          lat: latitude,
-          lng: longitude,
-          heading: heading ?? null,
-          speed: speed ?? null,
-          updatedAt: Date.now()
-        }).catch(console.error);
-      },
-      (err) => {
-        console.error("Geo error:", err);
-      },
-      {
-        enableHighAccuracy: true,
-        maximumAge: 5000,
-        timeout: 10000
-      }
-    );
-  }
-
-  function stopLocationTracking() {
-    if (watchId !== null && navigator.geolocation) {
-      navigator.geolocation.clearWatch(watchId);
-      watchId = null;
-    }
-  }
-
-  document.addEventListener("visibilitychange", () => {
-    if (document.visibilityState === "visible" && currentDriver) {
-      startLocationTracking();
-    }
-  });
-
-  /* -----------------------
-   * STATISTIK-UI
-   * ----------------------- */
-  const statsDoneEl = document.getElementById("statsDone");
-  const statsLabelEl = document.getElementById("statsLabel");
-  const statsCanceledEl = document.getElementById("statsCanceled");
-
-  function renderStats() {
-    const m = stats[currentStatsRange] || { done:0, canceled:0 };
-    statsDoneEl.textContent = m.done;
-
-    if (currentStatsRange === "today") {
-      statsLabelEl.textContent = "Udhëtime të përfunduara sot";
-    } else if (currentStatsRange === "week") {
-      statsLabelEl.textContent = "Udhëtime të përfunduara këtë javë";
-    } else {
-      statsLabelEl.textContent = "Udhëtime të përfunduara këtë muaj";
-    }
-
-    statsCanceledEl.textContent = "Anulime: " + (m.canceled || 0);
-  }
-
-  document.querySelectorAll(".stats-tab").forEach(btn => {
-    btn.addEventListener("click", () => {
-      document.querySelectorAll(".stats-tab").forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-      currentStatsRange = btn.dataset.range;
-      renderStats();
-    });
-  });
-
-  /* -----------------------
-   * LOGIN / AUTO-LOGIN
-   * ----------------------- */
-  function setOnlineUI(isOnline) {
-    if (isOnline) {
-      headerStatus.textContent = "Online";
-      headerDot.classList.add("online");
-    } else {
-      headerStatus.textContent = "Offline";
-      headerDot.classList.remove("online");
-    }
-  }
-
-  function initDriverSession(driver) {
+  function applyLoggedInUI(driver) {
     currentDriver = driver;
     headerDriverName.textContent = driver.name || "Shoferi";
-    setOnlineUI(true);
+    headerStatus.textContent = "Online";
     loginCard.style.display = "none";
     content.style.display = "block";
-    logoutWrapper.style.display = "block";
-
+    startLocationTracking();
     subscribeOrders();
     subscribeBalance();
-    startLocationTracking();
   }
 
-  function saveDriverToLocal(driver) {
+  function saveSession(driverId) {
     try {
-      localStorage.setItem("driverId", driver.id);
+      localStorage.setItem("shoferSession", JSON.stringify({ id: driverId }));
     } catch (e) {
-      console.warn("localStorage not available", e);
+      console.warn("Nuk u ruajt sesioni", e);
     }
   }
 
-  function tryAutoLogin() {
+  function clearSession() {
     try {
-      const savedId = localStorage.getItem("driverId");
-      if (!savedId) return;
-      const drvRef = ref(db, "drivers/" + savedId);
-      onValue(drvRef, (snap) => {
-        const d = snap.val();
-        if (!d || d.approved !== true || d.active === false) {
-          // ungültig -> löschen
-          localStorage.removeItem("driverId");
-          return;
-        }
-        initDriverSession({ id: savedId, ...d });
-      }, { onlyOnce: true });
-    } catch (e) {
-      console.error(e);
-    }
+      localStorage.removeItem("shoferSession");
+    } catch (e) {}
+  }
+
+  function bootstrapSession() {
+    let raw = null;
+    try {
+      raw = localStorage.getItem("shoferSession");
+    } catch (e) {}
+    if (!raw) return;
+
+    let parsed = null;
+    try {
+      parsed = JSON.parse(raw);
+    } catch (e) { return; }
+
+    if (!parsed || !parsed.id) return;
+
+    const drvRef = ref(db, "drivers/" + parsed.id);
+    onValue(drvRef, (snap) => {
+      const d = snap.val();
+      if (!d || d.approved !== true || d.active === false) {
+        clearSession();
+        return;
+      }
+      if (!currentDriver) {
+        applyLoggedInUI({ id: parsed.id, ...d });
+      }
+    }, { onlyOnce: true });
   }
 
   loginBtn.onclick = () => {
@@ -758,17 +760,68 @@
         }
 
         if (!currentDriver) {
-          saveDriverToLocal(found);
-          initDriverSession(found);
+          saveSession(found.id);
+          applyLoggedInUI(found);
         }
       },
       { onlyOnce: true }
     );
   };
 
-  /* -----------------------
-   * LEAFLET MINI-MAPS
-   * ----------------------- */
+  /* ---------- GEO TRACKING ---------- */
+
+  function startLocationTracking() {
+    if (!navigator.geolocation || !currentDriver) return;
+    if (locWatchId !== null) return;
+
+    locWatchId = navigator.geolocation.watchPosition(
+      (pos) => {
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+        const acc = pos.coords.accuracy;
+        const speed = pos.coords.speed;
+        const heading = pos.coords.heading;
+
+        const locRef = ref(db, "driverLocations/" + currentDriver.id);
+        set(locRef, {
+          lat,
+          lng,
+          accuracy: acc,
+          speed: speed || null,
+          heading: heading || null,
+          updatedAt: Date.now(),
+          name: currentDriver.name || null,
+          company: currentDriver.company || null,
+          online: true
+        });
+      },
+      (err) => {
+        console.warn("Geo error", err);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 20000,
+        maximumAge: 10000
+      }
+    );
+  }
+
+  function stopLocationTracking() {
+    if (locWatchId !== null && navigator.geolocation) {
+      navigator.geolocation.clearWatch(locWatchId);
+      locWatchId = null;
+    }
+    if (currentDriver) {
+      const locRef = ref(db, "driverLocations/" + currentDriver.id);
+      set(locRef, {
+        online: false,
+        updatedAt: Date.now()
+      }).catch(() => {});
+    }
+  }
+
+  /* ---------- MAP & HELPERS ---------- */
+
   function createMiniMap(containerId, lat, lng) {
     const container = document.getElementById(containerId);
     if (!container) return;
@@ -785,9 +838,23 @@
     L.marker([lat, lng]).addTo(map);
   }
 
-  /* -----------------------
-   * ORDERS
-   * ----------------------- */
+  function formatMinutesSince(timestamp) {
+    if (!timestamp) return "-";
+    const diffMs = Date.now() - timestamp;
+    const mins = Math.floor(diffMs / 60000);
+    if (mins <= 0) return "më pak se 1 min";
+    if (mins === 1) return "1 minutë";
+    return mins + " minuta";
+  }
+
+  function extractStreet(address) {
+    if (!address) return "Adresa nuk është e përcaktuar";
+    const parts = String(address).split(",");
+    return parts[0].trim() || "Adresa nuk është e përcaktuar";
+  }
+
+  /* ---------- ORDERS / UI ---------- */
+
   function subscribeOrders() {
     const ordersRef = ref(db, "orders");
 
@@ -797,66 +864,99 @@
       const mineBox = document.getElementById("myOrders");
       const noOpen = document.getElementById("noOpen");
       const noMine = document.getElementById("noMine");
+      const historyList = document.getElementById("historyList");
+      const noHistory = document.getElementById("noHistory");
 
       openBox.innerHTML = "";
       mineBox.innerHTML = "";
+      historyList.innerHTML = "";
+
       let openCount = 0;
       let mineCount = 0;
       hasActiveRide = false;
 
-      // Stats zurücksetzen
-      stats.today = { done:0, canceled:0 };
-      stats.week = { done:0, canceled:0 };
-      stats.month = { done:0, canceled:0 };
+      // Reset stats
+      driverStats.day.done = 0;
+      driverStats.day.canceled = 0;
+      driverStats.week.done = 0;
+      driverStats.week.canceled = 0;
+      driverStats.month.done = 0;
+      driverStats.month.canceled = 0;
 
-      const now = new Date();
-      const dayStart = +startOfDay(now);
-      const dayEnd = +endOfDay(now);
-      const weekStart = +startOfWeek(now);
-      const weekEnd = +endOfWeek(now);
-      const monthStart = +startOfMonth(now);
-      const monthEnd = +endOfMonth(now);
+      const now = Date.now();
+      const dayStart = startOfDay(now);
+      const dayEnd = endOfDay(now);
+      const weekStart = startOfWeek(now);
+      const weekEnd = endOfWeek(now);
+      const monthStart = startOfMonth(now);
+      const monthEnd = endOfMonth(now);
+
+      const historyArr = [];
 
       Object.entries(data).forEach(([id, o]) => {
         const safeIdOpen = "map_open_" + id.replace(/[^a-zA-Z0-9_-]/g, "");
         const safeIdMine = "map_mine_" + id.replace(/[^a-zA-Z0-9_-]/g, "");
 
-        // STATISTIK: nur erledigte / stornierte Fahrten
-        if (o.completedAt && o.status === "done") {
-          const t = o.completedAt;
-          if (t >= dayStart && t < dayEnd) stats.today.done++;
-          if (t >= weekStart && t < weekEnd) stats.week.done++;
-          if (t >= monthStart && t < monthEnd) stats.month.done++;
-        }
-        if (o.canceledAt && o.status === "canceled") {
-          const t = o.canceledAt;
-          if (t >= dayStart && t < dayEnd) stats.today.canceled++;
-          if (t >= weekStart && t < weekEnd) stats.week.canceled++;
-          if (t >= monthStart && t < monthEnd) stats.month.canceled++;
+        const isMine = (o.takenByDriverId === currentDriver?.id);
+
+        const completedTime = o.completedAt || o.createdAt || null;
+        const canceledTime = o.canceledAt || null;
+
+        // Stats for THIS driver
+        if (isMine) {
+          if (o.status === "done" && completedTime) {
+            const t = completedTime;
+            if (t >= dayStart && t < dayEnd) driverStats.day.done++;
+            if (t >= weekStart && t < weekEnd) driverStats.week.done++;
+            if (t >= monthStart && t < monthEnd) driverStats.month.done++;
+
+            historyArr.push({
+              type: "done",
+              name: o.name,
+              phone: o.phone,
+              address: extractStreet(o.address),
+              time: t
+            });
+          }
+
+          if (o.status === "canceled" && canceledTime) {
+            const t = canceledTime;
+            if (t >= dayStart && t < dayEnd) driverStats.day.canceled++;
+            if (t >= weekStart && t < weekEnd) driverStats.week.canceled++;
+            if (t >= monthStart && t < monthEnd) driverStats.month.canceled++;
+
+            historyArr.push({
+              type: "canceled",
+              name: o.name,
+              phone: o.phone,
+              address: extractStreet(o.address),
+              time: t
+            });
+          }
         }
 
         /* --------------------
-         * KËRKESA TË REJA
+         * KËRKESA NË PRITJE
          * -------------------- */
         if (o.status === "open") {
           openCount++;
           const wrapper = document.createElement("div");
           wrapper.className = "order-card";
 
-          const street = extractStreet(o);
+          const street = extractStreet(o.address);
 
           wrapper.innerHTML = `
             <div class="order-header">
               <div>
                 <div class="order-name">${o.name}</div>
                 <div class="order-phone">${o.phone}</div>
-                ${street ? `<div class="order-address">${street}</div>` : ""}
+                <div class="order-address">${street}</div>
               </div>
-              <span class="badge badge-open">Kërkesë e re</span>
+              <span class="badge badge-open">Në pritje</span>
             </div>
             <div id="${safeIdOpen}" class="mini-map"></div>
             <div class="order-footer">
-              <span>Zgjidhe dhe prano udhëtimin.</span>
+              <span>Kliko “Prano udhëtimin” për ta marrë këtë klient.</span>
               <a href="https://maps.google.com/?q=${o.lat},${o.lng}" target="_blank">Google Maps</a>
             </div>
           `;
@@ -883,15 +983,15 @@
 
           wrapper.appendChild(acceptBtn);
           openBox.appendChild(wrapper);
-          setTimeout(() => createMiniMap(safeIdOpen, o.lat, o.lng), 50);
+          setTimeout(() => createMiniMap(safeIdOpen, o.lat, o.lng), 80);
         }
 
         /* --------------------
-         * UDHËTIMET E MIA
+         * UDHËTIMET E MIA AKTIVE
          * -------------------- */
         if (
           o.status === "taken" &&
-          o.takenByDriverId === currentDriver?.id
+          isMine
         ) {
           mineCount++;
           hasActiveRide = true;
@@ -900,14 +1000,14 @@
           wrapper.className = "order-card";
 
           const timeText = formatMinutesSince(o.takenAt);
-          const street = extractStreet(o);
+          const street = extractStreet(o.address);
 
           wrapper.innerHTML = `
             <div class="order-header">
               <div>
                 <div class="order-name">${o.name}</div>
                 <div class="order-phone">${o.phone}</div>
-                ${street ? `<div class="order-address">${street}</div>` : ""}
+                <div class="order-address">${street}</div>
               </div>
               <span class="badge badge-active">Aktive</span>
             </div>
@@ -921,7 +1021,7 @@
           /* Perfundo */
           const finishBtn = document.createElement("button");
           finishBtn.className = "btn-secondary";
-          finishBtn.textContent = "✅ Perfundo udhëtimin";
+          finishBtn.textContent = "✅ Përfundo udhëtimin";
           finishBtn.onclick = () => {
             const thisOrder = ref(db, "orders/" + id);
 
@@ -931,33 +1031,19 @@
               current.completedAt = Date.now();
               return current;
             }).then(() => {
-              // Update balance
+              // Update balance (0.25 € për kompaninë)
               const balRef = ref(db, "balances/" + currentDriver.id);
               runTransaction(balRef, (cur) => {
-                const nowTs = Date.now();
                 if (!cur) {
                   return {
                     total: 0.25,
                     status: "open",
-                    lastUpdate: nowTs,
-                    history: {
-                      [id]: {
-                        amount: 0.25,
-                        orderId: id,
-                        timestamp: nowTs
-                      }
-                    }
+                    lastUpdate: Date.now()
                   };
                 }
                 cur.total = (cur.total || 0) + 0.25;
                 cur.status = "open";
-                cur.lastUpdate = nowTs;
-                if (!cur.history) cur.history = {};
-                cur.history[id] = {
-                  amount: 0.25,
-                  orderId: id,
-                  timestamp: nowTs
-                };
+                cur.lastUpdate = Date.now();
                 return cur;
               });
             });
@@ -968,12 +1054,8 @@
           cancelBtn.className = "btn-danger";
           cancelBtn.textContent = "✖ Anulo udhëtimin";
           cancelBtn.onclick = () => {
-            let reason = prompt("Shkruaj arsyen e anulimit (e detyrueshme):");
-            if (!reason || !reason.trim()) {
-              alert("Arsyeja e anulimit është e detyrueshme.");
-              return;
-            }
-            reason = reason.trim();
+            const reason = prompt("Shkruaj arsyen e anulimit:");
+            if (!reason) return;
             const thisOrder = ref(db, "orders/" + id);
             runTransaction(thisOrder, (current) => {
               if (!current || current.status !== "taken") return current;
@@ -988,161 +1070,182 @@
           wrapper.appendChild(cancelBtn);
           mineBox.appendChild(wrapper);
 
-          setTimeout(() => createMiniMap(safeIdMine, o.lat, o.lng), 50);
+          setTimeout(() => createMiniMap(safeIdMine, o.lat, o.lng), 80);
         }
       });
 
       noOpen.textContent =
-        openCount === 0 ? "Për momentin nuk ka kërkesa të reja." : "";
+        openCount === 0 ? "Për momentin nuk ka kërkesa në pritje." : "";
       noMine.textContent =
-        mineCount === 0 ? "Për momentin nuk ke udhëtime aktive." : "";
+        mineCount === 0 ? "Për momentin nuk ke udhëtim aktiv." : "";
 
-      // Stats UI updaten
-      renderStats();
+      // History (done + canceled, recent)
+      if (historyArr.length === 0) {
+        noHistory.textContent = "Ende nuk ka lëvizje të regjistruara.";
+      } else {
+        noHistory.textContent = "";
+        historyArr
+          .sort((a, b) => b.time - a.time)
+          .slice(0, 15)
+          .forEach((h) => {
+            const div = document.createElement("div");
+            div.className = "history-item";
+            const dt = new Date(h.time);
+            const timeStr = dt.toLocaleString();
+            const typeClass = h.type === "done" ? "history-type-done" : "history-type-canceled";
+            const label = h.type === "done" ? "Udhëtim i përfunduar" : "Udhëtim i anuluar";
+
+            div.innerHTML = `
+              <div class="history-top">
+                <span class="history-title ${typeClass}">${label}</span>
+                <span>${timeStr}</span>
+              </div>
+              <div>${h.name} • ${h.phone}</div>
+              <div style="color:#9ca3af;font-size:11px;margin-top:2px;">${h.address}</div>
+            `;
+            historyList.appendChild(div);
+          });
+      }
+
+      updateStatsUI();
     });
   }
 
-  /* -----------------------
-   * BALANCE
-   * ----------------------- */
+  function updateStatsUI() {
+    const st = driverStats[currentStatsRange];
+    if (!st) return;
+    statDoneEl.textContent = st.done;
+    statCanceledEl.textContent = st.canceled;
+  }
+
+  /* ---------- BALANCE ---------- */
+
   function subscribeBalance() {
     const balRef = ref(db, "balances/" + currentDriver.id);
     onValue(balRef, (snap) => {
       const data = snap.val();
-      balanceHistoryEl.innerHTML = "";
-
       if (!data) {
         balanceBox.innerHTML = "Nuk ka barazim aktual.";
         return;
       }
 
+      const total = (data.total || 0).toFixed(2);
+      const dateStr = data.lastUpdate ? new Date(data.lastUpdate).toLocaleString() : "-";
+
       if (data.status === "open") {
         balanceBox.innerHTML = `
-          <strong>Barazim i hapur:</strong> ${ (data.total || 0).toFixed(2) } €<br>
-          <small>Shuma që aktualisht i takon kompanisë.</small>
+          <strong>Detyrim aktual:</strong> ${total} €<br>
+          <div class="balance-status">
+            Ky është borxhi aktual ndaj kompanisë. Herën e fundit u përditësua: ${dateStr}.
+          </div>
         `;
       } else {
         balanceBox.innerHTML = `
           <strong>Barazim i përfunduar ✔</strong><br>
-          <small>Aktualisht nuk keni borxh të hapur.</small>
+          <div class="balance-status">
+            Aktualisht nuk ke borxh aktiv. Përditësimi i fundit: ${dateStr}.
+          </div>
         `;
       }
-
-      const history = data.history || {};
-      const entries = Object.entries(history)
-        .sort((a,b) => (b[1].timestamp || 0) - (a[1].timestamp || 0))
-        .slice(0, 20); // vetëm 20 të fundit
-
-      if (entries.length === 0) {
-        balanceHistoryEl.innerHTML = "<div class='empty-text'>Nuk ka lëvizje të regjistruara ende.</div>";
-        return;
-      }
-
-      entries.forEach(([orderId, h]) => {
-        const row = document.createElement("div");
-        row.className = "balance-row";
-
-        const date = h.timestamp ? new Date(h.timestamp).toLocaleString() : "-";
-        row.innerHTML = `
-          <span>${date}</span>
-          <span>${(h.amount || 0).toFixed(2)} €</span>
-        `;
-        balanceHistoryEl.appendChild(row);
-      });
     });
   }
 
-  /* -----------------------
-   * LOGOUT SLIDER
-   * ----------------------- */
-  function logoutDriver() {
+  /* ---------- TABS ---------- */
+
+  tabButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      tabButtons.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      const target = btn.dataset.tab;
+      tabPanels.forEach(p => {
+        p.classList.toggle("active", p.id === target);
+      });
+    });
+  });
+
+  /* ---------- STATS RANGE TOGGLE ---------- */
+
+  statsChips.forEach(chip => {
+    chip.addEventListener("click", () => {
+      statsChips.forEach(c => c.classList.remove("active"));
+      chip.classList.add("active");
+      currentStatsRange = chip.dataset.range || "day";
+      updateStatsUI();
+    });
+  });
+
+  /* ---------- LOGOUT SLIDER ---------- */
+
+  const logoutSlider = document.getElementById("logoutSlider");
+  const logoutThumb = document.getElementById("logoutThumb");
+
+  let sliding = false;
+  let startX = 0;
+  let thumbStart = 0;
+
+  function logout() {
     stopLocationTracking();
-    try {
-      localStorage.removeItem("driverId");
-    } catch (e) {}
+    clearSession();
     currentDriver = null;
-    hasActiveRide = false;
     headerDriverName.textContent = "Shoferi";
-    setOnlineUI(false);
+    headerStatus.textContent = "Offline";
     content.style.display = "none";
     loginCard.style.display = "block";
-    logoutWrapper.style.display = "none";
-    // Knopf zurücksetzen
-    logoutKnob.style.left = "4px";
+    logoutThumb.style.left = "4px";
+    logoutSlider.classList.remove("done");
   }
 
-  (function initLogoutSlider() {
-    let dragging = false;
-    let startX = 0;
-    let startLeft = 4;
+  function onSlideStart(e) {
+    e.preventDefault();
+    sliding = true;
+    startX = e.touches ? e.touches[0].clientX : e.clientX;
+    thumbStart = logoutThumb.offsetLeft;
 
-    function getClientX(e) {
-      if (e.touches && e.touches.length > 0) return e.touches[0].clientX;
-      return e.clientX;
+    document.addEventListener("touchmove", onSlideMove);
+    document.addEventListener("touchend", onSlideEnd);
+    document.addEventListener("mousemove", onSlideMove);
+    document.addEventListener("mouseup", onSlideEnd);
+  }
+
+  function onSlideMove(e) {
+    if (!sliding) return;
+    const x = e.touches ? e.touches[0].clientX : e.clientX;
+    const delta = x - startX;
+
+    const sliderRect = logoutSlider.getBoundingClientRect();
+    const maxLeft = sliderRect.width - logoutThumb.offsetWidth - 4;
+    let newLeft = thumbStart + delta;
+    if (newLeft < 4) newLeft = 4;
+    if (newLeft > maxLeft) newLeft = maxLeft;
+
+    logoutThumb.style.left = newLeft + "px";
+
+    if (newLeft > sliderRect.width * 0.6) {
+      sliding = false;
+      logoutSlider.classList.add("done");
+      document.removeEventListener("touchmove", onSlideMove);
+      document.removeEventListener("touchend", onSlideEnd);
+      document.removeEventListener("mousemove", onSlideMove);
+      document.removeEventListener("mouseup", onSlideEnd);
+      setTimeout(logout, 160);
     }
+  }
 
-    function onStart(e) {
-      if (!currentDriver) return;
-      dragging = true;
-      startX = getClientX(e);
-      const rect = logoutKnob.getBoundingClientRect();
-      const sliderRect = logoutSlider.getBoundingClientRect();
-      startLeft = rect.left - sliderRect.left;
-      logoutKnob.style.transition = "none";
-      e.preventDefault();
-    }
+  function onSlideEnd() {
+    if (!sliding) return;
+    sliding = false;
+    logoutThumb.style.left = "4px";
+    document.removeEventListener("touchmove", onSlideMove);
+    document.removeEventListener("touchend", onSlideEnd);
+    document.removeEventListener("mousemove", onSlideMove);
+    document.removeEventListener("mouseup", onSlideEnd);
+  }
 
-    function onMove(e) {
-      if (!dragging) return;
-      const sliderRect = logoutSlider.getBoundingClientRect();
-      const knobRect = logoutKnob.getBoundingClientRect();
-      const dx = getClientX(e) - startX;
-      let newLeft = startLeft + dx;
-      const minLeft = 4;
-      const maxLeft = sliderRect.width - knobRect.width - 4;
-      if (newLeft < minLeft) newLeft = minLeft;
-      if (newLeft > maxLeft) newLeft = maxLeft;
-      logoutKnob.style.left = newLeft + "px";
-    }
+  logoutThumb.addEventListener("touchstart", onSlideStart);
+  logoutThumb.addEventListener("mousedown", onSlideStart);
 
-    function onEnd() {
-      if (!dragging) return;
-      dragging = false;
-      const sliderRect = logoutSlider.getBoundingClientRect();
-      const knobRect = logoutKnob.getBoundingClientRect();
-      const left = knobRect.left - sliderRect.left;
-      const maxLeft = sliderRect.width - knobRect.width - 4;
-      const progress = left / maxLeft;
-
-      logoutKnob.style.transition = "left 0.18s ease";
-
-      if (progress > 0.6) {
-        // Voller Logout
-        logoutKnob.style.left = maxLeft + "px";
-        setTimeout(() => {
-          logoutDriver();
-        }, 160);
-      } else {
-        // Zurückspringen
-        logoutKnob.style.left = "4px";
-      }
-    }
-
-    logoutKnob.addEventListener("mousedown", onStart);
-    logoutKnob.addEventListener("touchstart", onStart, { passive:false });
-
-    window.addEventListener("mousemove", onMove);
-    window.addEventListener("touchmove", onMove, { passive:false });
-
-    window.addEventListener("mouseup", onEnd);
-    window.addEventListener("touchend", onEnd);
-    window.addEventListener("touchcancel", onEnd);
-  })();
-
-  /* -----------------------
-   * INIT
-   * ----------------------- */
-  tryAutoLogin();
+  /* ---------- AUTO-SESSION ---------- */
+  bootstrapSession();
 </script>
 
 </body>

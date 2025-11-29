@@ -1,59 +1,76 @@
 <!DOCTYPE html>
 <html lang="sq">
-
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Shoferi - Thirr Taxi</title>
 
-  <!-- iOS FULLSCREEN -->
+  <!-- iOS FULLSCREEN / MOBILE -->
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#020617">
 
   <!-- PWA -->
-  <link rel="manifest" href="/manifest-shofer.json" />
-  <link rel="apple-touch-icon" href="/icon-shofer-192.png" />
-
-  <!-- Leaflet -->
-  <link rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    crossorigin="">
+  <link rel="manifest" href="/manifest-shofer.json">
+  <link rel="apple-touch-icon" href="/icon-shofer-192.png">
 
   <script>
     if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("/sw-shofer.js");
+      navigator.serviceWorker.register("/sw-shofer.js")
+        .catch(console.error);
     }
   </script>
 
-  <!-- ======================= -->
-  <!--        CSS UI          -->
-  <!-- ======================= -->
+  <!-- Leaflet -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    crossorigin=""
+  />
 
   <style>
+    /* iOS / Safari: kein Weiß, kein komischer Balken */
     html, body {
       margin: 0;
       padding: 0;
       height: 100%;
-      background: #020617 !important;
       overscroll-behavior: none;
+      background-color: #020617 !important;
     }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      background: radial-gradient(circle at top, #020617, #020617 60%, #020617);
+    }
+
+    :root {
+      --bg: radial-gradient(circle at top, #020617, #020617 60%, #020617);
+      --card-bg: rgba(15, 23, 42, 0.9);
+      --accent: #38bdf8;
+      --accent-soft: rgba(56,189,248,0.25);
+      --border-radius-xl: 24px;
+      --shadow-soft: 0 22px 60px rgba(0, 0, 0, 0.75);
+      --tab-bg: rgba(15,23,42,0.98);
+      --tab-pill: rgba(15,23,42,1);
+    }
+
+    * { box-sizing: border-box; }
 
     body {
       font-family: system-ui, -apple-system, "SF Pro Text", sans-serif;
-      padding: 18px 12px 50px;
+      margin: 0;
+      padding: 18px 12px 40px;
+      background: var(--bg);
       color: #e5e7eb;
     }
 
-    * {
-      transition: 0.15s ease;
-      box-sizing: border-box;
-    }
-
-    /* Fade-In */
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(6px); }
-      to { opacity: 1; transform: translateY(0); }
+    .frame {
+      max-width: 480px;
+      margin: 0 auto;
+      padding-bottom: 40px; /* damit man immer ein bisschen scrollen kann */
     }
 
     /* HEADER */
@@ -61,41 +78,95 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 18px;
+      padding: 4px 4px 14px;
+      font-size: 13px;
+      color: #9ca3af;
     }
 
     .header-left {
-      font-size: 18px;
       font-weight: 600;
+      letter-spacing: 0.03em;
+      font-size: 14px;
+      color: #e5e7eb;
     }
 
     .header-center {
-      display: flex;
-      gap: 6px;
-      align-items: center;
+      display:flex;
+      align-items:center;
+      gap:6px;
+      font-weight:500;
+      color:#e5e7eb;
     }
 
     .dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 99px;
-      background: #22c55e;
-      box-shadow: 0 0 0 3px rgba(34,197,94,0.25);
+      width:7px;
+      height:7px;
+      border-radius:999px;
+      background:#22c55e;
+      box-shadow:0 0 0 5px rgba(34,197,94,0.25);
     }
 
-    /* ------------------------------------------------------------ */
-    /*                          LOGIN CARD                          */
-    /* ------------------------------------------------------------ */
+    .header-status {
+      font-size:12px;
+      color:#9ca3af;
+    }
 
+    /* TABS oben (Kërkesa / Aktive / Bilanci) */
+    .tabs {
+      background: var(--tab-bg);
+      border-radius: 999px;
+      padding: 4px;
+      display: flex;
+      gap: 4px;
+      margin-bottom: 14px;
+      border: 1px solid rgba(148,163,184,0.35);
+      box-shadow: 0 12px 40px rgba(15,23,42,0.9);
+    }
+
+    .tab-btn {
+      flex: 1;
+      border: none;
+      border-radius: 999px;
+      padding: 7px 4px;
+      background: transparent;
+      color: #9ca3af;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      position: relative;
+      transition: color 0.16s ease, transform 0.12s ease;
+    }
+
+    .tab-btn span {
+      position: relative;
+      z-index: 2;
+    }
+
+    .tab-btn.active {
+      color: #e5e7eb;
+      transform: translateY(-0.5px);
+    }
+
+    .tab-btn.active::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 999px;
+      background: radial-gradient(circle at top left, rgba(34,197,94,0.18), rgba(37,99,235,0.35));
+      box-shadow: 0 10px 30px rgba(52,211,153,0.45);
+      z-index: 1;
+    }
+
+    /* Karten / Cards */
     .card {
-      background: rgba(15,23,42,0.82);
-      padding: 18px 16px 20px;
-      border-radius: 20px;
+      background: var(--card-bg);
+      border-radius: var(--border-radius-xl);
+      padding: 16px 16px 18px;
+      box-shadow: var(--shadow-soft);
+      border: 1px solid rgba(148,163,184,0.22);
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
       margin-bottom: 18px;
-      border: 1px solid rgba(255,255,255,0.08);
-      backdrop-filter: blur(18px);
-      box-shadow: 0 4px 10px rgba(0,0,0,0.28);
-      animation: fadeIn 0.35s ease;
     }
 
     .card-title {
@@ -110,528 +181,912 @@
       margin-bottom: 10px;
     }
 
-    label { font-size: 13px; }
+    label {
+      display:block;
+      margin-top:8px;
+      font-size:13px;
+    }
 
     input {
       width: 100%;
-      margin-top: 4px;
       padding: 10px 12px;
-      background: rgba(255,255,255,0.10);
-      border: 1px solid rgba(255,255,255,0.18);
-      border-radius: 14px;
-      color: white;
+      border-radius: 16px;
+      border: 1px solid rgba(148,163,184,0.35);
+      background: rgba(15,23,42,0.94);
+      color: #e5e7eb;
       font-size: 15px;
+      outline: none;
+      margin-top: 4px;
     }
 
-    /* BUTTONS */
+    input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(56,189,248,0.45);
+    }
+
     button {
-      width: 100%;
-      border: none;
-      border-radius: 99px;
-      padding: 12px 14px;
-      font-weight: 600;
-      font-size: 15px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.30);
-      cursor: pointer;
+      border-radius:999px;
+      border:none;
+      font-size:15px;
+      font-weight:600;
+      padding:11px 12px;
+      cursor:pointer;
     }
 
-    button:hover { transform: translateY(-1px); }
+    .btn-primary {
+      width:100%;
+      margin-top:12px;
+      background: linear-gradient(135deg,#22c55e,#4ade80);
+      color:#022c22;
+      box-shadow:0 14px 38px rgba(34,197,94,0.4);
+    }
 
-    .btn-primary { background: #22c55e; color: #022c22; }
-    .btn-secondary { background: #0ea5e9; color: #022c22; }
-    .btn-danger { background: #ef4444; color: white; }
+    .btn-secondary {
+      background: linear-gradient(135deg,#0ea5e9,#22c55e);
+      color:#022c22;
+      box-shadow:0 10px 28px rgba(34,197,94,0.5);
+      font-size:14px;
+      padding:9px 10px;
+      width:100%;
+      margin-top:8px;
+    }
+
+    .btn-danger {
+      background:#ef4444;
+      color:white;
+      font-size:13px;
+      padding:8px 10px;
+      width:100%;
+      margin-top:6px;
+      box-shadow:0 6px 22px rgba(239,68,68,0.55);
+    }
 
     .login-error {
-      margin-top: 8px;
-      font-size: 12px;
-      color: #f97373;
+      margin-top:8px;
+      font-size:12px;
+      color:#f97373;
     }
 
-    /* ------------------------------------------------------------ */
-    /*                     PERFORMANCA IME (SOT)                    */
-    /* ------------------------------------------------------------ */
-
-    .stats-card {
-      background: rgba(15,23,42,0.9);
-      padding: 26px 18px 32px;
-      border-radius: 22px;
-      border: 1px solid rgba(255,255,255,0.06);
-      box-shadow: 0 6px 16px rgba(0,0,0,0.22);
-      text-align: center;
-      animation: fadeIn 0.35s ease;
-      margin-bottom: 22px;
+    .section-title {
+      font-size:14px;
+      font-weight:500;
+      margin-bottom:4px;
     }
 
-    .stats-title {
-      font-size: 16px;
-      font-weight: 600;
-      margin-bottom: 4px;
+    .section-sub {
+      font-size:11px;
+      color:#9ca3af;
+      margin-bottom:6px;
     }
 
-    .stats-sub {
-      font-size: 12px;
-      color: #9ca3af;
-      margin-bottom: 18px;
-    }
-
-    .stats-big {
-      font-size: 52px;
-      font-weight: 700;
-      margin-bottom: 6px;
-    }
-
-    .stats-label {
-      font-size: 14px;
-      color: #cbd5e1;
-    }
-
-    /* ------------------------------------------------------------ */
-    /*                             TABS                              */
-    /* ------------------------------------------------------------ */
-
-    .tabs {
-      display: flex;
-      gap: 6px;
-      padding: 4px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.08);
-      backdrop-filter: blur(14px);
-      margin-bottom: 16px;
-    }
-
-    .tab-btn {
-      flex: 1;
-      border: none;
-      background: transparent;
-      color: #9ca3af;
-      padding: 9px 0;
-      border-radius: 999px;
-      font-size: 13px;
-      font-weight: 500;
-    }
-
-    .tab-btn.active {
-      background: rgba(255,255,255,0.25);
-      color: white;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.25);
-    }
-
-    /* ------------------------------------------------------------ */
-    /*                         ORDER CARDS                          */
-    /* ------------------------------------------------------------ */
-
+    /* Order-Karte */
     .order-card {
-      background: rgba(30,41,59,0.75);
-      padding: 14px 16px;
-      border-radius: 18px;
-      border: 1px solid rgba(255,255,255,0.07);
-      margin-bottom: 12px;
-      box-shadow: 0 3px 8px rgba(0,0,0,0.28);
-      animation: fadeIn 0.35s ease;
+      background: radial-gradient(circle at top left, rgba(59,130,246,.22), rgba(15,23,42,.96));
+      border-radius: 22px;
+      padding: 12px 12px 14px;
+      margin-top: 10px;
+      border: 1px solid rgba(55, 65, 81, 0.9);
+      box-shadow: 0 18px 48px rgba(15, 23, 42, 0.95);
+    }
+
+    .order-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+      gap: 8px;
+    }
+
+    .order-main {
+      display:flex;
+      flex-direction:column;
+      gap:2px;
+    }
+
+    .order-name { font-size: 15px; font-weight: 600; }
+    .order-phone { font-size: 13px; opacity: .9; }
+    .order-address { font-size: 12px; color:#cbd5f5; }
+
+    .badge {
+      font-size:11px;
+      padding:4px 8px;
+      border-radius:999px;
+      white-space: nowrap;
+    }
+
+    .badge-active { background:rgba(34,197,94,0.18); color:#bbf7d0; }
+    .badge-open { background:rgba(251,191,36,0.18); color:#facc15; }
+
+    .mini-map {
+      width: 100%;
+      height: 140px;
+      border-radius: 16px;
+      overflow: hidden;
+      margin-top: 8px;
+      border: 1px solid rgba(15, 23, 42, .9);
+      background:#020617;
+    }
+
+    .order-footer {
+      margin-top: 7px;
+      font-size: 11.5px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #9ca3af;
+      gap:8px;
+    }
+
+    .order-footer a {
+      color: #38bdf8;
+      text-decoration: none;
+      font-size: 12px;
+    }
+
+    .timer {
+      font-size:11px;
+      color:#e5e7eb;
     }
 
     .empty-text {
-      font-size: 12px;
-      text-align: center;
-      color: #6b7280;
-      margin-top: 10px;
+      font-size:12px;
+      color:#6b7280;
+      margin-top:4px;
     }
 
-    /* ------------------------------------------------------------ */
-    /*                           BILANCI                             */
-    /* ------------------------------------------------------------ */
-
-    .balance-summary-box {
-      background: rgba(56,189,248,0.18);
-      padding: 18px;
-      border-radius: 18px;
-      text-align: center;
-      border: 1px solid rgba(56,189,248,0.3);
-      margin-bottom: 18px;
+    /* STATS CARD – NUR HEUTE, SCHÖNER */
+    .stat-main {
+      margin-top:8px;
+      text-align:center;
     }
 
-    .balance-summary-box strong {
-      font-size: 22px;
+    .stat-number {
+      font-size:32px;
+      font-weight:700;
+      margin-bottom:4px;
     }
 
-    .balance-history-card {
-      background: rgba(255,255,255,0.06);
-      border-radius: 18px;
-      padding: 14px 16px;
-      border: 1px solid rgba(255,255,255,0.10);
-      margin-bottom: 12px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+    .stat-label {
+      font-size:13px;
+      color:#9ca3af;
+      margin-top:2px;
     }
 
-    .balance-entry-title {
-      font-size: 15px;
-      font-weight: 600;
+    /* Bilanci – brenda tab-it */
+    .balance-summary {
+      font-size:16px;
+      margin-top:8px;
+      text-align:center;
+    }
+
+    .balance-summary strong {
+      font-weight:600;
+      font-size:18px;
+    }
+
+    .balance-meta {
+      font-size:11px;
+      color:#9ca3af;
+      margin-top:4px;
+      text-align:center;
+    }
+
+    .balance-toggle {
+      margin-top:12px;
+      display:flex;
+      gap:6px;
+    }
+
+    .balance-tab-btn {
+      flex:1;
+      border-radius:12px;
+      border:none;
+      padding:6px 6px;
+      background:rgba(15,23,42,0.95);
+      color:#9ca3af;
+      font-size:11px;
+      cursor:pointer;
+    }
+
+    .balance-tab-btn.active {
+      background:rgba(56,189,248,0.28);
+      color:#e5e7eb;
+      box-shadow:0 10px 30px rgba(56,189,248,0.6);
+    }
+
+    .balance-panel { margin-top:10px; font-size:12px; }
+
+    /* NEU: Bilanz-History als Karten: Adresse + Uhrzeit + 0,25 € */
+    .balance-row {
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      padding:10px 12px;
+      border-radius:14px;
+      background:rgba(15,23,42,0.96);
+      border:1px solid rgba(55,65,81,0.9);
+      margin-bottom:8px;
+    }
+
+    .balance-entry-main {
+      display:flex;
+      flex-direction:column;
+      gap:2px;
+    }
+
+    .balance-entry-address {
+      font-size:13px;
+      font-weight:500;
+      color:#e5e7eb;
     }
 
     .balance-entry-time {
-      font-size: 13px;
-      color: #9ca3af;
-      margin: 2px 0 6px;
+      font-size:11px;
+      color:#9ca3af;
     }
 
     .balance-entry-amount {
-      text-align: right;
-      font-size: 16px;
-      color: #22c55e;
-      font-weight: 700;
+      font-size:14px;
+      font-weight:600;
+      color:#bbf7d0;
+      white-space:nowrap;
+      margin-left:8px;
     }
 
+    .small-muted {
+      font-size:11px;
+      color:#6b7280;
+    }
   </style>
 </head>
 
 <body>
+<div class="frame">
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-left">Thirr Taxi</div>
+    <div class="header-center">
+      <div class="dot"></div>
+      <span id="headerDriverName">Shoferi</span>
+    </div>
+    <span id="headerStatus" class="header-status">Offline</span>
+  </div>
 
-  <div class="frame">
-
-    <!-- ================= HEADER ================= -->
-    <div class="header">
-      <div class="header-left">Thirr Taxi</div>
-
-      <div class="header-center">
-        <div class="dot"></div>
-        <span id="headerDriverName">Shoferi</span>
-      </div>
-
-      <span id="headerStatus" style="font-size:13px;color:#9ca3af;">Offline</span>
+  <!-- LOGIN CARD -->
+  <div id="loginCard" class="card">
+    <div class="card-title">Hyr si shofer</div>
+    <div class="card-subtitle">
+      Shkruaj vetëm PIN-in që ta ka dhënë administratori. Emri dhe kompania merren automatikisht.
     </div>
 
-    <!-- ================= LOGIN ================= -->
-    <div id="loginCard" class="card">
-      <div class="card-title">Hyr si shofer</div>
-      <div class="card-subtitle">Shkruaj vetëm PIN-in.</div>
+    <label>PIN</label>
+    <input id="loginPin" inputmode="numeric" placeholder="p.sh. 4829">
 
-      <label>PIN</label>
-      <input id="loginPin" inputmode="numeric" placeholder="4829">
+    <button id="loginBtn" class="btn-primary">Hyr online</button>
+    <div id="loginMsg" class="login-error"></div>
+  </div>
 
-      <button id="loginBtn" class="btn-primary">Hyr online</button>
+  <!-- CONTENT NACH LOGIN -->
+  <div id="content" style="display:none;">
 
-      <div id="loginMsg" class="login-error"></div>
+    <!-- TOP TABS -->
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="tab-requests"><span>Kërkesa</span></button>
+      <button class="tab-btn" data-tab="tab-active"><span>Udhëtimet e mia</span></button>
+      <button class="tab-btn" data-tab="tab-balance"><span>Bilanci</span></button>
     </div>
 
-
-    <!-- ================= CONTENT ================= -->
-    <div id="content" style="display:none;">
-
-
-      <!-- ===== PERFORMANCA IME (SOT) ===== -->
-      <div class="stats-card">
-        <div class="stats-title">Performanca ime</div>
-        <div class="stats-sub">Udhëtime të përfunduara sot</div>
-
-        <div id="statToday" class="stats-big">0</div>
-        <div class="stats-label">Sot</div>
+    <!-- STATS CARD – NUR HEUTE -->
+    <div class="card">
+      <div class="section-title">Performanca ime</div>
+      <div class="section-sub">Sa udhëtime ke përfunduar sot si shofer.</div>
+      <div class="stat-main">
+        <div id="statRidesCount" class="stat-number">0</div>
+        <div class="stat-label">Sot</div>
       </div>
+    </div>
 
+    <!-- TAB: KËRKESA -->
+    <div id="tab-requests" class="tab-panel" style="display:block;">
+      <div class="card">
+        <div class="section-title">Kërkesa të reja</div>
+        <div class="section-sub">Këto janë udhëtimet që mund t’i pranosh.</div>
 
-      <!-- ===== TABS ===== -->
-      <div class="tabs">
-        <button class="tab-btn active" data-tab="tab-requests">Kërkesa</button>
-        <button class="tab-btn" data-tab="tab-active">Aktive</button>
-        <button class="tab-btn" data-tab="tab-balance">Bilanci</button>
+        <div id="orders"></div>
+        <div id="noOpen" class="empty-text"></div>
       </div>
+    </div>
 
+    <!-- TAB: AKTIVE -->
+    <div id="tab-active" class="tab-panel" style="display:none;">
+      <div class="card">
+        <div class="section-title">Udhëtimet e mia aktive</div>
+        <div class="section-sub">Mund të kesh vetëm një udhëtim aktiv në të njëjtën kohë.</div>
 
-      <!-- ===== KËRKESA ===== -->
-      <div id="tab-requests" class="tab-panel" style="display:block;">
-        <div class="card">
-          <div class="section-title" style="font-size:15px;font-weight:600;margin-bottom:4px;">Kërkesa të reja</div>
-          <div class="section-sub" style="font-size:12px;color:#9ca3af;margin-bottom:8px;">Udhëtimet që mund t’i pranosh.</div>
+        <div id="myOrders"></div>
+        <div id="noMine" class="empty-text"></div>
+      </div>
+    </div>
 
-          <div id="orders"></div>
-          <div id="noOpen" class="empty-text"></div>
+    <!-- TAB: BILANCI -->
+    <div id="tab-balance" class="tab-panel" style="display:none;">
+      <div class="card">
+        <div class="section-title">Bilanci im</div>
+        <div class="section-sub">Sa ke për t’u barazuar dhe levizjet e fundit.</div>
+
+        <div id="balanceSummary" class="balance-summary"></div>
+        <div id="balanceMeta" class="balance-meta"></div>
+
+        <div class="balance-toggle">
+          <button class="balance-tab-btn active" data-btab="b-summary">Përmbledhje</button>
+          <button class="balance-tab-btn" data-btab="b-history">Levizjet e fundit</button>
         </div>
-      </div>
 
-
-      <!-- ===== AKTIVE ===== -->
-      <div id="tab-active" class="tab-panel" style="display:none;">
-        <div class="card">
-          <div class="section-title" style="font-size:15px;font-weight:600;margin-bottom:4px;">Udhëtimet e mia aktive</div>
-          <div class="section-sub" style="font-size:12px;color:#9ca3af;margin-bottom:8px;">
-            Vetëm një udhëtim aktiv.
-          </div>
-
-          <div id="myOrders"></div>
-          <div id="noMine" class="empty-text"></div>
+        <div id="b-summary" class="balance-panel">
+          <!-- mbushet nga JS -->
         </div>
-      </div>
-
-
-      <!-- ===== BILANCI ===== -->
-      <div id="tab-balance" class="tab-panel" style="display:none;">
-        <div class="card">
-
-          <div class="section-title" style="font-size:15px;font-weight:600;margin-bottom:6px;">
-            Bilanci im
-          </div>
-
-          <div id="balanceSummaryBox" class="balance-summary-box"></div>
-
+        <div id="b-history" class="balance-panel" style="display:none;">
           <div id="balanceHistoryList"></div>
-
+          <div id="balanceHistoryEmpty" class="small-muted"></div>
         </div>
       </div>
+    </div>
 
+  </div> <!-- /content -->
+</div> <!-- /frame -->
 
-    </div><!-- END CONTENT -->
+<script
+  src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  crossorigin=""
+></script>
 
-  </div><!-- END FRAME -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+  import { getDatabase, ref, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-database.js";
 
+  const firebaseConfig = {
+    apiKey: "AIzaSyCgCxp8M9XGOKFSIfaU9nM48rxtFQP-Kvs",
+    authDomain: "kosovataxi-f6ca3.firebaseapp.com",
+    projectId: "kosovataxi-f6ca3",
+    storageBucket: "kosovataxi-f6ca3.firebasestorage.app",
+    messagingSenderId: "1075646412122",
+    appId: "1:1075646412122:web:7aab19b92f51844fe32f63",
+    measurementId: "G-QYQE2476PR",
+    databaseURL: "https://kosovataxi-f6ca3-default-rtdb.europe-west1.firebasedatabase.app/"
+  };
 
-  <!-- ======================= -->
-  <!--         JS LOGIC        -->
-  <!-- ======================= -->
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
 
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  const LS_KEY = "thirrTaxiDriverId";
 
-  <script type="module">
+  let currentDriver = null;
+  let hasActiveRide = false;
+  let activeStatRange = "day"; // wird zwar nicht mehr im UI genutzt, aber bleibt für Stats-Logik
+  const stats = { day: 0, week: 0, month: 0 };
+  const maps = {};
+  let geoWatchId = null;
 
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
-    import { getDatabase, ref, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-database.js";
+  const loginCard = document.getElementById("loginCard");
+  const content = document.getElementById("content");
+  const loginBtn = document.getElementById("loginBtn");
+  const loginMsg = document.getElementById("loginMsg");
+  const headerDriverName = document.getElementById("headerDriverName");
+  const headerStatus = document.getElementById("headerStatus");
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyCgCxp8M9XGOKFSIfaU9nM48rxtFQP-Kvs",
-      authDomain: "kosovataxi-f6ca3.firebaseapp.com",
-      projectId: "kosovataxi-f6ca3",
-      storageBucket: "kosovataxi-f6ca3.firebasestorage.app",
-      messagingSenderId: "1075646412122",
-      appId: "1:1075646412122:web:7aab19b92f51844fe32f63",
-      databaseURL: "https://kosovataxi-f6ca3-default-rtdb.europe-west1.firebasedatabase.app/"
-    };
+  const tabButtons = document.querySelectorAll(".tab-btn");
+  const tabPanels = document.querySelectorAll(".tab-panel");
 
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
+  const statPills = document.querySelectorAll(".stat-pill"); // bleibt leer, da UI geändert – aber ungefährlich
+  const statRidesCount = document.getElementById("statRidesCount");
 
+  const balanceSummary = document.getElementById("balanceSummary");
+  const balanceMeta = document.getElementById("balanceMeta");
+  const balanceTabBtns = document.querySelectorAll(".balance-tab-btn");
+  const balancePanels = {
+    "b-summary": document.getElementById("b-summary"),
+    "b-history": document.getElementById("b-history")
+  };
+  const balanceHistoryList = document.getElementById("balanceHistoryList");
+  const balanceHistoryEmpty = document.getElementById("balanceHistoryEmpty");
 
-    /* ELEMENTS */
-    const loginCard = document.getElementById("loginCard");
-    const content = document.getElementById("content");
-    const loginBtn = document.getElementById("loginBtn");
-    const loginMsg = document.getElementById("loginMsg");
+  const ordersBox = document.getElementById("orders");
+  const myOrdersBox = document.getElementById("myOrders");
+  const noOpen = document.getElementById("noOpen");
+  const noMine = document.getElementById("noMine");
 
-    const statToday = document.getElementById("statToday");
+  /* ---------- HELFER ---------- */
 
-    const ordersBox = document.getElementById("orders");
-    const myOrdersBox = document.getElementById("myOrders");
+  function cleanAddress(a) {
+    if (!a) return "";
+    const lower = a.toLowerCase();
+    if (lower.includes("nuk") && lower.includes("përcaktuar")) return "";
+    return a;
+  }
 
-    const noOpen = document.getElementById("noOpen");
-    const noMine = document.getElementById("noMine");
+  function formatMinutesSince(timestamp) {
+    if (!timestamp) return "-";
+    const diffMs = Date.now() - timestamp;
+    const mins = Math.floor(diffMs / 60000);
+    if (mins <= 0) return "më pak se 1 min";
+    if (mins === 1) return "1 minutë";
+    return mins + " minuta";
+  }
 
-    const balanceSummaryBox = document.getElementById("balanceSummaryBox");
-    const balanceHistoryList = document.getElementById("balanceHistoryList");
+  function startOfDay(d) {
+    const n = new Date(d); n.setHours(0,0,0,0); return n;
+  }
+  function startOfWeek(d) {
+    const n = startOfDay(d);
+    const day = n.getDay();
+    const diff = (day === 0 ? -6 : 1 - day);
+    n.setDate(n.getDate() + diff);
+    return n;
+  }
+  function startOfMonth(d) {
+    const n = startOfDay(d);
+    return new Date(n.getFullYear(), n.getMonth(), 1);
+  }
 
-    let currentDriver = null;
-    const LS_KEY = "thirrTaxiDriverId";
+  function createOrUpdateMap(containerId, lat, lng) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
 
+    if (maps[containerId]) {
+      maps[containerId].setView([lat, lng], 16);
+      setTimeout(() => maps[containerId].invalidateSize(), 200);
+      return;
+    }
 
-    /* ================= LOGIN ==================== */
-    loginBtn.onclick = () => {
-      const pin = document.getElementById("loginPin").value.trim();
+    const map = L.map(containerId, {
+      zoomControl: false,
+      attributionControl: false,
+    }).setView([lat, lng], 16);
 
-      if (!pin) {
-        loginMsg.textContent = "Shkruaj PIN-in.";
-        return;
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 19,
+    }).addTo(map);
+
+    L.marker([lat, lng]).addTo(map);
+    maps[containerId] = map;
+
+    setTimeout(() => map.invalidateSize(), 200);
+  }
+
+  function invalidateAllMaps() {
+    setTimeout(() => {
+      Object.values(maps).forEach(m => {
+        try { m.invalidateSize(); } catch(e) {}
+      });
+    }, 220);
+  }
+
+  // NEU: UI zeigt nur heute -> wir setzen nur stats.day
+  function updateStatUI() {
+    const value = stats.day || 0;
+    statRidesCount.textContent = value;
+  }
+
+  function recalcStats(allOrders) {
+    stats.day = 0;
+    stats.week = 0;
+    stats.month = 0;
+    if (!currentDriver) return;
+
+    const now = new Date();
+    const dDay = startOfDay(now);
+    const dWeek = startOfWeek(now);
+    const dMonth = startOfMonth(now);
+
+    Object.values(allOrders).forEach(o => {
+      if (o.takenByDriverId !== currentDriver.id || o.status !== "done") return;
+      const t = o.completedAt || o.takenAt || o.createdAt;
+      if (!t) return;
+      const dt = new Date(t);
+
+      if (dt >= dDay) stats.day++;
+      if (dt >= dWeek) stats.week++;
+      if (dt >= dMonth) stats.month++;
+    });
+
+    updateStatUI();
+  }
+
+  function startLocationTracking() {
+    if (!navigator.geolocation || !currentDriver) return;
+    if (geoWatchId !== null) return;
+
+    geoWatchId = navigator.geolocation.watchPosition(
+      (pos) => {
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+        const locRef = ref(db, "driverLocations/" + currentDriver.id);
+        runTransaction(locRef, () => ({
+          lat,
+          lng,
+          updatedAt: Date.now()
+        }));
+      },
+      (err) => {
+        console.warn("Geolocation error:", err);
+      },
+      {
+        enableHighAccuracy: true,
+        maximumAge: 5000,
+        timeout: 15000
       }
+    );
+  }
 
-      const drvRef = ref(db, "drivers");
+  /* ---------- TAB LOGIK ---------- */
 
-      onValue(drvRef, snap => {
+  tabButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const target = btn.dataset.tab;
+
+      tabButtons.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+
+      tabPanels.forEach(p => {
+        p.style.display = (p.id === target) ? "block" : "none";
+      });
+
+      invalidateAllMaps();
+    });
+  });
+
+  // statPills existieren im DOM nicht mehr, deswegen passiert hier quasi nichts (NodeList leer)
+  statPills.forEach(pill => {
+    pill.addEventListener("click", () => {
+      const r = pill.dataset.range;
+      if (!r) return;
+      activeStatRange = r;
+      statPills.forEach(p => p.classList.remove("active"));
+      pill.classList.add("active");
+      updateStatUI();
+    });
+  });
+
+  balanceTabBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const target = btn.dataset.btab;
+      balanceTabBtns.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+
+      Object.entries(balancePanels).forEach(([id, el]) => {
+        el.style.display = (id === target) ? "block" : "none";
+      });
+    });
+  });
+
+  /* ---------- LOGIN / AUTO-LOGIN ---------- */
+
+  function afterLoginSetup() {
+    if (!currentDriver) return;
+    if (window.__driverInitialized) return;
+    window.__driverInitialized = true;
+
+    headerDriverName.textContent = currentDriver.name || "Shoferi";
+    headerStatus.textContent = "Online";
+
+    loginCard.style.display = "none";
+    content.style.display = "block";
+
+    subscribeOrders();
+    subscribeBalance();
+    startLocationTracking();
+  }
+
+  loginBtn.onclick = () => {
+    loginMsg.textContent = "";
+    const pin = document.getElementById("loginPin").value.trim();
+    if (!pin) {
+      loginMsg.textContent = "Ju lutem shkruani PIN-in.";
+      return;
+    }
+
+    const driversRef = ref(db, "drivers");
+    onValue(
+      driversRef,
+      (snap) => {
         const data = snap.val() || {};
         let found = null;
-
         Object.entries(data).forEach(([id, d]) => {
-          if (String(d.pin) === pin && d.approved) {
+          if (
+            String(d.pin) === String(pin) &&
+            d.approved === true &&
+            (d.active !== false)
+          ) {
             found = { id, ...d };
           }
         });
 
         if (!found) {
-          loginMsg.textContent = "PIN i pavlefshëm.";
+          loginMsg.textContent = "PIN i pavlefshëm ose shoferi nuk është aktiv.";
           return;
         }
 
         currentDriver = found;
-        localStorage.setItem(LS_KEY, found.id);
+        localStorage.setItem(LS_KEY, currentDriver.id);
+        afterLoginSetup();
+      },
+      { onlyOnce: true }
+    );
+  };
 
-        loginCard.style.display = "none";
-        content.style.display = "block";
-
-        subscribeOrders();
-        subscribeBalance();
-
-      }, { onlyOnce: true });
-    };
-
-
-    /* ========== AUTO LOGIN ========== */
-    const saved = localStorage.getItem(LS_KEY);
-    if (saved) {
-      const drv = ref(db, "drivers/" + saved);
-
-      onValue(drv, snap => {
+  // Auto-Login nach Reload
+  const savedId = localStorage.getItem(LS_KEY);
+  if (savedId) {
+    const drvRef = ref(db, "drivers/" + savedId);
+    onValue(
+      drvRef,
+      (snap) => {
         const d = snap.val();
-        if (d && d.approved) {
-          currentDriver = { id: saved, ...d };
-
-          loginCard.style.display = "none";
-          content.style.display = "block";
-
-          subscribeOrders();
-          subscribeBalance();
+        if (d && d.approved === true && (d.active !== false)) {
+          currentDriver = { id: savedId, ...d };
+          afterLoginSetup();
+        } else {
+          localStorage.removeItem(LS_KEY);
         }
-      }, { onlyOnce: true });
-    }
+      },
+      { onlyOnce: true }
+    );
+  }
 
+  /* ---------- ORDERS / REALTIME ---------- */
 
-    /* ================== SUBSCRIBE ORDERS ================== */
+  function subscribeOrders() {
+    const ordersRef = ref(db, "orders");
 
-    function subscribeOrders() {
-      const ordersRef = ref(db, "orders");
+    onValue(ordersRef, (snap) => {
+      const data = snap.val() || {};
 
-      onValue(ordersRef, snap => {
-        const data = snap.val() || {};
+      ordersBox.innerHTML = "";
+      myOrdersBox.innerHTML = "";
+      let openCount = 0;
+      let mineCount = 0;
+      hasActiveRide = false;
 
-        ordersBox.innerHTML = "";
-        myOrdersBox.innerHTML = "";
+      recalcStats(data);
 
-        let todayCount = 0;
+      Object.entries(data).forEach(([id, o]) => {
+        const safeIdOpen = "map_open_" + id.replace(/[^a-zA-Z0-9_-]/g, "");
+        const safeIdMine = "map_mine_" + id.replace(/[^a-zA-Z0-9_-]/g, "");
 
-        const now = new Date();
-        const todayStr = now.toDateString();
+        const rawAdr = o.addressStreet || o.address;
+        const addressText = cleanAddress(rawAdr);
 
-        Object.entries(data).forEach(([id, o]) => {
+        /* KËRKESA TË REJA */
+        if (o.status === "open") {
+          openCount++;
+          const wrapper = document.createElement("div");
+          wrapper.className = "order-card";
 
-          /* ===== Count Today ===== */
-          if (o.takenByDriverId === currentDriver?.id && o.status === "done") {
-            const d = new Date(o.completedAt);
-            if (d.toDateString() === todayStr) todayCount++;
+          wrapper.innerHTML = `
+            <div class="order-header">
+              <div class="order-main">
+                <div class="order-name">${o.name || "Klienti"}</div>
+                <div class="order-phone">${o.phone || ""}</div>
+                ${addressText ? `<div class="order-address">${addressText}</div>` : ""}
+              </div>
+              <span class="badge badge-open">Kërkesë e re</span>
+            </div>
+            <div id="${safeIdOpen}" class="mini-map"></div>
+            <div class="order-footer">
+              <span>Preke butonin për ta pranuar këtë udhëtim.</span>
+              <a href="https://maps.google.com/?q=${o.lat},${o.lng}" target="_blank">Google Maps</a>
+            </div>
+          `;
+
+          const acceptBtn = document.createElement("button");
+          acceptBtn.className = "btn-secondary";
+          acceptBtn.textContent = "✅ Prano udhëtimin";
+          acceptBtn.onclick = () => {
+            if (hasActiveRide) {
+              alert("Nuk mund të pranosh më shumë se një udhëtim në të njëjtën kohë.");
+              return;
+            }
+            const thisOrder = ref(db, "orders/" + id);
+            runTransaction(thisOrder, (current) => {
+              if (!current || current.status !== "open") return current;
+              current.status = "taken";
+              current.takenByName = currentDriver.name;
+              current.takenByCompany = currentDriver.company || "Thirr Taxi";
+              current.takenByDriverId = currentDriver.id;
+              current.takenAt = Date.now();
+              return current;
+            }).then(() => {
+              const activeBtn = document.querySelector('.tab-btn[data-tab="tab-active"]');
+              if (activeBtn) activeBtn.click();
+            });
+          };
+
+          wrapper.appendChild(acceptBtn);
+          ordersBox.appendChild(wrapper);
+
+          if (typeof o.lat === "number" && typeof o.lng === "number") {
+            setTimeout(() => createOrUpdateMap(safeIdOpen, o.lat, o.lng), 50);
           }
+        }
 
-          /* ===== OPEN REQUESTS ===== */
-          if (o.status === "open") {
-            const card = document.createElement("div");
-            card.className = "order-card";
+        /* UDHËTIMET E MIJA AKTIVE */
+        if (
+          o.status === "taken" &&
+          o.takenByDriverId === currentDriver?.id
+        ) {
+          mineCount++;
+          hasActiveRide = true;
 
-            card.innerHTML = `
-              <div style="font-size:16px;font-weight:600;">${o.name || "Klienti"}</div>
-              <div style="font-size:13px;color:#9ca3af;">${o.phone || ""}</div>
-              <div style="margin-top:6px;font-size:12px;">📍 ${o.addressStreet || o.address || "-"}</div>
+          const wrapper = document.createElement("div");
+          wrapper.className = "order-card";
 
-              <button class="btn-secondary" style="margin-top:14px;">Prano</button>
-            `;
+          const timeText = formatMinutesSince(o.takenAt);
 
-            card.querySelector("button").onclick = () => {
-              const orderRef = ref(db, "orders/" + id);
-              runTransaction(orderRef, cur => {
-                if (cur && cur.status === "open") {
-                  cur.status = "taken";
-                  cur.takenByDriverId = currentDriver.id;
-                  cur.takenAt = Date.now();
+          wrapper.innerHTML = `
+            <div class="order-header">
+              <div class="order-main">
+                <div class="order-name">${o.name || "Klienti"}</div>
+                <div class="order-phone">${o.phone || ""}</div>
+                ${addressText ? `<div class="order-address">${addressText}</div>` : ""}
+              </div>
+              <span class="badge badge-active">Aktive</span>
+            </div>
+            <div id="${safeIdMine}" class="mini-map"></div>
+            <div class="order-footer">
+              <span class="timer">Udhëtimi është pranuar: ${timeText} më parë</span>
+              <a href="https://maps.google.com/?q=${o.lat},${o.lng}" target="_blank">Google Maps</a>
+            </div>
+          `;
+
+          const finishBtn = document.createElement("button");
+          finishBtn.className = "btn-secondary";
+          finishBtn.textContent = "✅ Përfundo udhëtimin";
+          finishBtn.onclick = () => {
+            const thisOrder = ref(db, "orders/" + id);
+            runTransaction(thisOrder, (current) => {
+              if (!current || current.status !== "taken") return current;
+              current.status = "done";
+              current.completedAt = Date.now();
+              return current;
+            }).then(() => {
+              const balRef = ref(db, "balances/" + currentDriver.id);
+              runTransaction(balRef, (cur) => {
+                const ts = Date.now();
+                const histEntry = {
+                  amount: 0.25,
+                  orderId: id,
+                  timestamp: ts,
+                  type: "ride",
+                  address: addressText || ""
+                };
+                if (!cur) {
+                  return {
+                    total: 0.25,
+                    status: "open",
+                    lastUpdate: ts,
+                    history: {
+                      [id]: histEntry
+                    }
+                  };
                 }
+                cur.total = (cur.total || 0) + 0.25;
+                cur.status = "open";
+                cur.lastUpdate = ts;
+                if (!cur.history) cur.history = {};
+                cur.history[id] = histEntry;
                 return cur;
               });
-            };
+            });
+          };
 
-            ordersBox.appendChild(card);
+          const cancelBtn = document.createElement("button");
+          cancelBtn.className = "btn-danger";
+          cancelBtn.textContent = "✖ Anulo udhëtimin";
+          cancelBtn.onclick = () => {
+            const reason = prompt("Shkruaj arsyen e anulimit:");
+            if (!reason) return;
+            const thisOrder = ref(db, "orders/" + id);
+            runTransaction(thisOrder, (current) => {
+              if (!current || current.status !== "taken") return current;
+              current.status = "canceled";
+              current.canceledAt = Date.now();
+              current.canceledReason = reason;
+              return current;
+            });
+          };
+
+          wrapper.appendChild(finishBtn);
+          wrapper.appendChild(cancelBtn);
+          myOrdersBox.appendChild(wrapper);
+
+          if (typeof o.lat === "number" && typeof o.lng === "number") {
+            setTimeout(() => createOrUpdateMap(safeIdMine, o.lat, o.lng), 50);
           }
-
-          /* ===== ACTIVE RIDE ===== */
-          if (o.status === "taken" && o.takenByDriverId === currentDriver?.id) {
-            const card = document.createElement("div");
-            card.className = "order-card";
-
-            card.innerHTML = `
-              <div style="font-size:16px;font-weight:600;">${o.name}</div>
-              <div style="font-size:13px;color:#9ca3af;">${o.phone}</div>
-              <div style="margin-top:6px;font-size:12px;">📍 ${o.addressStreet || o.address || "-"}</div>
-
-              <button class="btn-secondary" style="margin-top:14px;">Përfundo</button>
-            `;
-
-            card.querySelector("button").onclick = () => {
-              const orderRef = ref(db, "orders/" + id);
-              runTransaction(orderRef, cur => {
-                if (cur && cur.status === "taken") {
-                  cur.status = "done";
-                  cur.completedAt = Date.now();
-                }
-                return cur;
-              });
-            };
-
-            myOrdersBox.appendChild(card);
-          }
-        });
-
-        /* UPDATE TODAY STATS */
-        statToday.textContent = todayCount;
-
-        noOpen.textContent = ordersBox.children.length === 0
-          ? "Nuk ka kërkesa."
-          : "";
-
-        noMine.textContent = myOrdersBox.children.length === 0
-          ? "Asnjë udhëtim aktiv."
-          : "";
+        }
       });
-    }
 
+      noOpen.textContent =
+        openCount === 0 ? "Për momentin nuk ka kërkesa të reja." : "";
+      noMine.textContent =
+        mineCount === 0 ? "Për momentin nuk ke udhëtime aktive." : "";
 
-    /* ====================== BALANCE ======================= */
+      invalidateAllMaps();
+    });
+  }
 
-    function subscribeBalance() {
-      const balRef = ref(db, "balances/" + currentDriver.id);
+  /* ---------- BILANCI / REALTIME ---------- */
 
-      onValue(balRef, snap => {
-        const data = snap.val();
-
-        if (!data) {
-          balanceSummaryBox.innerHTML = `<strong>0.00 €</strong><br><div style="font-size:12px;">Asnjë bilanc</div>`;
-          balanceHistoryList.innerHTML = "";
-          return;
-        }
-
-        /* SUMMARY */
-        balanceSummaryBox.innerHTML = `
-          <strong>${(data.total || 0).toFixed(2)} €</strong>
-          <div style="font-size:12px;margin-top:6px;color:#d1d5db;">Bilanci aktual</div>
-        `;
-
-        /* HISTORY */
+  function subscribeBalance() {
+    const balRef = ref(db, "balances/" + currentDriver.id);
+    onValue(balRef, (snap) => {
+      const data = snap.val();
+      if (!data) {
+        balanceSummary.innerHTML = "Nuk ka ende asnjë bilanc.";
+        balanceMeta.textContent = "";
+        balancePanels["b-summary"].innerHTML = "";
         balanceHistoryList.innerHTML = "";
+        balanceHistoryEmpty.textContent = "Ende nuk ka levizje.";
+        return;
+      }
 
-        const history = data.history || {};
+      const total = data.total || 0;
+      const statusOpen = data.status !== "closed";
 
-        Object.entries(history)
-          .sort((a,b) => b[1].timestamp - a[1].timestamp)
-          .forEach(([id, h]) => {
+      if (statusOpen) {
+        balanceSummary.innerHTML = `
+          <strong>Bilanc i hapur:</strong> ${total.toFixed(2)} €
+        `;
+        balancePanels["b-summary"].innerHTML = `
+          <p>Ky është bilanci yt aktual për t’u barazuar me kompaninë.</p>
+        `;
+      } else {
+        balanceSummary.innerHTML = `
+          <strong>Bilanc i përfunduar ✔</strong>
+        `;
+        balancePanels["b-summary"].innerHTML = `
+          <p>Aktualisht nuk ke borxh të hapur ndaj kompanisë.</p>
+        `;
+      }
 
-            const dt = new Date(h.timestamp)
-              .toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" });
+      if (data.lastUpdate) {
+        const d = new Date(data.lastUpdate);
+        balanceMeta.textContent = "Përditësimi i fundit: " + d.toLocaleString();
+      } else {
+        balanceMeta.textContent = "";
+      }
 
-            const address = h.address || "Adresë";
+      balanceHistoryList.innerHTML = "";
+      balanceHistoryEmpty.textContent = "";
 
-            const card = document.createElement("div");
-            card.className = "balance-history-card";
+      const history = data.history || {};
+      const entries = Object.entries(history)
+        .map(([key, h]) => ({ key, ...h }))
+        .sort((a,b) => (b.timestamp || 0) - (a.timestamp || 0))
+        .slice(0, 15);
 
-            card.innerHTML = `
-              <div class="balance-entry-title">📍 ${address}</div>
-              <div class="balance-entry-time">⏱ ${dt}</div>
-              <div class="balance-entry-amount">+0.25 €</div>
-            `;
+      if (entries.length === 0) {
+        balanceHistoryEmpty.textContent = "Ende nuk ka levizje në histori.";
+      } else {
+        entries.forEach(h => {
+          const row = document.createElement("div");
+          row.className = "balance-row";
+          const d = h.timestamp ? new Date(h.timestamp) : null;
+          const timeStr = d ? d.toLocaleTimeString("de-DE", { hour:"2-digit", minute:"2-digit" }) : "-";
+          const address = h.address || "Adresë";
 
-            balanceHistoryList.appendChild(card);
-          });
-
-      });
-    }
-
-  </script>
+          row.innerHTML = `
+            <div class="balance-entry-main">
+              <div class="balance-entry-address">📍 ${address}</div>
+              <div class="balance-entry-time">⏱ ${timeStr}</div>
+            </div>
+            <div class="balance-entry-amount">+${(h.amount || 0).toFixed(2)} €</div>
+          `;
+          balanceHistoryList.appendChild(row);
+        });
+      }
+    });
+  }
+</script>
 
 </body>
 </html>

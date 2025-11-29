@@ -101,11 +101,12 @@
       display: flex;
       gap: 6px;
       padding: 6px;
-      margin-bottom: 12px;
+      margin-bottom: 14px;
       background: rgba(2,6,23,0.96);
       border-radius: 999px;
       backdrop-filter: blur(20px);
       border: 1px solid rgba(255,255,255,0.12);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.45);
     }
 
     .tab-btn {
@@ -113,18 +114,19 @@
       padding: 9px 0;
       border: none;
       border-radius: 999px;
-      background: transparent;
+      background: rgba(15,23,42,0.75);
       font-size: 14px;
       font-weight: 500;
-      color: #94a3b8;
+      color: #9ca3af;
       cursor: pointer;
       touch-action: manipulation;
+      transition: background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
     }
 
     .tab-btn.active {
-      background: rgba(255,255,255,0.12);
-      color: #e5e7eb;
-      box-shadow: 0 2px 8px rgba(15,23,42,0.7);
+      background: rgba(248,250,252,0.18);
+      color: #f9fafb;
+      box-shadow: 0 3px 10px rgba(15,23,42,0.8);
     }
 
     /*********************************************
@@ -214,7 +216,7 @@
     }
 
     /*********************************************
-     * STATS – nur heute
+     * STATS – heute
      *********************************************/
     .stat-main {
       text-align: center;
@@ -231,22 +233,19 @@
       opacity: .6;
     }
 
-    /* sticky Performanca card */
+    /* Performanca sticky direkt unter Tabs */
     .performance-card {
       position: sticky;
-      top: 56px; /* direkt unter Tabs */
+      top: 60px; /* knapp unter Tabs */
       z-index: 40;
-      background: rgba(15,23,42,0.9);
-      backdrop-filter: blur(20px);
-      margin-bottom: 16px;
-    }
-
-    .performance-card .stat-main {
-      padding: 4px 0;
+      background: rgba(15,23,42,0.90);
+      backdrop-filter: blur(18px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.55);
+      margin-bottom: 18px;
     }
 
     .performance-card .stat-number {
-      font-size: 26px;
+      font-size: 28px;
     }
 
     /*********************************************
@@ -431,7 +430,7 @@
       <button class="tab-btn" data-tab="tab-balance">Bilanci</button>
     </div>
 
-    <!-- STATS – heute (sticky card) -->
+    <!-- STATS – heute (jetzt sticky durch performance-card) -->
     <div class="card performance-card">
       <div class="section-title">Performanca ime</div>
       <div class="section-sub">Sa udhëtime ke përfunduar sot si shofer.</div>
@@ -487,7 +486,7 @@
   crossorigin=""
 ></script>
 
-<!-- APP LOGIC -->
+  <!-- APP LOGIC -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
   import { getDatabase, ref, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-database.js";
@@ -600,12 +599,11 @@
       maps[containerId].setView([lat, lng], 16);
     }
 
-    // Fix für schwarze Karten bei Tab-Wechsel
     setTimeout(() => {
       try {
         maps[containerId].invalidateSize();
       } catch (e) {}
-    }, 240);
+    }, 250);
   }
 
   function invalidateAllMaps() {
@@ -616,12 +614,10 @@
     }, 260);
   }
 
-  // wichtig: alte Leaflet-Instanzen entfernen, bevor neue erstellt werden
+  // wichtig bei vielen Kërkesa: alte Leaflet-Instanzen sauber entfernen
   function resetAllMaps() {
     Object.entries(maps).forEach(([key, map]) => {
-      try {
-        map.remove();
-      } catch(e) {}
+      try { map.remove(); } catch(e) {}
       delete maps[key];
     });
   }
@@ -776,7 +772,7 @@
     onValue(ordersRef, (snap) => {
       const data = snap.val() || {};
 
-      // alle alten Maps entfernen, dann neu aufbauen → keine schwarzen Karten
+      // alle Leaflet-Instanzen entfernen → neue, saubere Maps
       resetAllMaps();
 
       ordersBox.innerHTML = "";
@@ -1019,3 +1015,4 @@
 
 </body>
 </html>
+

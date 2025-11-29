@@ -3,376 +3,108 @@
 <head>
   <meta charset="UTF-8">
   <title>Shoferi - Thirr Taxi</title>
-
-  <!-- iOS FULLSCREEN / MOBILE -->
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#020617">
 
-  <!-- PWA -->
-  <link rel="manifest" href="/manifest-shofer.json">
-  <link rel="apple-touch-icon" href="/icon-shofer-192.png">
-
-  <script>
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("/sw-shofer.js")
-        .catch(console.error);
-    }
-  </script>
-
-  <!-- Leaflet -->
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    crossorigin=""
-  />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 
   <style>
-    /*********************************************
-     * GLOBAL – iOS dark style
-     *********************************************/
     html, body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      background: #020617;
-      font-family: -apple-system, system-ui, sans-serif;
-      color: #e5e7eb;
+      margin:0; padding:0; height:100%;
+      background:#020617; color:#e5e7eb;
+      font-family:-apple-system,system-ui,sans-serif;
+    }
+    body { padding:12px 12px 80px; }
+    body::before{
+      content:""; position:fixed; inset:0;
+      background:radial-gradient(circle at top,#0b1120,#020617 70%);
+      z-index:-1;
+    }
+    .frame{ max-width:500px; margin:0 auto; }
+
+    /* HEADER */
+    .header{ display:flex; justify-content:space-between; align-items:center; padding:4px 0 12px; }
+    .header-left{ font-size:17px; font-weight:600; }
+    .header-center{ display:flex; align-items:center; gap:6px; }
+    .dot{ width:7px; height:7px; border-radius:999px; background:#22c55e; }
+    .header-status{ font-size:12px; opacity:.7; }
+
+    /* STICKY TABS */
+    .tabs{
+      position:sticky; top:0; z-index:50;
+      display:flex; gap:6px; padding:6px;
+      background:rgba(2,6,23,0.92);
+      backdrop-filter:blur(16px);
+      border-bottom:1px solid rgba(255,255,255,0.06);
+    }
+    .tab-btn{
+      flex:1; padding:10px 0;
+      border:none; border-radius:999px;
+      background:transparent;
+      color:#94a3b8; font-size:14px;
+    }
+    .tab-btn.active{
+      background:rgba(255,255,255,0.12);
+      color:white; font-weight:600;
     }
 
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      background: radial-gradient(circle at top, #0b1120, #020617 70%);
-      z-index: -1;
+    /* STICKY PERFORMANCE */
+    .performance-card{
+      position:sticky; top:60px; z-index:40;
+      background:rgba(15,23,42,0.88);
+      backdrop-filter:blur(20px);
+      border-radius:18px; padding:12px 16px;
+      margin-bottom:14px;
+    }
+    .stat-main{ text-align:center; padding:4px 0; }
+    .stat-number{ font-size:26px; font-weight:700; }
+    .stat-label{ font-size:12px; opacity:.6; }
+
+    /* GENERAL CARD */
+    .card{
+      background:rgba(15,23,42,0.70);
+      border-radius:20px; padding:16px;
+      margin-bottom:16px;
+      border:1px solid rgba(148,163,184,0.22);
+      backdrop-filter:blur(14px);
+    }
+    .section-title{ font-size:15px; font-weight:600; }
+    .section-sub{ font-size:12px; opacity:.7; margin-bottom:8px; }
+
+    /* ORDER CARDS */
+    .order-card{
+      background:rgba(30,41,59,0.75);
+      border-radius:18px;
+      padding:14px;
+      margin-bottom:12px;
+      border:1px solid rgba(148,163,184,0.18);
+    }
+    .order-header{ display:flex; justify-content:space-between; }
+    .order-name{ font-size:15px; font-weight:600; }
+    .order-phone{ font-size:13px; opacity:.9; }
+    .order-address{ font-size:12px; color:#cbd5f5; margin-top:3px; line-height:1.3; }
+    .badge{ padding:4px 8px; border-radius:8px; font-size:11px; }
+    .badge-open{ background:rgba(251,191,36,0.15); color:#facc15; }
+    .badge-active{ background:rgba(34,197,94,0.18); color:#4ade80; }
+    .mini-map{
+      width:100%; height:130px;
+      border-radius:14px; margin:10px 0;
+      background:#020617;
+      border:1px solid rgba(15,23,42,0.9);
+      overflow:hidden;
     }
 
-    body {
-      padding: 16px 12px 60px;
+    button{
+      padding:10px; width:100%;
+      border:none; border-radius:12px;
+      font-size:15px; font-weight:600;
+      margin-top:10px;
     }
+    .btn-secondary{ background:linear-gradient(135deg,#0ea5e9,#22c55e); color:#022c22; }
+    .btn-danger{ background:#ef4444; color:white; }
 
-    .frame {
-      max-width: 500px;
-      margin: 0 auto;
-    }
-
-    /*********************************************
-     * HEADER
-     *********************************************/
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding-bottom: 14px;
-    }
-
-    .header-left {
-      font-size: 16px;
-      font-weight: 600;
-    }
-
-    .header-center {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 999px;
-      background: #22c55e;
-    }
-
-    .header-status {
-      font-size: 12px;
-      opacity: .7;
-    }
-
-    /*********************************************
-     * TABS (Kërkesa / Udhëtimet / Bilanci)
-     *********************************************/
-    .tabs {
-      display: flex;
-      gap: 6px;
-      padding: 4px;
-      margin-bottom: 16px;
-      background: rgba(255,255,255,0.04);
-      border-radius: 999px;
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(255,255,255,0.08);
-      position: sticky;
-      top: 0;
-      z-index: 40;
-    }
-
-    .tab-btn {
-      flex: 1;
-      padding: 10px 0;
-      border: none;
-      border-radius: 999px;
-      background: transparent;
-      font-size: 14px;
-      font-weight: 500;
-      color: #94a3b8;
-      cursor: pointer;
-      touch-action: manipulation;
-    }
-
-    .tab-btn.active {
-      background: rgba(255,255,255,0.12);
-      color: #e5e7eb;
-      box-shadow: 0 2px 8px rgba(15,23,42,0.6);
-    }
-
-    /*********************************************
-     * CARD BASE
-     *********************************************/
-    .card {
-      background: rgba(15,23,42,0.70);
-      border-radius: 22px;
-      border: 1px solid rgba(148,163,184,0.22);
-      padding: 16px 18px;
-      margin-bottom: 18px;
-      backdrop-filter: blur(18px);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.24); /* dezent */
-    }
-
-    .section-title {
-      font-size: 15px;
-      font-weight: 600;
-    }
-
-    .section-sub {
-      font-size: 12px;
-      opacity: .7;
-      margin-bottom: 10px;
-    }
-
-    /*********************************************
-     * LOGIN
-     *********************************************/
-    label {
-      font-size: 13px;
-      margin-top: 4px;
-      display: block;
-    }
-
-    input {
-      width: 100%;
-      padding: 10px 12px;
-      margin-top: 4px;
-      border-radius: 14px;
-      background: rgba(15,23,42,0.95);
-      border: 1px solid rgba(148,163,184,0.35);
-      color: #e5e7eb;
-      font-size: 15px;
-      outline: none;
-    }
-
-    input:focus {
-      border-color: #38bdf8;
-      box-shadow: 0 0 0 1px rgba(56,189,248,0.45);
-    }
-
-    button {
-      width: 100%;
-      border: none;
-      border-radius: 12px;
-      padding: 11px;
-      font-size: 15px;
-      font-weight: 600;
-      margin-top: 10px;
-      cursor: pointer;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.28);
-      touch-action: manipulation;
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg,#22c55e,#4ade80);
-      color:#022c22;
-    }
-
-    .btn-secondary {
-      background: linear-gradient(135deg,#0ea5e9,#22c55e);
-      color:#022c22;
-      font-size: 14px;
-    }
-
-    .btn-danger {
-      background:#ef4444;
-      color:white;
-      font-size: 13px;
-    }
-
-    .login-error {
-      font-size: 12px;
-      color: #f97373;
-      margin-top: 6px;
-    }
-
-    /*********************************************
-     * STATS – nur heute
-     *********************************************/
-    .stat-main {
-      text-align: center;
-      padding: 8px 0;
-    }
-
-    .stat-number {
-      font-size: 34px;
-      font-weight: 700;
-    }
-
-    .stat-label {
-      font-size: 13px;
-      opacity: .6;
-    }
-
-    /*********************************************
-     * ORDER CARDS (Kërkesa / Udhëtimet)
-     *********************************************/
-    .order-card {
-      background: rgba(30,41,59,0.75);
-      border-radius: 18px;
-      border: 1px solid rgba(148,163,184,0.18);
-      padding: 14px 14px 16px;
-      margin-bottom: 12px;
-      backdrop-filter: blur(14px);
-      box-shadow: 0 3px 8px rgba(0,0,0,0.32);
-    }
-
-    .order-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 8px;
-    }
-
-    .order-main {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-
-    .order-name {
-      font-size: 15px;
-      font-weight: 600;
-    }
-
-    .order-phone {
-      font-size: 13px;
-      opacity: .9;
-    }
-
-    .order-address {
-      font-size: 12px;
-      color: #cbd5f5;
-      margin-top: 2px;
-      line-height: 1.3;
-      word-break: break-word;
-    }
-
-    .badge {
-      padding: 4px 8px;
-      border-radius: 8px;
-      font-size: 11px;
-      white-space: nowrap;
-    }
-
-    .badge-open {
-      background: rgba(251,191,36,0.15);
-      color: #facc15;
-    }
-
-    .badge-active {
-      background: rgba(34,197,94,0.18);
-      color: #4ade80;
-    }
-
-    .mini-map {
-      width: 100%;
-      height: 130px;
-      border-radius: 14px;
-      margin: 10px 0;
-      overflow: hidden;
-      background: #020617;
-      border: 1px solid rgba(15,23,42,0.9);
-    }
-
-    .info-line {
-      font-size: 12px;
-      opacity: .7;
-      margin-bottom: 6px;
-    }
-
-    .empty-text {
-      font-size: 12px;
-      opacity: .7;
-      text-align: center;
-      margin-top: 6px;
-    }
-
-    /*********************************************
-     * BILANCI – History Cards
-     *********************************************/
-    .balance-summary {
-      font-size: 15px;
-      margin-bottom: 4px;
-      text-align: center;
-    }
-
-    .balance-meta {
-      font-size: 11px;
-      opacity: .7;
-      margin-bottom: 10px;
-      text-align: center;
-    }
-
-    .balance-row {
-      background: rgba(30,41,59,0.70);
-      border-radius: 16px;
-      border: 1px solid rgba(148,163,184,0.22);
-      padding: 10px 12px;
-      margin-bottom: 8px;
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 10px;
-    }
-
-    .balance-entry-main {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-
-    .balance-entry-address {
-      font-size: 13px;
-      font-weight: 500;
-    }
-
-    .balance-entry-time {
-      font-size: 11px;
-      opacity: .7;
-    }
-
-    .balance-entry-amount {
-      font-size: 15px;
-      font-weight: 700;
-      color: #4ade80;
-      white-space: nowrap;
-    }
-
-    .balance-empty {
-      font-size: 12px;
-      opacity: .7;
-      text-align: center;
-      margin-top: 6px;
-    }
-
+    .empty-text{ text-align:center; font-size:12px; opacity:.7; }
   </style>
 </head>
 
@@ -389,18 +121,13 @@
     <span id="headerStatus" class="header-status">Offline</span>
   </div>
 
-  <!-- LOGIN CARD -->
+  <!-- LOGIN -->
   <div id="loginCard" class="card">
     <div class="section-title">Hyr si shofer</div>
-    <div class="section-sub">
-      Shkruaj vetëm PIN-in që ta ka dhënë administratori. Emri dhe kompania merren automatikisht.
-    </div>
-
-    <label>PIN</label>
-    <input id="loginPin" inputmode="numeric" placeholder="p.sh. 4829">
-
-    <button id="loginBtn" class="btn-primary">Hyr online</button>
-    <div id="loginMsg" class="login-error"></div>
+    <div class="section-sub">Shkruaj vetëm PIN-in.</div>
+    <input id="loginPin" placeholder="PIN" inputmode="numeric">
+    <button id="loginBtn" class="btn-secondary">Hyr</button>
+    <div id="loginMsg" class="empty-text" style="color:#f87171;"></div>
   </div>
 
   <!-- CONTENT -->
@@ -408,15 +135,15 @@
 
     <!-- TABS -->
     <div class="tabs">
-      <button class="tab-btn active" data-tab="tab-requests">Kërkesa</button>
-      <button class="tab-btn" data-tab="tab-active">Udhëtimet e mia</button>
-      <button class="tab-btn" data-tab="tab-balance">Bilanci</button>
+      <button class="tab-btn active" data-tab="req">Kërkesa</button>
+      <button class="tab-btn" data-tab="act">Udhëtimet</button>
+      <button class="tab-btn" data-tab="bal">Bilanci</button>
     </div>
 
-    <!-- STATS – heute -->
-    <div class="card">
+    <!-- PERFORMANCE -->
+    <div class="card performance-card">
       <div class="section-title">Performanca ime</div>
-      <div class="section-sub">Sa udhëtime ke përfunduar sot si shofer.</div>
+      <div class="section-sub">Udhëtimet e sotme</div>
       <div class="stat-main">
         <div id="statRidesCount" class="stat-number">0</div>
         <div class="stat-label">Sot</div>
@@ -424,580 +151,241 @@
     </div>
 
     <!-- TAB: KËRKESA -->
-    <div id="tab-requests" class="tab-panel" style="display:block;">
+    <div id="tab-req">
       <div class="card">
         <div class="section-title">Kërkesa të reja</div>
-        <div class="section-sub">Këto janë udhëtimet që mund t’i pranosh.</div>
-
         <div id="orders"></div>
         <div id="noOpen" class="empty-text"></div>
       </div>
     </div>
 
     <!-- TAB: AKTIVE -->
-    <div id="tab-active" class="tab-panel" style="display:none;">
+    <div id="tab-act" style="display:none;">
       <div class="card">
-        <div class="section-title">Udhëtimet e mia aktive</div>
-        <div class="section-sub">Mund të kesh vetëm një udhëtim aktiv në të njëjtën kohë.</div>
-
+        <div class="section-title">Udhëtimet e mia</div>
         <div id="myOrders"></div>
         <div id="noMine" class="empty-text"></div>
       </div>
     </div>
 
     <!-- TAB: BILANCI -->
-    <div id="tab-balance" class="tab-panel" style="display:none;">
+    <div id="tab-bal" style="display:none;">
       <div class="card">
         <div class="section-title">Bilanci im</div>
-        <div class="section-sub">Sa ke për t’u barazuar dhe lëvizjet e fundit.</div>
-
-        <div id="balanceSummary" class="balance-summary"></div>
-        <div id="balanceMeta" class="balance-meta"></div>
-
+        <div id="balanceSummary"></div>
         <div id="balanceHistoryList"></div>
-        <div id="balanceHistoryEmpty" class="balance-empty"></div>
+        <div id="balanceHistoryEmpty" class="empty-text"></div>
       </div>
     </div>
 
-  </div><!-- /content -->
+  </div>
+</div>
 
-</div><!-- /frame -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-<!-- Leaflet JS -->
-<script
-  src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-  crossorigin=""
-></script>
-
-<!-- APP LOGIC -->
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
-  import { getDatabase, ref, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-database.js";
+/* --- FIREBASE IMPORTS --- */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+import { getDatabase, ref, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-database.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyCgCxp8M9XGOKFSIfaU9nM48rxtFQP-Kvs",
-    authDomain: "kosovataxi-f6ca3.firebaseapp.com",
-    projectId: "kosovataxi-f6ca3",
-    storageBucket: "kosovataxi-f6ca3.firebasestorage.app",
-    messagingSenderId: "1075646412122",
-    appId: "1:1075646412122:web:7aab19b92f51844fe32f63",
-    measurementId: "G-QYQE2476PR",
-    databaseURL: "https://kosovataxi-f6ca3-default-rtdb.europe-west1.firebasedatabase.app/"
-  };
+/* --- FIREBASE CONFIG --- */
+const firebaseConfig = {
+  apiKey: "AIzaSyCgCxp8M9XGOKFSIfaU9nM48rxtFQP-Kvs",
+  authDomain: "kosovataxi-f6ca3.firebaseapp.com",
+  projectId: "kosovataxi-f6ca3",
+  storageBucket: "kosovataxi-f6ca3.firebasestorage.app",
+  databaseURL: "https://kosovataxi-f6ca3-default-rtdb.europe-west1.firebasedatabase.app/"
+};
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
 
-  const app = initializeApp(firebaseConfig);
-  const db = getDatabase(app);
+/* --- GLOBAL --- */
+let currentDriver = null;
+let maps = {};
 
-  const LS_KEY = "thirrTaxiDriverId";
-
-  let currentDriver = null;
-  let hasActiveRide = false;
-  const stats = { day: 0, week: 0, month: 0 };
-  const maps = {};
-  let geoWatchId = null;
-
-  // DOM
-  const loginCard = document.getElementById("loginCard");
-  const content = document.getElementById("content");
-  const loginBtn = document.getElementById("loginBtn");
-  const loginMsg = document.getElementById("loginMsg");
-  const headerDriverName = document.getElementById("headerDriverName");
-  const headerStatus = document.getElementById("headerStatus");
-
-  const tabButtons = document.querySelectorAll(".tab-btn");
-  const tabPanels = document.querySelectorAll(".tab-panel");
-
-  const statRidesCount = document.getElementById("statRidesCount");
-
-  const balanceSummary = document.getElementById("balanceSummary");
-  const balanceMeta = document.getElementById("balanceMeta");
-  const balanceHistoryList = document.getElementById("balanceHistoryList");
-  const balanceHistoryEmpty = document.getElementById("balanceHistoryEmpty");
-
-  const ordersBox = document.getElementById("orders");
-  const myOrdersBox = document.getElementById("myOrders");
-  const noOpen = document.getElementById("noOpen");
-  const noMine = document.getElementById("noMine");
-
-  /***************** HELPERS *****************/
-
-  function cleanAddress(a) {
-    if (!a) return "";
-    const lower = a.toLowerCase();
-    if (lower.includes("nuk") && lower.includes("përcaktuar")) return "";
-    return a;
-  }
-
-  function shortenAddress(address, maxLength = 28) {
-    if (!address) return "";
-    const trimmed = address.trim();
-    if (trimmed.length <= maxLength) return trimmed;
-    return trimmed.substring(0, maxLength) + "... +";
-  }
-
-  function formatMinutesSince(timestamp) {
-    if (!timestamp) return "-";
-    const diffMs = Date.now() - timestamp;
-    const mins = Math.floor(diffMs / 60000);
-    if (mins <= 0) return "më pak se 1 min";
-    if (mins === 1) return "1 minutë";
-    return mins + " minuta";
-  }
-
-  function startOfDay(d) {
-    const n = new Date(d); n.setHours(0,0,0,0); return n;
-  }
-  function startOfWeek(d) {
-    const n = startOfDay(d);
-    const day = n.getDay();
-    const diff = (day === 0 ? -6 : 1 - day);
-    n.setDate(n.getDate() + diff);
-    return n;
-  }
-  function startOfMonth(d) {
-    const n = startOfDay(d);
-    return new Date(n.getFullYear(), n.getMonth(), 1);
-  }
-
-  function createOrUpdateMap(containerId, lat, lng) {
-    const container = document.getElementById(containerId);
-    if (!container) return;
-
-    if (!maps[containerId]) {
-      const map = L.map(containerId, {
-        zoomControl: false,
-        attributionControl: false,
-        preferCanvas: true
-      }).setView([lat, lng], 16);
-
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        maxZoom: 19,
-        updateWhenIdle: true
-      }).addTo(map);
-
-      L.marker([lat, lng]).addTo(map);
-      maps[containerId] = map;
-    } else {
-      maps[containerId].setView([lat, lng], 16);
-    }
-
-    // Fix für schwarze Karten bei Tab-Wechsel
-    setTimeout(() => {
-      try {
-        maps[containerId].invalidateSize();
-      } catch (e) {}
-    }, 240);
-  }
-
-  function invalidateAllMaps() {
-    setTimeout(() => {
-      Object.values(maps).forEach(m => {
-        try { m.invalidateSize(); } catch(e) {}
-      });
-    }, 260);
-  }
-
-  function resetAllMaps() {
-    // Verhindert schwarze Maps / verwaiste Leaflet-Container
-    Object.keys(maps).forEach(key => {
-      try {
-        maps[key].remove();
-      } catch (e) {}
-      delete maps[key];
-    });
-  }
-
-  function recalcStats(allOrders) {
-    stats.day = 0;
-    stats.week = 0;
-    stats.month = 0;
-    if (!currentDriver) return;
-
-    const now = new Date();
-    const dDay = startOfDay(now);
-    const dWeek = startOfWeek(now);
-    const dMonth = startOfMonth(now);
-
-    Object.values(allOrders).forEach(o => {
-      if (o.takenByDriverId !== currentDriver.id || o.status !== "done") return;
-      const t = o.completedAt || o.takenAt || o.createdAt;
-      if (!t) return;
-      const dt = new Date(t);
-
-      if (dt >= dDay) stats.day++;
-      if (dt >= dWeek) stats.week++;
-      if (dt >= dMonth) stats.month++;
-    });
-
-    statRidesCount.textContent = stats.day || 0;
-  }
-
-  function startLocationTracking() {
-    if (!navigator.geolocation || !currentDriver) return;
-    if (geoWatchId !== null) return;
-
-    geoWatchId = navigator.geolocation.watchPosition(
-      (pos) => {
-        const lat = pos.coords.latitude;
-        const lng = pos.coords.longitude;
-        const locRef = ref(db, "driverLocations/" + currentDriver.id);
-        runTransaction(locRef, () => ({
-          lat,
-          lng,
-          updatedAt: Date.now()
-        }));
-      },
-      (err) => {
-        console.warn("Geolocation error:", err);
-      },
-      {
-        enableHighAccuracy: true,
-        maximumAge: 5000,
-        timeout: 15000
-      }
-    );
-  }
-
-  /***************** TABS *****************/
-
-  tabButtons.forEach(btn => {
-    btn.addEventListener("click", () => {
-      const target = btn.dataset.tab;
-
-      tabButtons.forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-
-      tabPanels.forEach(p => {
-        p.style.display = (p.id === target) ? "block" : "none";
-      });
-
-      invalidateAllMaps();
-    });
+/* --- HELPERS --- */
+function resetMaps(){
+  Object.keys(maps).forEach(id=>{
+    try { maps[id].remove(); } catch(e){}
+    delete maps[id];
   });
+}
 
-  /***************** LOGIN / AUTO-LOGIN *****************/
+function createMap(id, lat, lng){
+  const c = document.getElementById(id);
+  if(!c) return;
 
-  function afterLoginSetup() {
-    if (!currentDriver) return;
-    if (window.__driverInitialized) return;
-    window.__driverInitialized = true;
+  const m = L.map(id,{zoomControl:false,attributionControl:false}).setView([lat,lng],16);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(m);
+  L.marker([lat,lng]).addTo(m);
+  maps[id]=m;
 
-    headerDriverName.textContent = currentDriver.name || "Shoferi";
-    headerStatus.textContent = "Online";
+  setTimeout(()=>{m.invalidateSize();},240);
+}
 
-    loginCard.style.display = "none";
-    content.style.display = "block";
+/* --- LOGIN --- */
+loginBtn.onclick = ()=> {
+  const pin = loginPin.value.trim();
+  if(!pin){ loginMsg.textContent="Shkruaj PIN-in."; return; }
 
-    subscribeOrders();
-    subscribeBalance();
-    startLocationTracking();
-  }
+  const r = ref(db,"drivers");
+  onValue(r, snap=>{
+    const data = snap.val() || {};
+    let found=null;
+    Object.entries(data).forEach(([id,d])=>{
+      if(String(d.pin)==pin && d.approved && d.active!==false){
+        found={id,...d};
+      }
+    });
+    if(!found){ loginMsg.textContent="PIN i gabuar."; return; }
 
-  loginBtn.onclick = () => {
-    loginMsg.textContent = "";
-    const pin = document.getElementById("loginPin").value.trim();
-    if (!pin) {
-      loginMsg.textContent = "Ju lutem shkruani PIN-in.";
-      return;
-    }
+    currentDriver=found;
+    loginCard.style.display="none";
+    content.style.display="block";
+    loadOrders();
+    loadBalance();
+  }, {onlyOnce:true});
+};
 
-    const driversRef = ref(db, "drivers");
-    onValue(
-      driversRef,
-      (snap) => {
-        const data = snap.val() || {};
-        let found = null;
-        Object.entries(data).forEach(([id, d]) => {
-          if (
-            String(d.pin) === String(pin) &&
-            d.approved === true &&
-            (d.active !== false)
-          ) {
-            found = { id, ...d };
-          }
-        });
+/* --- TABS --- */
+document.querySelectorAll(".tab-btn").forEach(btn=>{
+  btn.onclick=()=>{
+    document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
 
-        if (!found) {
-          loginMsg.textContent = "PIN i pavlefshëm ose shoferi nuk është aktiv.";
-          return;
-        }
+    const t = btn.dataset.tab;
+    document.getElementById("tab-req").style.display = (t==="req"?"block":"none");
+    document.getElementById("tab-act").style.display = (t==="act"?"block":"none");
+    document.getElementById("tab-bal").style.display = (t==="bal"?"block":"none");
 
-        currentDriver = found;
-        localStorage.setItem(LS_KEY, currentDriver.id);
-        afterLoginSetup();
-      },
-      { onlyOnce: true }
-    );
+    setTimeout(()=>{
+      Object.values(maps).forEach(m=>m.invalidateSize());
+    },200);
   };
+});
 
-  // Auto-Login nach Reload
-  const savedId = localStorage.getItem(LS_KEY);
-  if (savedId) {
-    const drvRef = ref(db, "drivers/" + savedId);
-    onValue(
-      drvRef,
-      (snap) => {
-        const d = snap.val();
-        if (d && d.approved === true && (d.active !== false)) {
-          currentDriver = { id: savedId, ...d };
-          afterLoginSetup();
-        } else {
-          localStorage.removeItem(LS_KEY);
-        }
-      },
-      { onlyOnce: true }
-    );
-  }
+/* --- ORDERS --- */
+function loadOrders(){
+  const r=ref(db,"orders");
+  onValue(r,snap=>{
+    const orders=snap.val()||{};
+    resetMaps();
 
-  /***************** ORDERS / REALTIME *****************/
+    ordersDiv=orders;
+    ordersBox.innerHTML="";
+    myOrders.innerHTML="";
 
-  function subscribeOrders() {
-    const ordersRef = ref(db, "orders");
+    let open=0, mine=0;
 
-    onValue(ordersRef, (snap) => {
-      const data = snap.val() || {};
+    Object.entries(orders).forEach(([id,o])=>{
+      const adr=o.addressFull || o.address || "";
+      const lat=o.lat, lng=o.lng;
 
-      // Alle alten Leaflet-Instanzen sauber entfernen,
-      // damit neue Maps nicht schwarz werden.
-      resetAllMaps();
+      const mapIdOpen="m_o_"+id;
+      const mapIdMine="m_m_"+id;
 
-      ordersBox.innerHTML = "";
-      myOrdersBox.innerHTML = "";
-      let openCount = 0;
-      let mineCount = 0;
-      hasActiveRide = false;
-
-      recalcStats(data);
-
-      Object.entries(data).forEach(([id, o]) => {
-        const safeIdOpen = "map_open_" + id.replace(/[^a-zA-Z0-9_-]/g, "");
-        const safeIdMine = "map_mine_" + id.replace(/[^a-zA-Z0-9_-]/g, "");
-
-        // Adresse aus allen möglichen Feldern
-        const rawAdr =
-          o.addressStreet ||
-          o.address ||
-          o.addressFull ||
-          o.locationAddress ||
-          "";
-
-        const addressFull = cleanAddress(rawAdr);
-        const addressShort = shortenAddress(addressFull);
-        const addressLine = addressFull || addressShort;
-
-        /* KËRKESA TË REJA */
-        if (o.status === "open") {
-          openCount++;
-          const wrapper = document.createElement("div");
-          wrapper.className = "order-card";
-
-          wrapper.innerHTML = `
+      /* OPEN */
+      if(o.status==="open"){
+        open++;
+        ordersBox.innerHTML+=`
+          <div class="order-card">
             <div class="order-header">
-              <div class="order-main">
-                <div class="order-name">${o.name || "Klienti"}</div>
-                <div class="order-phone">${o.phone || ""}</div>
-                ${addressLine ? `<div class="order-address">${addressLine}</div>` : ""}
+              <div>
+                <div class="order-name">${o.name||"Klienti"}</div>
+                <div class="order-phone">${o.phone||""}</div>
+                <div class="order-address">${adr}</div>
               </div>
               <span class="badge badge-open">Kërkesë</span>
             </div>
-            <div id="${safeIdOpen}" class="mini-map"></div>
-            <button class="btn-secondary">✅ Prano udhëtimin</button>
-          `;
+            <div id="${mapIdOpen}" class="mini-map"></div>
+            <button class="btn-secondary" onclick="takeOrder('${id}')">Prano</button>
+          </div>
+        `;
+        setTimeout(()=>{ createMap(mapIdOpen,lat,lng); },100);
+      }
 
-          const acceptBtn = wrapper.querySelector("button");
-          acceptBtn.onclick = () => {
-            if (hasActiveRide) {
-              alert("Nuk mund të pranosh më shumë se një udhëtim në të njëjtën kohë.");
-              return;
-            }
-            const thisOrder = ref(db, "orders/" + id);
-            runTransaction(thisOrder, (current) => {
-              if (!current || current.status !== "open") return current;
-              current.status = "taken";
-              current.takenByName = currentDriver.name;
-              current.takenByCompany = currentDriver.company || "Thirr Taxi";
-              current.takenByDriverId = currentDriver.id;
-              current.takenAt = Date.now();
-              current.addressFull = addressFull;
-              return current;
-            }).then(() => {
-              const activeBtn = document.querySelector('.tab-btn[data-tab="tab-active"]');
-              if (activeBtn) activeBtn.click();
-            });
-          };
-
-          ordersBox.appendChild(wrapper);
-
-          if (typeof o.lat === "number" && typeof o.lng === "number") {
-            setTimeout(() => {
-              createOrUpdateMap(safeIdOpen, o.lat, o.lng);
-            }, 120);
-          }
-        }
-
-        /* UDHËTIMET E MIJA AKTIVE */
-        if (
-          o.status === "taken" &&
-          o.takenByDriverId === currentDriver?.id
-        ) {
-          mineCount++;
-          hasActiveRide = true;
-
-          const wrapper = document.createElement("div");
-          wrapper.className = "order-card";
-
-          const timeText = formatMinutesSince(o.takenAt);
-
-          wrapper.innerHTML = `
+      /* MINE */
+      if(o.status==="taken" && o.takenByDriverId===currentDriver.id){
+        mine++;
+        myOrders.innerHTML+=`
+          <div class="order-card">
             <div class="order-header">
-              <div class="order-main">
-                <div class="order-name">${o.name || "Klienti"}</div>
-                <div class="order-phone">${o.phone || ""}</div>
-                ${addressLine ? `<div class="order-address">${addressLine}</div>` : ""}
+              <div>
+                <div class="order-name">${o.name||"Klienti"}</div>
+                <div class="order-phone">${o.phone||""}</div>
+                <div class="order-address">${adr}</div>
               </div>
               <span class="badge badge-active">Aktive</span>
             </div>
-            <div id="${safeIdMine}" class="mini-map"></div>
-            <div class="info-line">Udhëtimi është pranuar: ${timeText} më parë</div>
-            <button class="btn-secondary finish-btn">✅ Përfundo udhëtimin</button>
-            <button class="btn-danger cancel-btn">✖ Anulo udhëtimin</button>
-          `;
-
-          const finishBtn = wrapper.querySelector(".finish-btn");
-          const cancelBtn = wrapper.querySelector(".cancel-btn");
-
-          finishBtn.onclick = () => {
-            const thisOrder = ref(db, "orders/" + id);
-            runTransaction(thisOrder, (current) => {
-              if (!current || current.status !== "taken") return current;
-              current.status = "done";
-              current.completedAt = Date.now();
-              current.addressFull = addressFull;
-              return current;
-            }).then(() => {
-              const balRef = ref(db, "balances/" + currentDriver.id);
-              runTransaction(balRef, (cur) => {
-                const ts = Date.now();
-                const histEntry = {
-                  amount: 0.25,
-                  orderId: id,
-                  timestamp: ts,
-                  type: "ride",
-                  address: addressFull
-                };
-                if (!cur) {
-                  return {
-                    total: 0.25,
-                    status: "open",
-                    lastUpdate: ts,
-                    history: {
-                      [id]: histEntry
-                    }
-                  };
-                }
-                cur.total = (cur.total || 0) + 0.25;
-                cur.status = "open";
-                cur.lastUpdate = ts;
-                if (!cur.history) cur.history = {};
-                cur.history[id] = histEntry;
-                return cur;
-              });
-            });
-          };
-
-          cancelBtn.onclick = () => {
-            const reason = prompt("Shkruaj arsyen e anulimit:");
-            if (!reason) return;
-            const thisOrder = ref(db, "orders/" + id);
-            runTransaction(thisOrder, (current) => {
-              if (!current || current.status !== "taken") return current;
-              current.status = "canceled";
-              current.canceledAt = Date.now();
-              current.canceledReason = reason;
-              return current;
-            });
-          };
-
-          myOrdersBox.appendChild(wrapper);
-
-          if (typeof o.lat === "number" && typeof o.lng === "number") {
-            setTimeout(() => {
-              createOrUpdateMap(safeIdMine, o.lat, o.lng);
-            }, 120);
-          }
-        }
-      });
-
-      noOpen.textContent =
-        openCount === 0 ? "Për momentin nuk ka kërkesa të reja." : "";
-      noMine.textContent =
-        mineCount === 0 ? "Për momentin nuk ke udhëtime aktive." : "";
-
-      invalidateAllMaps();
-    });
-  }
-
-  /***************** BILANCI / REALTIME *****************/
-
-  function subscribeBalance() {
-    const balRef = ref(db, "balances/" + currentDriver.id);
-    onValue(balRef, (snap) => {
-      const data = snap.val();
-      if (!data) {
-        balanceSummary.textContent = "Nuk ka ende asnjë bilanc.";
-        balanceMeta.textContent = "";
-        balanceHistoryList.innerHTML = "";
-        balanceHistoryEmpty.textContent = "Ende nuk ka levizje.";
-        return;
-      }
-
-      const total = data.total || 0;
-      const statusOpen = data.status !== "closed";
-
-      if (statusOpen) {
-        balanceSummary.textContent = "Bilanc i hapur: " + total.toFixed(2) + " €";
-      } else {
-        balanceSummary.textContent = "Bilanci është i mbyllur ✔";
-      }
-
-      if (data.lastUpdate) {
-        const d = new Date(data.lastUpdate);
-        balanceMeta.textContent = "Përditësimi i fundit: " + d.toLocaleString();
-      } else {
-        balanceMeta.textContent = "";
-      }
-
-      balanceHistoryList.innerHTML = "";
-      balanceHistoryEmpty.textContent = "";
-
-      const history = data.history || {};
-      const entries = Object.entries(history)
-        .map(([key, h]) => ({ key, ...h }))
-        .sort((a,b) => (b.timestamp || 0) - (a.timestamp || 0))
-        .slice(0, 20);
-
-      if (entries.length === 0) {
-        balanceHistoryEmpty.textContent = "Ende nuk ka levizje në histori.";
-      } else {
-        entries.forEach(h => {
-          const row = document.createElement("div");
-          row.className = "balance-row";
-          const d = h.timestamp ? new Date(h.timestamp).toLocaleString() : "-";
-          const addrShort = shortenAddress(h.address || "");
-
-          row.innerHTML = `
-            <div class="balance-entry-main">
-              <div class="balance-entry-address">${addrShort || "Pa adresë"}</div>
-              <div class="balance-entry-time">${d}</div>
-            </div>
-            <div class="balance-entry-amount">+${(h.amount || 0).toFixed(2)} €</div>
-          `;
-          balanceHistoryList.appendChild(row);
-        });
+            <div id="${mapIdMine}" class="mini-map"></div>
+            <button class="btn-secondary" onclick="finishOrder('${id}')">Përfundo</button>
+            <button class="btn-danger" onclick="cancelOrder('${id}')">Anulo</button>
+          </div>
+        `;
+        setTimeout(()=>{ createMap(mapIdMine,lat,lng); },100);
       }
     });
-  }
+
+    noOpen.textContent = open===0?"Nuk ka kërkesa.":"";
+    noMine.textContent = mine===0?"Nuk ke udhëtime aktive.":"";
+  });
+}
+
+/* --- ORDER ACTIONS --- */
+window.takeOrder=id=>{
+  const r=ref(db,"orders/"+id);
+  runTransaction(r,c=>{
+    if(!c || c.status!=="open") return c;
+    c.status="taken";
+    c.takenByDriverId=currentDriver.id;
+    c.takenAt=Date.now();
+    return c;
+  });
+};
+window.finishOrder=id=>{
+  const r=ref(db,"orders/"+id);
+  runTransaction(r,c=>{
+    if(!c || c.status!=="taken") return c;
+    c.status="done";
+    c.completedAt=Date.now();
+    return c;
+  });
+};
+window.cancelOrder=id=>{
+  const reason=prompt("Arsyeja:");
+  const r=ref(db,"orders/"+id);
+  runTransaction(r,c=>{
+    if(!c || c.status!=="taken") return c;
+    c.status="canceled";
+    c.canceledReason=reason||"";
+    c.canceledAt=Date.now();
+    return c;
+  });
+};
+
+/* --- BALANCE --- */
+function loadBalance(){
+  const r=ref(db,"balances/"+currentDriver.id);
+  onValue(r,snap=>{
+    const b=snap.val();
+    if(!b){
+      balanceSummary.textContent="Nuk ka bilanc.";
+      return;
+    }
+    balanceSummary.textContent="Bilanci: "+(b.total||0).toFixed(2)+" €";
+
+    balanceHistoryList.innerHTML="";
+    if(!b.history){
+      balanceHistoryEmpty.textContent="Nuk ka histori.";
+      return;
+    }
+    Object.values(b.history).slice(-20).reverse().forEach(h=>{
+      balanceHistoryList.innerHTML+=`
+        <div>${h.address||""} — +${h.amount.toFixed(2)} €</div>
+      `;
+    });
+  });
+}
 </script>
-
 </body>
 </html>

@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <title>Shoferi - KosovaTaxi</title>
 
-  <!-- iOS FULLSCREEN FIX -->
+  <!-- iOS / Mobile Viewport -->
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -29,13 +29,15 @@
   />
 
   <style>
-    /* iOS FIX – kein Weiß, kein Balken oben */
+    /* iOS FIX – kein Weiß, kein Balken */
     html, body {
       margin: 0;
       padding: 0;
       height: 100%;
       overscroll-behavior: none;
       background-color: #020617 !important;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
     }
 
     body::before {
@@ -46,7 +48,6 @@
       background: radial-gradient(circle at top, #020617, #020617 60%, #020617);
     }
 
-    /* Dein ursprüngliches Design */
     :root {
       --bg: radial-gradient(circle at top, #020617, #020617 60%, #020617);
       --card-bg: rgba(15, 23, 42, 0.9);
@@ -55,25 +56,36 @@
       --shadow-soft: 0 20px 60px rgba(0, 0, 0, 0.65);
     }
 
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
 
     body {
       font-family: system-ui, -apple-system, sans-serif;
       margin: 0;
-      padding: 18px 12px 26px;
+      padding: calc(14px + env(safe-area-inset-top, 0px)) 10px calc(22px + env(safe-area-inset-bottom, 0px));
       background: var(--bg);
       color: #e5e7eb;
+      overflow-y: auto;
     }
 
-    .frame { max-width: 440px; margin: 0 auto; }
+    .frame {
+      max-width: 440px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-height: calc(100vh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 36px);
+    }
 
     .header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 4px 4px 14px;
+      padding: 2px 4px 10px;
       font-size: 13px;
       color: #9ca3af;
+      flex-shrink: 0;
     }
 
     .header-center {
@@ -100,7 +112,7 @@
       border: 1px solid rgba(148,163,184,0.22);
       backdrop-filter: blur(22px);
       -webkit-backdrop-filter: blur(22px);
-      margin-bottom: 16px;
+      margin-bottom: 8px;
     }
 
     .card-title {
@@ -128,14 +140,16 @@
       border: 1px solid rgba(148,163,184,0.35);
       background: rgba(15,23,42,0.94);
       color: #e5e7eb;
-      font-size: 15px;
+      font-size: 16px; /* 16px, damit iOS NICHT reinzoomt */
       outline: none;
       margin-top: 4px;
+      transition: border 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
     }
 
     input:focus {
       border-color: var(--accent);
       box-shadow: 0 0 0 1px rgba(56,189,248,0.45);
+      background: rgba(15,23,42,0.98);
     }
 
     button {
@@ -145,6 +159,12 @@
       font-weight:600;
       padding:11px 12px;
       cursor:pointer;
+      transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
+    }
+
+    button:active {
+      transform: translateY(1px) scale(0.99);
+      filter: brightness(0.97);
     }
 
     .btn-primary {
@@ -201,6 +221,7 @@
       margin-top: 10px;
       border: 1px solid rgba(55, 65, 81, 0.9);
       box-shadow: 0 18px 48px rgba(15, 23, 42, 0.95);
+      cursor: default;
     }
 
     .order-header {
@@ -208,6 +229,7 @@
       justify-content: space-between;
       align-items: center;
       margin-bottom: 6px;
+      gap: 8px;
     }
 
     .order-name { font-size: 15px; font-weight: 600; }
@@ -217,6 +239,7 @@
       font-size:11px;
       padding:4px 8px;
       border-radius:999px;
+      white-space: nowrap;
     }
 
     .badge-active { background:rgba(34,197,94,0.18); color:#bbf7d0; }
@@ -239,6 +262,7 @@
       align-items: center;
       color: #9ca3af;
       gap:8px;
+      flex-wrap: wrap;
     }
 
     .order-footer a {
@@ -258,10 +282,24 @@
       margin-top:4px;
     }
 
+    @media (max-width: 400px) {
+      body {
+        padding: calc(10px + env(safe-area-inset-top, 0px)) 8px calc(18px + env(safe-area-inset-bottom, 0px));
+      }
+      .card {
+        padding: 14px 12px 16px;
+        border-radius: 20px;
+      }
+      .card-title {
+        font-size: 18px;
+      }
+      .order-name {
+        font-size: 14px;
+      }
+    }
   </style>
 </head>
-
-  <body>
+<body>
 
 <div class="frame">
   <div class="header">
@@ -287,35 +325,35 @@
     <div id="loginMsg" class="login-error"></div>
   </div>
 
-<!-- DASHBOARD -->
-<div id="content" style="display:none;">
+  <!-- DASHBOARD -->
+  <div id="content" style="display:none;">
 
-  <!-- KARTE 1: VOZITJET E MIA AKTIVE -->
-  <div class="card">
-    <div class="section-title">Vozitjet e mia aktive</div>
-    <div class="section-sub">Mund të kesh vetëm një vozitje aktive në të njëjtën kohë.</div>
-    
-    <div id="myOrders"></div>
-    <div id="noMine" class="empty-text"></div>
+    <!-- KARTE 1: VOZITJET E MIA AKTIVE -->
+    <div class="card">
+      <div class="section-title">Vozitjet e mia aktive</div>
+      <div class="section-sub">Mund të kesh vetëm një vozitje aktive në të njëjtën kohë.</div>
+
+      <div id="myOrders"></div>
+      <div id="noMine" class="empty-text"></div>
+    </div>
+
+    <!-- KARTE 2: VOZITJET NË PRITJE -->
+    <div class="card">
+      <div class="section-title">Vozitje në pritje</div>
+      <div class="section-sub">Këto janë kërkesa të hapura që mund t’i pranosh.</div>
+
+      <div id="orders"></div>
+      <div id="noOpen" class="empty-text"></div>
+    </div>
+
+    <!-- KARTE 3: BARAZIMI IM -->
+    <div class="card">
+      <div class="section-title">Barazimi im</div>
+      <div id="balanceBox" style="font-size:14px; color:#e5e7eb;"></div>
+    </div>
+
   </div>
-
-  <!-- KARTE 2: VOZITJET NË PRITJE -->
-  <div class="card">
-    <div class="section-title">Vozitje në pritje</div>
-    <div class="section-sub">Këto janë kërkesa të hapura që mund t’i pranosh.</div>
-
-    <div id="orders"></div>
-    <div id="noOpen" class="empty-text"></div>
-  </div>
-
-  <!-- KARTE 3: BARAZIMI IM -->
-  <div class="card" style="margin-top:16px;">
-    <div class="section-title">Barazimi im</div>
-    <div id="balanceBox" style="font-size:14px; color:#e5e7eb;"></div>
-  </div>
-
 </div>
-
 
 <script
   src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
@@ -439,9 +477,7 @@
         const safeIdOpen = "map_open_" + id.replace(/[^a-zA-Z0-9_-]/g, "");
         const safeIdMine = "map_mine_" + id.replace(/[^a-zA-Z0-9_-]/g, "");
 
-        /* --------------------
-         * VOZITJE NË PRITJE
-         * -------------------- */
+        /* VOZITJE NË PRITJE */
         if (o.status === "open") {
           openCount++;
           const wrapper = document.createElement("div");
@@ -462,10 +498,7 @@
             </div>
           `;
 
-          const acceptBtn = document.createElement("button");
-          acceptBtn.className = "btn-secondary";
-          acceptBtn.textContent = "✅ Prano vozitjen";
-          acceptBtn.onclick = () => {
+          const onAccept = () => {
             if (hasActiveRide) {
               alert("Nuk mund të pranoni më shumë se një vozitje.");
               return;
@@ -482,14 +515,25 @@
             });
           };
 
+          const acceptBtn = document.createElement("button");
+          acceptBtn.className = "btn-secondary";
+          acceptBtn.textContent = "✅ Prano vozitjen";
+          acceptBtn.onclick = onAccept;
+
           wrapper.appendChild(acceptBtn);
+
+          // Optional: ganze Karte (ohne Link/Button) klickbar machen
+          wrapper.addEventListener("click", (e) => {
+            const tag = e.target.tagName.toLowerCase();
+            if (tag === "a" || tag === "button") return;
+            onAccept();
+          });
+
           openBox.appendChild(wrapper);
           setTimeout(() => createMiniMap(safeIdOpen, o.lat, o.lng), 50);
         }
 
-        /* --------------------
-         * VOZITJET E MIA
-         * -------------------- */
+        /* VOZITJET E MIA (AKTIVE) */
         if (
           o.status === "taken" &&
           o.takenByDriverId === currentDriver?.id
@@ -517,7 +561,6 @@
             </div>
           `;
 
-          /* Perfundo */
           const finishBtn = document.createElement("button");
           finishBtn.className = "btn-secondary";
           finishBtn.textContent = "✅ Perfundo vozitjen";
@@ -530,7 +573,7 @@
               current.completedAt = Date.now();
               return current;
             }).then(() => {
-              // Update balance
+              // Update balance (+0.25 € für jede Fahrt)
               const balRef = ref(db, "balances/" + currentDriver.id);
               runTransaction(balRef, (cur) => {
                 if (!cur) {
@@ -548,7 +591,6 @@
             });
           };
 
-          /* Anulo */
           const cancelBtn = document.createElement("button");
           cancelBtn.className = "btn-danger";
           cancelBtn.textContent = "✖ Anulo vozitjen";
@@ -606,4 +648,3 @@
 
 </body>
 </html>
-

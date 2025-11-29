@@ -50,7 +50,7 @@
 
     :root {
       --bg: radial-gradient(circle at top, #020617, #020617 60%, #020617);
-      --card-bg: rgba(15,23,42,0.9);
+      --card-bg: rgba(15, 23, 42, 0.9);
       --accent: #38bdf8;
       --border-radius-xl: 24px;
       --shadow-soft: 0 20px 60px rgba(0, 0, 0, 0.65);
@@ -139,7 +139,7 @@
       border: 1px solid rgba(148,163,184,0.35);
       background: rgba(15,23,42,0.94);
       color: #e5e7eb;
-      font-size: 16px;
+      font-size: 16px; /* 16px, damit iOS NICHT reinzoomt */
       outline: none;
       margin-top: 4px;
       transition: border 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
@@ -220,7 +220,6 @@
     }
 
     /* ---------- FLAT-TABS ---------- */
-
     .tabs {
       display: flex;
       gap: 8px;
@@ -239,29 +238,41 @@
       align-items: center;
       gap: 6px;
       cursor: pointer;
-      transition: background .25s, transform .20s;
-      color: #9ca3af;
+      transition:
+        background .25s ease,
+        transform .20s ease;
       user-select: none;
-    }
-
-    .tab.active {
-      background: rgba(56,189,248,0.25);
-      color:#e5e7eb;
-      transform: translateY(-1px);
+      color: #9ca3af;
     }
 
     .tab-icon {
-      width:22px;
-      height:22px;
-      opacity:.7;
+      width: 22px;
+      height: 22px;
+      opacity: .7;
+      transition: opacity .20s ease, transform .20s ease;
     }
 
     .tab-label {
-      font-size:13px;
-      opacity:.75;
+      font-size: 13px;
+      opacity: .75;
+      transition: opacity .20s ease;
     }
 
-    /* ORDER CARDS */
+    .tab.active {
+      background: rgba(56,189,248,0.25); /* light blue */
+      transform: translateY(-1px);
+      color: #e5e7eb;
+    }
+
+    .tab.active .tab-icon {
+      opacity: 1;
+      transform: scale(1.05);
+    }
+
+    .tab.active .tab-label {
+      opacity: 1;
+      font-weight: 600;
+    }
 
     .order-card {
       background: radial-gradient(circle at top left, rgba(59,130,246,.22), rgba(15,23,42,.96));
@@ -303,14 +314,19 @@
       border: 1px solid rgba(15, 23, 42, .9);
     }
 
-    /* --- NEW INFO CARD (above Te reja orders) --- */
+    .timer {
+      font-size:11px;
+      color:#e5e7eb;
+    }
+
+    /* Neue Info-Card */
     .info-card {
       background: rgba(15,23,42,0.9);
       border: 1px solid rgba(148,163,184,0.25);
       border-radius: 20px;
       padding: 16px 18px;
       box-shadow: 0 12px 32px rgba(0,0,0,0.4);
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
 
     .info-header {
@@ -342,6 +358,21 @@
       opacity: 0.8;
     }
 
+    @media (max-width: 400px) {
+      body {
+        padding: calc(10px + env(safe-area-inset-top, 0px)) 8px calc(18px + env(safe-area-inset-bottom, 0px));
+      }
+      .card {
+        padding: 14px 12px 16px;
+        border-radius: 20px;
+      }
+      .card-title {
+        font-size: 18px;
+      }
+      .order-name {
+        font-size: 14px;
+      }
+    }
   </style>
 </head>
 
@@ -358,8 +389,9 @@
     <span id="headerStatus">Offline</span>
   </div>
 
-  <!-- NEW FLAT-TABS -->
-  <div class="tabs">
+  <!-- TABS – werden erst nach Login angezeigt -->
+  <div id="tabsBox" class="tabs" style="display:none;">
+    <!-- Te reja – Glocke -->
     <div class="tab active" data-target="tab-new">
       <svg class="tab-icon" viewBox="0 0 24 24">
         <path fill="white" d="M12 2a6 6 0 0 0-6 6v3.586l-.707.707A1 1 0 0 0 6 14h12a1 1 0 0 0 .707-1.707L18 11.586V8a6 6 0 0 0-6-6zm0 20a3 3 0 0 0 3-3H9a3 3 0 0 0 3 3z"/>
@@ -367,6 +399,7 @@
       <span class="tab-label">Te reja</span>
     </div>
 
+    <!-- Aktiv – Blitz -->
     <div class="tab" data-target="tab-active">
       <svg class="tab-icon" viewBox="0 0 24 24">
         <path fill="white" d="M13 2L3 14h7v8l10-12h-7z"/>
@@ -374,11 +407,23 @@
       <span class="tab-label">Aktiv</span>
     </div>
 
+    <!-- Bilanci – Euro -->
     <div class="tab" data-target="tab-balance">
       <svg class="tab-icon" viewBox="0 0 24 24">
         <path fill="white" d="M15 4H9a7 7 0 0 0 0 14h6a1 1 0 1 0 0-2H9a5 5 0 0 1-4.9-4h3.02a1 1 0 0 0 0-2H4.1A5 5 0 0 1 9 6h6a1 1 0 1 0 0-2z"/>
       </svg>
       <span class="tab-label">Bilanci</span>
+    </div>
+  </div>
+
+  <!-- Neue Info-Card – eigene Karte unter Tabs, erst nach Login & bei offenen Fahrten -->
+  <div id="infoCardOpen" class="info-card" style="display:none;">
+    <div class="info-header">
+      <div class="info-title">Klientët që presin taksi</div>
+      <div class="notif" id="notifCount">0</div>
+    </div>
+    <div class="info-desc">
+      Kliko “Prano” për ta marrë klientin.
     </div>
   </div>
 
@@ -399,20 +444,8 @@
   <!-- DASHBOARD -->
   <div id="content" style="display:none;">
 
-    <!-- TAB 1: TE REJA -->
+    <!-- TAB 1: TE REJA / OPEN ORDERS -->
     <div id="tab-new-content" class="card">
-
-      <!-- NEW INFO CARD (inserted above orders) -->
-      <div id="infoCardOpen" class="info-card" style="display:none;">
-        <div class="info-header">
-          <div class="info-title">Klientët që presin taksi</div>
-          <div class="notif" id="notifCount">0</div>
-        </div>
-        <div class="info-desc">
-          Kliko “Prano” për ta marrë klientin.
-        </div>
-      </div>
-
       <div class="section-title">Vozitje në pritje</div>
       <div class="section-sub">Këto janë kërkesa të hapura që mund t’i pranosh.</div>
 
@@ -438,7 +471,10 @@
   </div>
 </div>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<script
+  src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  crossorigin=""
+></script>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
@@ -469,13 +505,18 @@
   const headerStatus = document.getElementById("headerStatus");
   const balanceBox = document.getElementById("balanceBox");
 
-  const notifCount = document.getElementById("notifCount");
+  const tabsBox = document.getElementById("tabsBox");
   const infoCardOpen = document.getElementById("infoCardOpen");
+  const notifCount = document.getElementById("notifCount");
 
-  /* TABS LOGIC */
-  document.querySelectorAll(".tab").forEach(t => {
+  /* ---------------- TAB LOGIK (FLAT-TABS) ------------------- */
+
+  const tabs = document.querySelectorAll(".tab");
+
+  tabs.forEach(t => {
     t.addEventListener("click", () => {
-      document.querySelector(".tab.active").classList.remove("active");
+      const currentActive = document.querySelector(".tab.active");
+      if (currentActive) currentActive.classList.remove("active");
       t.classList.add("active");
 
       const target = t.dataset.target;
@@ -491,6 +532,8 @@
     });
   });
 
+  /* ----------------------------------------------- */
+
   loginBtn.onclick = () => {
     loginMsg.textContent = "";
     const pin = document.getElementById("loginPin").value.trim();
@@ -500,33 +543,42 @@
     }
 
     const driversRef = ref(db, "drivers");
-    onValue(driversRef, snap => {
-      const data = snap.val() || {};
-      let found = null;
+    onValue(
+      driversRef,
+      (snap) => {
+        const data = snap.val() || {};
+        let found = null;
+        Object.entries(data).forEach(([id, d]) => {
+          if (
+            String(d.pin) === String(pin) &&
+            d.approved === true &&
+            (d.active !== false)
+          ) {
+            found = { id, ...d };
+          }
+        });
 
-      Object.entries(data).forEach(([id, d]) => {
-        if (String(d.pin) === String(pin) && d.approved && d.active !== false) {
-          found = { id, ...d };
+        if (!found) {
+          loginMsg.textContent = "PIN i pavlefshëm ose shoferi nuk është aktiv.";
+          return;
         }
-      });
 
-      if (!found) {
-        loginMsg.textContent = "PIN i pavlefshëm ose shoferi nuk është aktiv.";
-        return;
-      }
+        if (!currentDriver) {
+          currentDriver = found;
+          headerDriverName.textContent = found.name || "Shoferi";
+          headerStatus.textContent = "Online";
 
-      if (!currentDriver) {
-        currentDriver = found;
-        headerDriverName.textContent = found.name || "Shoferi";
-        headerStatus.textContent = "Online";
-        loginCard.style.display = "none";
-        content.style.display = "block";
+          // Beim Login: Login ausblenden, Tabs + Content anzeigen
+          loginCard.style.display = "none";
+          tabsBox.style.display = "flex";
+          content.style.display = "block";
 
-        subscribeOrders();
-        subscribeBalance();
-      }
-
-    }, { onlyOnce: true });
+          subscribeOrders();
+          subscribeBalance();
+        }
+      },
+      { onlyOnce: true }
+    );
   };
 
   function createMiniMap(containerId, lat, lng) {
@@ -545,11 +597,13 @@
     L.marker([lat, lng]).addTo(map);
   }
 
-  function formatMinutesSince(ts) {
-    if (!ts) return "-";
-    const diff = Date.now() - ts;
-    const min = Math.floor(diff / 60000);
-    return min <= 0 ? "më pak se 1 min" : (min === 1 ? "1 minutë" : min + " minuta");
+  function formatMinutesSince(timestamp) {
+    if (!timestamp) return "-";
+    const diffMs = Date.now() - timestamp;
+    const mins = Math.floor(diffMs / 60000);
+    if (mins <= 0) return "më pak se 1 min";
+    if (mins === 1) return "1 minutë";
+    return mins + " minuta";
   }
 
   function subscribeOrders() {
@@ -572,10 +626,9 @@
         const safeIdOpen = "map_open_" + id.replace(/[^a-zA-Z0-9_-]/g, "");
         const safeIdMine = "map_mine_" + id.replace(/[^a-zA-Z0-9_-]/g, "");
 
-        // OPEN ORDERS
+        /* VOZITJE NË PRITJE */
         if (o.status === "open") {
           openCount++;
-
           const wrapper = document.createElement("div");
           wrapper.className = "order-card";
 
@@ -600,14 +653,14 @@
               return;
             }
             const thisOrder = ref(db, "orders/" + id);
-
-            runTransaction(thisOrder, cur => {
-              if (!cur || cur.status !== "open") return cur;
-              cur.status = "taken";
-              cur.takenByName = currentDriver.name;
-              cur.takenByDriverId = currentDriver.id;
-              cur.takenAt = Date.now();
-              return cur;
+            runTransaction(thisOrder, (current) => {
+              if (!current || current.status !== "open") return current;
+              current.status = "taken";
+              current.takenByName = currentDriver.name;
+              current.takenByCompany = currentDriver.company || "KosovaTaxi";
+              current.takenByDriverId = currentDriver.id;
+              current.takenAt = Date.now();
+              return current;
             });
           };
 
@@ -615,13 +668,18 @@
           setTimeout(() => createMiniMap(safeIdOpen, o.lat, o.lng), 50);
         }
 
-        // MY ACTIVE ORDERS
-        if (o.status === "taken" && o.takenByDriverId === currentDriver?.id) {
+        /* VOZITJET E MIA (AKTIVE) */
+        if (
+          o.status === "taken" &&
+          o.takenByDriverId === currentDriver?.id
+        ) {
           mineCount++;
           hasActiveRide = true;
 
           const wrapper = document.createElement("div");
           wrapper.className = "order-card";
+
+          const timeText = formatMinutesSince(o.takenAt);
 
           wrapper.innerHTML = `
             <div class="order-header">
@@ -633,7 +691,7 @@
             </div>
             <div id="${safeIdMine}" class="mini-map"></div>
             <div style="display:flex; justify-content:space-between; margin-top:8px; font-size:12px;">
-              <span>Vozitja: ${formatMinutesSince(o.takenAt)} më parë</span>
+              <span class="timer">Vozitja: ${timeText} më parë</span>
               <a href="https://maps.google.com/?q=${o.lat},${o.lng}" target="_blank" style="color:#38bdf8;">Google Maps</a>
             </div>
           `;
@@ -641,19 +699,24 @@
           const finishBtn = document.createElement("button");
           finishBtn.className = "btn-secondary";
           finishBtn.textContent = "✅ Perfundo vozitjen";
-
           finishBtn.onclick = () => {
-            const refO = ref(db, "orders/" + id);
-            runTransaction(refO, cur => {
-              if (!cur || cur.status !== "taken") return cur;
-              cur.status = "done";
-              cur.completedAt = Date.now();
-              return cur;
+            const thisOrder = ref(db, "orders/" + id);
+
+            runTransaction(thisOrder, (current) => {
+              if (!current || current.status !== "taken") return current;
+              current.status = "done";
+              current.completedAt = Date.now();
+              return current;
             }).then(() => {
+              // Update balance (+0.25 € für jede Fahrt)
               const balRef = ref(db, "balances/" + currentDriver.id);
-              runTransaction(balRef, cur => {
+              runTransaction(balRef, (cur) => {
                 if (!cur) {
-                  return { total: 0.25, status: "open", lastUpdate: Date.now() };
+                  return {
+                    total: 0.25,
+                    status: "open",
+                    lastUpdate: Date.now()
+                  };
                 }
                 cur.total = (cur.total || 0) + 0.25;
                 cur.status = "open";
@@ -666,17 +729,16 @@
           const cancelBtn = document.createElement("button");
           cancelBtn.className = "btn-danger";
           cancelBtn.textContent = "✖ Anulo vozitjen";
-
           cancelBtn.onclick = () => {
             const reason = prompt("Shkruaj arsyen:");
             if (!reason) return;
-            const refO = ref(db, "orders/" + id);
-            runTransaction(refO, cur => {
-              if (!cur || cur.status !== "taken") return cur;
-              cur.status = "canceled";
-              cur.canceledAt = Date.now();
-              cur.canceledReason = reason;
-              return cur;
+            const thisOrder = ref(db, "orders/" + id);
+            runTransaction(thisOrder, (current) => {
+              if (!current || current.status !== "taken") return current;
+              current.status = "canceled";
+              current.canceledAt = Date.now();
+              current.canceledReason = reason;
+              return current;
             });
           };
 
@@ -688,19 +750,24 @@
         }
       });
 
-      // DYNAMIC NEW CARD VISIBILITY
+      // Neue Info-Card: Anzahl & Sichtbarkeit
       notifCount.textContent = openCount;
-      infoCardOpen.style.display = openCount > 0 ? "block" : "none";
+      if (currentDriver && openCount > 0) {
+        infoCardOpen.style.display = "block";
+      } else {
+        infoCardOpen.style.display = "none";
+      }
 
-      noOpen.textContent = openCount === 0 ? "Për momentin nuk ka vozitje në pritje." : "";
-      noMine.textContent = mineCount === 0 ? "Për momentin nuk keni vozitje aktive." : "";
+      noOpen.textContent =
+        openCount === 0 ? "Për momentin nuk ka vozitje në pritje." : "";
+      noMine.textContent =
+        mineCount === 0 ? "Për momentin nuk keni vozitje aktive." : "";
     });
   }
 
   function subscribeBalance() {
     const balRef = ref(db, "balances/" + currentDriver.id);
-
-    onValue(balRef, snap => {
+    onValue(balRef, (snap) => {
       const data = snap.val();
       if (!data) {
         balanceBox.innerHTML = "Nuk ka barazim aktual.";
@@ -720,7 +787,6 @@
       }
     });
   }
-
 </script>
 
 </body>

@@ -29,7 +29,6 @@
   />
 
   <style>
-    /* Base layout */
     html, body {
       margin: 0;
       padding: 0;
@@ -56,9 +55,7 @@
       --shadow-soft: 0 20px 60px rgba(0, 0, 0, 0.65);
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       font-family: system-ui, -apple-system, sans-serif;
@@ -139,7 +136,7 @@
       border: 1px solid rgba(148,163,184,0.35);
       background: rgba(15,23,42,0.94);
       color: #e5e7eb;
-      font-size: 16px; /* 16px, damit iOS NICHT reinzoomt */
+      font-size: 16px;
       outline: none;
       margin-top: 4px;
       transition: border 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
@@ -194,6 +191,17 @@
       box-shadow:0 6px 22px rgba(239,68,68,0.55);
     }
 
+    .btn-ghost {
+      background:rgba(15,23,42,0.95);
+      border-radius:14px;
+      padding:6px 12px;
+      font-size:12px;
+      color:#e5e7eb;
+      border:1px solid rgba(148,163,184,0.4);
+      box-shadow:none;
+      width:auto;
+    }
+
     .login-error {
       margin-top:8px;
       font-size:12px;
@@ -219,7 +227,7 @@
       margin-top:4px;
     }
 
-    /* ---------- FLAT-TABS ---------- */
+    /* Tabs oben */
     .tabs {
       display: flex;
       gap: 8px;
@@ -238,9 +246,7 @@
       align-items: center;
       gap: 6px;
       cursor: pointer;
-      transition:
-        background .25s ease,
-        transform .20s ease;
+      transition: background .25s ease, transform .20s ease;
       user-select: none;
       color: #9ca3af;
     }
@@ -259,7 +265,7 @@
     }
 
     .tab.active {
-      background: rgba(56,189,248,0.25); /* light blue */
+      background: rgba(56,189,248,0.25);
       transform: translateY(-1px);
       color: #e5e7eb;
     }
@@ -274,7 +280,7 @@
       font-weight: 600;
     }
 
-    /* Premium Order Cards (open + active) */
+    /* Premium Order Cards */
     .order-card {
       background: rgba(15,23,42,0.92);
       border-radius: 24px;
@@ -360,7 +366,6 @@
       margin-bottom: 4px;
     }
 
-    /* BUTTON ohne Glow für offene Fahrten */
     .btn-accept {
       width:100%;
       background:linear-gradient(135deg,#22c55e,#4ade80);
@@ -374,7 +379,7 @@
       box-shadow:none;
     }
 
-    /* Neue Info-Card */
+    /* Info-Card oben bei Te reja */
     .info-card {
       background: rgba(15,23,42,0.9);
       border: 1px solid rgba(148,163,184,0.25);
@@ -413,7 +418,7 @@
       opacity: 0.8;
     }
 
-    /* --- NEUES LAYOUT FÜR BILANCI / BARAZIMET --- */
+    /* Segmented Controls */
     .segmented {
       display:flex;
       background:rgba(255,255,255,0.06);
@@ -442,7 +447,8 @@
       font-weight:600;
     }
 
-    .barazim-card {
+    .barazim-card,
+    .stat-card-driver {
       background:rgba(15,23,42,0.92);
       padding:16px 16px 14px;
       border-radius:18px;
@@ -456,6 +462,7 @@
       align-items:center;
       font-size:13px;
       margin-bottom:6px;
+      gap:12px;
     }
 
     .row span {
@@ -466,6 +473,42 @@
       font-size:14px;
       font-weight:600;
       color:#e5e7eb;
+    }
+
+    .stat-big {
+      font-size:20px;
+      font-weight:700;
+      color:#e5e7eb;
+    }
+
+    .stat-sub {
+      font-size:11px;
+      color:#6b7280;
+      margin-top:2px;
+    }
+
+    .stat-list-7 {
+      margin-top:10px;
+      font-size:11px;
+    }
+
+    .stat-list-7-row {
+      display:flex;
+      justify-content:space-between;
+      padding:3px 0;
+      border-bottom:1px dashed rgba(55,65,81,0.7);
+    }
+
+    .stat-list-7-row:last-child {
+      border-bottom:none;
+    }
+
+    .settle-details {
+      margin-top:8px;
+      font-size:11px;
+      color:#9ca3af;
+      border-top:1px dashed rgba(55,65,81,0.7);
+      padding-top:6px;
     }
 
     @media (max-width: 400px) {
@@ -499,9 +542,8 @@
     <span id="headerStatus">Offline</span>
   </div>
 
-  <!-- TABS – werden erst nach Login angezeigt -->
+  <!-- Tabs oben – erst nach Login sichtbar -->
   <div id="tabsBox" class="tabs" style="display:none;">
-    <!-- Te reja – Glocke -->
     <div class="tab active" data-target="tab-new">
       <svg class="tab-icon" viewBox="0 0 24 24">
         <path fill="white" d="M12 2a6 6 0 0 0-6 6v3.586l-.707.707A1 1 0 0 0 6 14h12a1 1 0 0 0 .707-1.707L18 11.586V8a6 6 0 0 0-6-6zm0 20a3 3 0 0 0 3-3H9a3 3 0 0 0 3 3z"/>
@@ -509,7 +551,6 @@
       <span class="tab-label">Te reja</span>
     </div>
 
-    <!-- Aktiv – Blitz -->
     <div class="tab" data-target="tab-active">
       <svg class="tab-icon" viewBox="0 0 24 24">
         <path fill="white" d="M13 2L3 14h7v8l10-12h-7z"/>
@@ -517,7 +558,6 @@
       <span class="tab-label">Aktiv</span>
     </div>
 
-    <!-- Bilanci – Euro -->
     <div class="tab" data-target="tab-balance">
       <svg class="tab-icon" viewBox="0 0 24 24">
         <path fill="white" d="M15 4H9a7 7 0 0 0 0 14h6a1 1 0 1 0 0-2H9a5 5 0 0 1-4.9-4h3.02a1 1 0 0 0 0-2H4.1A5 5 0 0 1 9 6h6a1 1 0 1 0 0-2z"/>
@@ -526,7 +566,7 @@
     </div>
   </div>
 
-  <!-- Info-Card – nur bei Te reja + offenen Fahrten -->
+  <!-- Info-Card (nur bei Te reja + offenen Fahrten) -->
   <div id="infoCardOpen" class="info-card" style="display:none;">
     <div class="info-header">
       <div class="info-title">Klientët që presin taksi</div>
@@ -554,7 +594,7 @@
   <!-- DASHBOARD -->
   <div id="content" style="display:none;">
 
-    <!-- TAB 1: TE REJA / OPEN ORDERS -->
+    <!-- TAB 1: TE REJA -->
     <div id="tab-new-content">
       <div id="orders"></div>
       <div id="noOpen" class="empty-text"></div>
@@ -569,42 +609,106 @@
       <div id="noMine" class="empty-text"></div>
     </div>
 
-    <!-- TAB 3: BILANCI -->
+    <!-- TAB 3: BILANCI / STATISTIKAT & BARAZIMET -->
     <div id="tab-balance-content" class="card" style="display:none;">
-      <div class="section-title">Barazimet & Statistikat</div>
+      <div class="section-title">Bilanci, Statistikat &amp; Barazimet</div>
 
-      <!-- Untertabs für Barazime -->
+      <!-- Haupt-Segmente: Statistikat / Barazimet -->
       <div class="segmented">
-        <div class="seg active" data-seg="segAktuale">Barazimet aktuale</div>
-        <div class="seg" data-seg="segPerfunduara">Barazimet të përfunduara</div>
+        <div class="seg active" data-main="statsSection">Statistikat</div>
+        <div class="seg" data-main="balancesSection">Barazimet</div>
       </div>
 
-      <!-- AKTUALE -->
-      <div id="segAktuale">
-        <div class="barazim-card">
+      <!-- STATISTIKAT -->
+      <div id="statsSection">
+        <div class="stat-card-driver">
           <div class="row">
-            <span>Vozitje pa u barazuar</span>
-            <strong id="balanceOpenRides">-</strong>
+            <span>Sot</span>
+            <strong id="driverStatsTodayCount" class="stat-big">0 vozitje</strong>
           </div>
           <div class="row">
-            <span>Shuma aktuale</span>
-            <strong id="balanceCurrentAmount">0.00 €</strong>
+            <span>Të ardhurat sot</span>
+            <strong id="driverStatsTodayRevenue">0.00 €</strong>
           </div>
-          <div class="row">
-            <span>Statusi</span>
-            <strong id="balanceStatusText">-</strong>
+          <div class="stat-sub" id="driverStatsTodayStatusSplit">
+            E hapur: 0 • Në vozitje: 0 • Përfunduar: 0 • Anuluar: 0
           </div>
         </div>
 
-        <div id="balanceBox" style="font-size:13px; color:#9ca3af; margin-top:4px;"></div>
+        <div class="stat-card-driver">
+          <div class="row">
+            <span>7 ditët e fundit</span>
+            <strong id="driverStats7DaysCount" class="stat-big">0 vozitje</strong>
+          </div>
+          <div class="row">
+            <span>Të ardhurat 7-ditore</span>
+            <strong id="driverStats7DaysRevenue">0.00 €</strong>
+          </div>
+          <div class="stat-sub" id="driverStats7DaysLabel"></div>
+          <div class="stat-list-7" id="driverStatsLast7List"></div>
+        </div>
+
+        <div class="stat-card-driver">
+          <div class="row">
+            <span>Ky muaj</span>
+            <strong id="driverStatsMonthCount" class="stat-big">0 vozitje</strong>
+          </div>
+          <div class="row">
+            <span>Të ardhurat mujore</span>
+            <strong id="driverStatsMonthRevenue">0.00 €</strong>
+          </div>
+          <div class="stat-sub" id="driverStatsMonthLabel"></div>
+        </div>
+
+        <div class="stat-card-driver">
+          <div class="row">
+            <span>Total deri tani</span>
+            <strong id="driverStatsAllTimeRides" class="stat-big">0 vozitje</strong>
+          </div>
+          <div class="row">
+            <span>Të ardhurat totale</span>
+            <strong id="driverStatsAllTimeRevenue">0.00 €</strong>
+          </div>
+          <div class="row">
+            <span>Norma e anulimit</span>
+            <strong id="driverStatsCancelRate">0%</strong>
+          </div>
+        </div>
       </div>
 
-      <!-- PERFUNDUARA -->
-      <div id="segPerfunduara" style="display:none;">
-        <div id="balanceHistoryEmpty" class="empty-text">
-          Nuk ka ende barazime të përfunduara në këtë pajisje. Barazimet menaxhohen nga admini.
+      <!-- BARAZIMET -->
+      <div id="balancesSection" style="display:none;">
+        <div class="segmented">
+          <div class="seg active" data-bal="current">Barazimet aktuale</div>
+          <div class="seg" data-bal="history">Barazimet të përfunduara</div>
         </div>
-        <div id="balanceHistoryList"></div>
+
+        <!-- AKTUALE -->
+        <div id="balCurrentSection">
+          <div class="barazim-card">
+            <div class="row">
+              <span>Vozitje pa u barazuar</span>
+              <strong id="balanceOpenRides">-</strong>
+            </div>
+            <div class="row">
+              <span>Shuma aktuale</span>
+              <strong id="balanceCurrentAmount">0.00 €</strong>
+            </div>
+            <div class="row">
+              <span>Statusi</span>
+              <strong id="balanceStatusText">-</strong>
+            </div>
+          </div>
+          <div id="balanceBox" style="font-size:13px; color:#9ca3af; margin-top:4px;"></div>
+        </div>
+
+        <!-- HISTORIKU -->
+        <div id="balHistorySection" style="display:none;">
+          <div id="balanceHistoryEmpty" class="empty-text">
+            Nuk ka ende barazime të përfunduara në këtë pajisje. Barazimet menaxhohen nga admini.
+          </div>
+          <div id="balanceHistoryList"></div>
+        </div>
       </div>
     </div>
 
@@ -638,6 +742,10 @@
   let hasActiveRide = false;
   let currentTab = "tab-new";
   let lastOpenCount = 0;
+  let ordersCache = {};
+  let balanceHistory = [];
+  let historyLoadedForDriver = false;
+  let lastBalanceSnapshot = null;
 
   const loginCard = document.getElementById("loginCard");
   const content = document.getElementById("content");
@@ -645,11 +753,6 @@
   const loginMsg = document.getElementById("loginMsg");
   const headerDriverName = document.getElementById("headerDriverName");
   const headerStatus = document.getElementById("headerStatus");
-  const balanceBox = document.getElementById("balanceBox");
-
-  const balanceOpenRidesEl = document.getElementById("balanceOpenRides");
-  const balanceCurrentAmountEl = document.getElementById("balanceCurrentAmount");
-  const balanceStatusTextEl = document.getElementById("balanceStatusText");
 
   const tabsBox = document.getElementById("tabsBox");
   const infoCardOpen = document.getElementById("infoCardOpen");
@@ -657,12 +760,58 @@
 
   const tabs = document.querySelectorAll(".tab");
 
-  const segButtons = document.querySelectorAll(".seg");
-  const segAktuale = document.getElementById("segAktuale");
-  const segPerfunduara = document.getElementById("segPerfunduara");
+  const balanceBox = document.getElementById("balanceBox");
+  const balanceOpenRidesEl = document.getElementById("balanceOpenRides");
+  const balanceCurrentAmountEl = document.getElementById("balanceCurrentAmount");
+  const balanceStatusTextEl = document.getElementById("balanceStatusText");
+  const balanceHistoryEmptyEl = document.getElementById("balanceHistoryEmpty");
+  const balanceHistoryListEl = document.getElementById("balanceHistoryList");
 
-  /* ---------------- TAB LOGIK (FLAT-TABS) ------------------- */
+  const statsSection = document.getElementById("statsSection");
+  const balancesSection = document.getElementById("balancesSection");
+  const mainSegButtons = document.querySelectorAll("[data-main]");
 
+  const balCurrentSection = document.getElementById("balCurrentSection");
+  const balHistorySection = document.getElementById("balHistorySection");
+  const balSegButtons = document.querySelectorAll("[data-bal]");
+
+  // Stats elements
+  const sTodayCount = document.getElementById("driverStatsTodayCount");
+  const sTodayRevenue = document.getElementById("driverStatsTodayRevenue");
+  const sTodaySplit = document.getElementById("driverStatsTodayStatusSplit");
+  const s7DaysCount = document.getElementById("driverStats7DaysCount");
+  const s7DaysRevenue = document.getElementById("driverStats7DaysRevenue");
+  const s7DaysLabel = document.getElementById("driverStats7DaysLabel");
+  const sLast7List = document.getElementById("driverStatsLast7List");
+  const sMonthCount = document.getElementById("driverStatsMonthCount");
+  const sMonthRevenue = document.getElementById("driverStatsMonthRevenue");
+  const sMonthLabel = document.getElementById("driverStatsMonthLabel");
+  const sAllTimeRides = document.getElementById("driverStatsAllTimeRides");
+  const sAllTimeRevenue = document.getElementById("driverStatsAllTimeRevenue");
+  const sCancelRate = document.getElementById("driverStatsCancelRate");
+
+  /* ---------- Helper Zeitfunktionen ---------- */
+  function startOfDay(d) {
+    const n = new Date(d); n.setHours(0,0,0,0); return n;
+  }
+  function endOfDay(d) {
+    const n = startOfDay(d); n.setDate(n.getDate() + 1); return n;
+  }
+  function daysAgo(num) {
+    const d = new Date();
+    d.setDate(d.getDate() - num);
+    return d;
+  }
+  function startOfMonth(d) {
+    const n = startOfDay(d);
+    return new Date(n.getFullYear(), n.getMonth(), 1);
+  }
+  const monthNamesSq = [
+    "Janar","Shkurt","Mars","Prill","Maj","Qershor",
+    "Korrik","Gusht","Shtator","Tetor","Nëntor","Dhjetor"
+  ];
+
+  /* ---------- Tabs oben ---------- */
   tabs.forEach(t => {
     t.addEventListener("click", () => {
       const currentActive = document.querySelector(".tab.active");
@@ -681,7 +830,6 @@
       document.getElementById("tab-balance-content").style.display =
         target === "tab-balance" ? "block" : "none";
 
-      // Info-Card nur bei "Te reja" + offenen Fahrten
       if (target === "tab-new" && currentDriver && lastOpenCount > 0) {
         infoCardOpen.style.display = "block";
       } else {
@@ -690,20 +838,29 @@
     });
   });
 
-  /* --------- SEGMENTED BARAZIME (AKTUALE / PERFUNDUARA) --------- */
-  segButtons.forEach(s => {
-    s.addEventListener("click", () => {
-      segButtons.forEach(b => b.classList.remove("active"));
-      s.classList.add("active");
-
-      const t = s.dataset.seg;
-      segAktuale.style.display = t === "segAktuale" ? "block" : "none";
-      segPerfunduara.style.display = t === "segPerfunduara" ? "block" : "none";
+  /* ---------- Haupt-Segmente (Statistikat / Barazimet) ---------- */
+  mainSegButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      mainSegButtons.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      const target = btn.dataset.main;
+      statsSection.style.display = target === "statsSection" ? "block" : "none";
+      balancesSection.style.display = target === "balancesSection" ? "block" : "none";
     });
   });
 
-  /* ----------------------------------------------- */
+  /* ---------- Unter-Segmente (Barazime aktuale / historik) ---------- */
+  balSegButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      balSegButtons.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      const target = btn.dataset.bal;
+      balCurrentSection.style.display = target === "current" ? "block" : "none";
+      balHistorySection.style.display = target === "history" ? "block" : "none";
+    });
+  });
 
+  /* ---------- Login ---------- */
   loginBtn.onclick = () => {
     loginMsg.textContent = "";
     const pin = document.getElementById("loginPin").value.trim();
@@ -738,11 +895,11 @@
           headerDriverName.textContent = found.name || "Shoferi";
           headerStatus.textContent = "Online";
 
-          // Beim Login: Login ausblenden, Tabs + Content anzeigen
           loginCard.style.display = "none";
           tabsBox.style.display = "flex";
           content.style.display = "block";
 
+          loadBalanceHistoryForCurrentDriver();
           subscribeOrders();
           subscribeBalance();
         }
@@ -751,6 +908,7 @@
     );
   };
 
+  /* ---------- Map ---------- */
   function createMiniMap(containerId, lat, lng) {
     const container = document.getElementById(containerId);
     if (!container) return;
@@ -776,11 +934,14 @@
     return mins + " minuta";
   }
 
+  /* ---------- Orders + Stats ---------- */
   function subscribeOrders() {
     const ordersRef = ref(db, "orders");
 
     onValue(ordersRef, (snap) => {
-      const data = snap.val() || {};
+      ordersCache = snap.val() || {};
+      const data = ordersCache;
+
       const openBox = document.getElementById("orders");
       const mineBox = document.getElementById("myOrders");
       const noOpen = document.getElementById("noOpen");
@@ -796,7 +957,6 @@
         const safeIdOpen = "map_open_" + id.replace(/[^a-zA-Z0-9_-]/g, "");
         const safeIdMine = "map_mine_" + id.replace(/[^a-zA-Z0-9_-]/g, "");
 
-        /* VOZITJE NË PRITJE – Premium-Karte */
         if (o.status === "open") {
           openCount++;
 
@@ -814,16 +974,12 @@
               </div>
               <div class="badge-open">Në pritje</div>
             </div>
-
             <div class="divider"></div>
-
             <div id="${safeIdOpen}" class="mini-map"></div>
-
             <button class="btn-accept">Prano vozitjen</button>
           `;
 
           openBox.appendChild(wrapper);
-
           setTimeout(() => createMiniMap(safeIdOpen, o.lat, o.lng), 50);
 
           const acceptBtn = wrapper.querySelector(".btn-accept");
@@ -846,7 +1002,6 @@
           };
         }
 
-        /* VOZITJET E MIA (AKTIVE) – Premium-Karte */
         if (
           o.status === "taken" &&
           o.takenByDriverId === currentDriver?.id
@@ -869,11 +1024,8 @@
               </div>
               <span class="badge-active">Aktive</span>
             </div>
-
             <div class="divider"></div>
-
             <div id="${safeIdMine}" class="mini-map"></div>
-
             <div class="timer">
               Vozitja ka filluar: ${timeText} më parë
             </div>
@@ -891,7 +1043,6 @@
               current.completedAt = Date.now();
               return current;
             }).then(() => {
-              // Update balance (+0.25 € für jede Fahrt)
               const balRef = ref(db, "balances/" + currentDriver.id);
               runTransaction(balRef, (cur) => {
                 if (!cur) {
@@ -936,24 +1087,273 @@
       lastOpenCount = openCount;
       notifCount.textContent = openCount;
 
-      // Info-Card nur bei Te reja + offene Fahrten + eingeloggt
       if (currentDriver && currentTab === "tab-new" && openCount > 0) {
         infoCardOpen.style.display = "block";
       } else {
         infoCardOpen.style.display = "none";
       }
 
-      noOpen.textContent =
+      document.getElementById("noOpen").textContent =
         openCount === 0 ? "Për momentin nuk ka vozitje në pritje." : "";
-      noMine.textContent =
+      document.getElementById("noMine").textContent =
         mineCount === 0 ? "Për momentin nuk keni vozitje aktive." : "";
+
+      updateDriverStats();
     });
   }
 
+  /* ---------- Driver-Statistikat ---------- */
+  function updateDriverStats() {
+    if (!currentDriver) return;
+
+    const now = new Date();
+    const todayStart = startOfDay(now).getTime();
+    const todayEnd = endOfDay(now).getTime();
+    const sevenStart = startOfDay(daysAgo(6)).getTime(); // 0..6
+    const monthStart = startOfMonth(now).getTime();
+    const monthEnd = startOfMonth(new Date(now.getFullYear(), now.getMonth() + 1, 1)).getTime();
+
+    let todayTotal = 0, todayDone = 0, todayOpen = 0, todayTaken = 0, todayCanceled = 0;
+    let sevenDone = 0;
+    let monthDone = 0;
+    let allDone = 0;
+    let allCanceled = 0;
+
+    const sevenMap = {};
+    for (let i = 6; i >= 0; i--) {
+      const d = startOfDay(daysAgo(i));
+      const key = d.toISOString().slice(0,10);
+      sevenMap[key] = 0;
+    }
+
+    Object.values(ordersCache).forEach(o => {
+      if (o.takenByDriverId !== currentDriver.id) return;
+
+      const created = o.createdAt || null;
+      const completed = o.completedAt || null;
+
+      if (created && created >= todayStart && created < todayEnd) {
+        todayTotal++;
+        if (o.status === "open") todayOpen++;
+        else if (o.status === "taken") todayTaken++;
+        else if (o.status === "done") todayDone++;
+        else if (o.status === "canceled") todayCanceled++;
+      }
+
+      if (o.status === "done" && completed) {
+        allDone++;
+        if (completed >= sevenStart && completed < todayEnd) sevenDone++;
+        if (completed >= monthStart && completed < monthEnd) monthDone++;
+
+        const k = startOfDay(new Date(completed)).toISOString().slice(0,10);
+        if (sevenMap[k] !== undefined) sevenMap[k] += 1;
+      }
+
+      if (o.status === "canceled") {
+        allCanceled++;
+      }
+    });
+
+    sTodayCount.textContent = `${todayTotal} vozitje`;
+    sTodayRevenue.textContent = (todayDone * 0.25).toFixed(2) + " €";
+    sTodaySplit.textContent =
+      `E hapur: ${todayOpen} • Në vozitje: ${todayTaken} • Përfunduar: ${todayDone} • Anuluar: ${todayCanceled}`;
+
+    s7DaysCount.textContent = `${sevenDone} vozitje`;
+    s7DaysRevenue.textContent = (sevenDone * 0.25).toFixed(2) + " €";
+    const sevenStartDate = new Date(sevenStart);
+    s7DaysLabel.textContent =
+      `Periudha: ${sevenStartDate.toLocaleDateString()} - ${now.toLocaleDateString()}`;
+
+    sLast7List.innerHTML = "";
+    Object.keys(sevenMap).sort().forEach(key => {
+      const d = new Date(key + "T00:00:00");
+      const row = document.createElement("div");
+      row.className = "stat-list-7-row";
+      row.innerHTML = `
+        <span>${d.getDate()}. ${monthNamesSq[d.getMonth()]}</span>
+        <span>${sevenMap[key]} vozitje</span>
+      `;
+      sLast7List.appendChild(row);
+    });
+
+    sMonthCount.textContent = `${monthDone} vozitje`;
+    sMonthRevenue.textContent = (monthDone * 0.25).toFixed(2) + " €";
+    sMonthLabel.textContent =
+      `Muaji: ${monthNamesSq[new Date(monthStart).getMonth()]} ${new Date(monthStart).getFullYear()}`;
+
+    sAllTimeRides.textContent = `${allDone} vozitje`;
+    sAllTimeRevenue.textContent = (allDone * 0.25).toFixed(2) + " €";
+    const totalRelevant = allDone + allCanceled;
+    const cancelRate = totalRelevant === 0 ? 0 : Math.round((allCanceled / totalRelevant) * 100);
+    sCancelRate.textContent = cancelRate + " %";
+  }
+
+  /* ---------- Balance History (lokal pro Gerät) ---------- */
+  function historyKeyForCurrentDriver() {
+    if (!currentDriver) return null;
+    return "balanceHistory_driver_" + currentDriver.id;
+  }
+
+  function loadBalanceHistoryForCurrentDriver() {
+    if (!currentDriver) return;
+    const key = historyKeyForCurrentDriver();
+    try {
+      const raw = localStorage.getItem(key);
+      balanceHistory = raw ? JSON.parse(raw) : [];
+    } catch {
+      balanceHistory = [];
+    }
+    historyLoadedForDriver = true;
+    renderBalanceHistory();
+  }
+
+  function saveBalanceHistoryForCurrentDriver() {
+    const key = historyKeyForCurrentDriver();
+    if (!key) return;
+    try {
+      localStorage.setItem(key, JSON.stringify(balanceHistory));
+    } catch {}
+  }
+
+  function renderBalanceHistory() {
+    if (!balanceHistoryListEl) return;
+
+    if (!balanceHistory || balanceHistory.length === 0) {
+      balanceHistoryEmptyEl.style.display = "block";
+      balanceHistoryListEl.innerHTML = "";
+      return;
+    }
+
+    balanceHistoryEmptyEl.style.display = "none";
+    balanceHistoryListEl.innerHTML = "";
+
+    const copy = [...balanceHistory].sort((a,b) => b.to - a.to);
+
+    copy.forEach((entry, index) => {
+      const card = document.createElement("div");
+      card.className = "barazim-card";
+
+      const dateText = new Date(entry.to).toLocaleString();
+      const rides = entry.rides || Math.round((entry.total || 0) / 0.25);
+
+      card.innerHTML = `
+        <div class="row">
+          <span>Barazimi #${copy.length - index}</span>
+          <strong>${dateText}</strong>
+        </div>
+        <div class="row">
+          <span>Vozitje në këtë barazim</span>
+          <strong>${rides}</strong>
+        </div>
+        <div class="row">
+          <span>Shuma e barazimit</span>
+          <strong>${(entry.total || 0).toFixed(2)} €</strong>
+        </div>
+        <div class="row" style="margin-top:8px;">
+          <span>Detajet e klientëve</span>
+          <button class="btn-ghost">Shiko detajet</button>
+        </div>
+        <div class="settle-details" style="display:none;"></div>
+      `;
+
+      const btn = card.querySelector(".btn-ghost");
+      const details = card.querySelector(".settle-details");
+
+      btn.addEventListener("click", () => {
+        if (details.style.display === "none" || details.style.display === "") {
+          details.style.display = "block";
+          renderSettlementDetails(entry, details);
+        } else {
+          details.style.display = "none";
+        }
+      });
+
+      balanceHistoryListEl.appendChild(card);
+    });
+  }
+
+  function renderSettlementDetails(entry, container) {
+    const from = entry.from || 0;
+    const to = entry.to || 0;
+
+    const rides = [];
+    Object.entries(ordersCache).forEach(([id, o]) => {
+      if (o.takenByDriverId !== currentDriver.id) return;
+      if (o.status !== "done") return;
+      if (!o.completedAt) return;
+      if (o.completedAt <= from) return;
+      if (o.completedAt > to) return;
+
+      rides.push({
+        id,
+        name: o.name || "Klienti",
+        phone: o.phone || "",
+        adresa: o.adresa || "",
+        completedAt: o.completedAt
+      });
+    });
+
+    if (rides.length === 0) {
+      container.innerHTML = "<div>Detajet nuk mund të llogariten nga kjo pajisje.</div>";
+      return;
+    }
+
+    rides.sort((a,b) => a.completedAt - b.completedAt);
+
+    let html = "";
+    rides.forEach((r, idx) => {
+      html += `
+        <div style="margin-bottom:6px;">
+          <strong>#${idx+1}</strong><br>
+          ${r.name} • ${r.phone}<br>
+          ${r.adresa ? `<span>${r.adresa}</span><br>` : ""}
+          <small>${new Date(r.completedAt).toLocaleString()}</small>
+        </div>
+      `;
+    });
+
+    container.innerHTML = html;
+  }
+
+  /* ---------- Balance subscribe ---------- */
   function subscribeBalance() {
     const balRef = ref(db, "balances/" + currentDriver.id);
     onValue(balRef, (snap) => {
       const data = snap.val();
+
+      if (!historyLoadedForDriver) {
+        loadBalanceHistoryForCurrentDriver();
+      }
+
+      // Übergang: open -> closed => neuen Barazim in History eintragen
+      if (lastBalanceSnapshot &&
+          lastBalanceSnapshot.status === "open" &&
+          lastBalanceSnapshot.total > 0 &&
+          data &&
+          data.status === "closed") {
+
+        const prevTo = balanceHistory.length
+          ? balanceHistory[balanceHistory.length - 1].to
+          : 0;
+
+        const settleTo = data.lastUpdate || Date.now();
+        const from = Math.max(prevTo, 0);
+        const total = lastBalanceSnapshot.total || 0;
+        const rides = Math.round(total / 0.25);
+
+        balanceHistory.push({
+          from,
+          to: settleTo,
+          total,
+          rides,
+          createdAt: Date.now()
+        });
+        saveBalanceHistoryForCurrentDriver();
+        renderBalanceHistory();
+      }
+
+      lastBalanceSnapshot = data ? { ...data } : null;
 
       if (!data) {
         balanceOpenRidesEl.textContent = "-";
@@ -973,7 +1373,7 @@
         balanceStatusTextEl.textContent = "Në pritje të barazimit";
         balanceBox.innerHTML = `
           <strong>Barazim i hapur:</strong> ${total.toFixed(2)} €<br>
-          <small>Barazimi bëhet nga administrata, jo nga shoferi.</small>
+          <small>Barazimi bëhet vetëm nga administrata, jo nga shoferi.</small>
         `;
       } else {
         balanceStatusTextEl.textContent = "I barazuar";

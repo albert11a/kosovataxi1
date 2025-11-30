@@ -280,7 +280,7 @@
       font-weight: 600;
     }
 
-    /* Premium Order Cards */
+    /* Order Cards */
     .order-card {
       background: rgba(15,23,42,0.92);
       border-radius: 24px;
@@ -379,7 +379,6 @@
       box-shadow:none;
     }
 
-    /* Info-Card oben bei Te reja */
     .info-card {
       background: rgba(15,23,42,0.9);
       border: 1px solid rgba(148,163,184,0.25);
@@ -418,7 +417,6 @@
       opacity: 0.8;
     }
 
-    /* Segmented Controls */
     .segmented {
       display:flex;
       background:rgba(255,255,255,0.06);
@@ -702,10 +700,10 @@
           <div id="balanceBox" style="font-size:13px; color:#9ca3af; margin-top:4px;"></div>
         </div>
 
-        <!-- HISTORIKU -->
+        <!-- HISTORIKU (nga Firebase) -->
         <div id="balHistorySection" style="display:none;">
           <div id="balanceHistoryEmpty" class="empty-text">
-            Nuk ka ende barazime të përfunduara në këtë pajisje. Barazimet menaxhohen nga admini.
+            Nuk ka ende barazime të përfunduara për ju.
           </div>
           <div id="balanceHistoryList"></div>
         </div>
@@ -722,7 +720,12 @@
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
-  import { getDatabase, ref, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-database.js";
+  import {
+    getDatabase,
+    ref,
+    onValue,
+    runTransaction
+  } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-database.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyCgCxp8M9XGOKFSIfaU9nM48rxtFQP-Kvs",
@@ -743,9 +746,7 @@
   let currentTab = "tab-new";
   let lastOpenCount = 0;
   let ordersCache = {};
-  let balanceHistory = [];
-  let historyLoadedForDriver = false;
-  let lastBalanceSnapshot = null;
+  let driverBalanceHistoryFirebase = {}; // nga Firebase
 
   const loginCard = document.getElementById("loginCard");
   const content = document.getElementById("content");
@@ -790,7 +791,6 @@
   const sAllTimeRevenue = document.getElementById("driverStatsAllTimeRevenue");
   const sCancelRate = document.getElementById("driverStatsCancelRate");
 
-  /* ---------- Helper Zeitfunktionen ---------- */
   function startOfDay(d) {
     const n = new Date(d); n.setHours(0,0,0,0); return n;
   }
@@ -899,9 +899,9 @@
           tabsBox.style.display = "flex";
           content.style.display = "block";
 
-          loadBalanceHistoryForCurrentDriver();
           subscribeOrders();
           subscribeBalance();
+          subscribeBalanceHistory(); // lexon barazimet e perfunduara nga Firebase
         }
       },
       { onlyOnce: true }
@@ -1093,9 +1093,9 @@
         infoCardOpen.style.display = "none";
       }
 
-      document.getElementById("noOpen").textContent =
+      noOpen.textContent =
         openCount === 0 ? "Për momentin nuk ka vozitje në pritje." : "";
-      document.getElementById("noMine").textContent =
+      noMine.textContent =
         mineCount === 0 ? "Për momentin nuk keni vozitje aktive." : "";
 
       updateDriverStats();
@@ -1109,7 +1109,7 @@
     const now = new Date();
     const todayStart = startOfDay(now).getTime();
     const todayEnd = endOfDay(now).getTime();
-    const sevenStart = startOfDay(daysAgo(6)).getTime(); // 0..6
+    const sevenStart = startOfDay(daysAgo(6)).getTime();
     const monthStart = startOfMonth(now).getTime();
     const monthEnd = startOfMonth(new Date(now.getFullYear(), now.getMonth() + 1, 1)).getTime();
 
@@ -1189,171 +1189,11 @@
     sCancelRate.textContent = cancelRate + " %";
   }
 
-  /* ---------- Balance History (lokal pro Gerät) ---------- */
-  function historyKeyForCurrentDriver() {
-    if (!currentDriver) return null;
-    return "balanceHistory_driver_" + currentDriver.id;
-  }
-
-  function loadBalanceHistoryForCurrentDriver() {
-    if (!currentDriver) return;
-    const key = historyKeyForCurrentDriver();
-    try {
-      const raw = localStorage.getItem(key);
-      balanceHistory = raw ? JSON.parse(raw) : [];
-    } catch {
-      balanceHistory = [];
-    }
-    historyLoadedForDriver = true;
-    renderBalanceHistory();
-  }
-
-  function saveBalanceHistoryForCurrentDriver() {
-    const key = historyKeyForCurrentDriver();
-    if (!key) return;
-    try {
-      localStorage.setItem(key, JSON.stringify(balanceHistory));
-    } catch {}
-  }
-
-  function renderBalanceHistory() {
-    if (!balanceHistoryListEl) return;
-
-    if (!balanceHistory || balanceHistory.length === 0) {
-      balanceHistoryEmptyEl.style.display = "block";
-      balanceHistoryListEl.innerHTML = "";
-      return;
-    }
-
-    balanceHistoryEmptyEl.style.display = "none";
-    balanceHistoryListEl.innerHTML = "";
-
-    const copy = [...balanceHistory].sort((a,b) => b.to - a.to);
-
-    copy.forEach((entry, index) => {
-      const card = document.createElement("div");
-      card.className = "barazim-card";
-
-      const dateText = new Date(entry.to).toLocaleString();
-      const rides = entry.rides || Math.round((entry.total || 0) / 0.25);
-
-      card.innerHTML = `
-        <div class="row">
-          <span>Barazimi #${copy.length - index}</span>
-          <strong>${dateText}</strong>
-        </div>
-        <div class="row">
-          <span>Vozitje në këtë barazim</span>
-          <strong>${rides}</strong>
-        </div>
-        <div class="row">
-          <span>Shuma e barazimit</span>
-          <strong>${(entry.total || 0).toFixed(2)} €</strong>
-        </div>
-        <div class="row" style="margin-top:8px;">
-          <span>Detajet e klientëve</span>
-          <button class="btn-ghost">Shiko detajet</button>
-        </div>
-        <div class="settle-details" style="display:none;"></div>
-      `;
-
-      const btn = card.querySelector(".btn-ghost");
-      const details = card.querySelector(".settle-details");
-
-      btn.addEventListener("click", () => {
-        if (details.style.display === "none" || details.style.display === "") {
-          details.style.display = "block";
-          renderSettlementDetails(entry, details);
-        } else {
-          details.style.display = "none";
-        }
-      });
-
-      balanceHistoryListEl.appendChild(card);
-    });
-  }
-
-  function renderSettlementDetails(entry, container) {
-    const from = entry.from || 0;
-    const to = entry.to || 0;
-
-    const rides = [];
-    Object.entries(ordersCache).forEach(([id, o]) => {
-      if (o.takenByDriverId !== currentDriver.id) return;
-      if (o.status !== "done") return;
-      if (!o.completedAt) return;
-      if (o.completedAt <= from) return;
-      if (o.completedAt > to) return;
-
-      rides.push({
-        id,
-        name: o.name || "Klienti",
-        phone: o.phone || "",
-        adresa: o.adresa || "",
-        completedAt: o.completedAt
-      });
-    });
-
-    if (rides.length === 0) {
-      container.innerHTML = "<div>Detajet nuk mund të llogariten nga kjo pajisje.</div>";
-      return;
-    }
-
-    rides.sort((a,b) => a.completedAt - b.completedAt);
-
-    let html = "";
-    rides.forEach((r, idx) => {
-      html += `
-        <div style="margin-bottom:6px;">
-          <strong>#${idx+1}</strong><br>
-          ${r.name} • ${r.phone}<br>
-          ${r.adresa ? `<span>${r.adresa}</span><br>` : ""}
-          <small>${new Date(r.completedAt).toLocaleString()}</small>
-        </div>
-      `;
-    });
-
-    container.innerHTML = html;
-  }
-
-  /* ---------- Balance subscribe ---------- */
+  /* ---------- Balance (aktuell, nga /balances) ---------- */
   function subscribeBalance() {
     const balRef = ref(db, "balances/" + currentDriver.id);
     onValue(balRef, (snap) => {
       const data = snap.val();
-
-      if (!historyLoadedForDriver) {
-        loadBalanceHistoryForCurrentDriver();
-      }
-
-      // Übergang: open -> closed => neuen Barazim in History eintragen
-      if (lastBalanceSnapshot &&
-          lastBalanceSnapshot.status === "open" &&
-          lastBalanceSnapshot.total > 0 &&
-          data &&
-          data.status === "closed") {
-
-        const prevTo = balanceHistory.length
-          ? balanceHistory[balanceHistory.length - 1].to
-          : 0;
-
-        const settleTo = data.lastUpdate || Date.now();
-        const from = Math.max(prevTo, 0);
-        const total = lastBalanceSnapshot.total || 0;
-        const rides = Math.round(total / 0.25);
-
-        balanceHistory.push({
-          from,
-          to: settleTo,
-          total,
-          rides,
-          createdAt: Date.now()
-        });
-        saveBalanceHistoryForCurrentDriver();
-        renderBalanceHistory();
-      }
-
-      lastBalanceSnapshot = data ? { ...data } : null;
 
       if (!data) {
         balanceOpenRidesEl.textContent = "-";
@@ -1383,6 +1223,110 @@
         `;
       }
     });
+  }
+
+  /* ---------- Balance History (nga Firebase /balanceHistory/{driverId}) ---------- */
+  function subscribeBalanceHistory() {
+    const histRef = ref(db, "balanceHistory/" + currentDriver.id);
+    onValue(histRef, (snap) => {
+      driverBalanceHistoryFirebase = snap.val() || {};
+      renderBalanceHistoryFromFirebase();
+    });
+  }
+
+  function renderBalanceHistoryFromFirebase() {
+    const data = driverBalanceHistoryFirebase || {};
+    const entries = Object.entries(data);
+
+    if (entries.length === 0) {
+      balanceHistoryEmptyEl.style.display = "block";
+      balanceHistoryListEl.innerHTML = "";
+      return;
+    }
+
+    balanceHistoryEmptyEl.style.display = "none";
+    balanceHistoryListEl.innerHTML = "";
+
+    // sorto sipas createdAt desc
+    entries.sort((a,b) => {
+      const aa = a[1]?.createdAt || 0;
+      const bb = b[1]?.createdAt || 0;
+      return bb - aa;
+    });
+
+    entries.forEach(([histId, h], index) => {
+      const card = document.createElement("div");
+      card.className = "barazim-card";
+
+      const created = h.createdAt ? new Date(h.createdAt).toLocaleString() : "-";
+      const total = h.total || 0;
+      const ridesCount = h.ridesCount || (h.rides ? Object.keys(h.rides).length : 0);
+
+      card.innerHTML = `
+        <div class="row">
+          <span>Barazimi #${entries.length - index}</span>
+          <strong>${created}</strong>
+        </div>
+        <div class="row">
+          <span>Vozitje në këtë barazim</span>
+          <strong>${ridesCount}</strong>
+        </div>
+        <div class="row">
+          <span>Shuma e barazimit</span>
+          <strong>${total.toFixed(2)} €</strong>
+        </div>
+        <div class="row" style="margin-top:8px;">
+          <span>Detajet e klientëve</span>
+          <button class="btn-ghost">Shiko detajet</button>
+        </div>
+        <div class="settle-details" style="display:none;"></div>
+      `;
+
+      const btn = card.querySelector(".btn-ghost");
+      const details = card.querySelector(".settle-details");
+
+      btn.addEventListener("click", () => {
+        if (details.style.display === "none" || details.style.display === "") {
+          details.style.display = "block";
+          renderSettlementDetailsFromFirebase(h, details);
+        } else {
+          details.style.display = "none";
+        }
+      });
+
+      balanceHistoryListEl.appendChild(card);
+    });
+  }
+
+  function renderSettlementDetailsFromFirebase(histObj, container) {
+    const ridesObj = histObj.rides || {};
+    const rides = Object.values(ridesObj);
+
+    if (rides.length === 0) {
+      container.innerHTML = "<div>Nuk ka lista të ruajtura të klientëve për këtë barazim.</div>";
+      return;
+    }
+
+    rides.sort((a,b) => {
+      const aa = a.completedAt || 0;
+      const bb = b.completedAt || 0;
+      return aa - bb;
+    });
+
+    let html = "";
+    rides.forEach((r, idx) => {
+      const t = r.completedAt ? new Date(r.completedAt).toLocaleString() : "-";
+      html += `
+        <div style="margin-bottom:6px;">
+          <strong>#${idx+1}</strong><br>
+          ${r.name || "Klienti"} • ${r.phone || ""}<br>
+          ${r.adresa ? `<span>${r.adresa}</span><br>` : ""}
+          <small>${t}</small>
+        </div>
+      `;
+    });
+
+    container.innerHTML = html;
   }
 </script>
 

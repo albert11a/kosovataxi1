@@ -18,8 +18,6 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
 
   <style>
-
-    /* iOS Hintergrund-Fix */
     html, body {
       margin: 0;
       padding: 0;
@@ -28,7 +26,6 @@
       background-color: #020617 !important;
     }
 
-    /* Hintergrund 100% dunkel deckend */
     body::before {
       content: "";
       position: fixed;
@@ -64,7 +61,6 @@
       text-align: center;
     }
 
-    /* Neuer Header: ThirrTaxi mittig */
     .app-header {
       margin-top: 5px;
       margin-bottom: 22px;
@@ -207,14 +203,12 @@
       display: flex;
       justify-content: space-between;
     }
-
   </style>
 </head>
 <body>
 
 <div class="app-frame">
 
-  <!-- Neuer schöner Header -->
   <div class="app-header">ThirrTaxi</div>
 
   <div class="card">
@@ -373,10 +367,22 @@
     msg.textContent = "Duke marrë lokacionin…";
 
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
+      async (pos) => {
         const lat = pos.coords.latitude;
         const lng = pos.coords.longitude;
 
+        // ⭐ REVERSE GEOCODING (OpenStreetMap)
+        let adresa = "";
+        try {
+          const url = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`;
+          const res = await fetch(url);
+          const data = await res.json();
+          adresa = data.display_name || "Adresë e panjohur";
+        } catch (err) {
+          adresa = "Adresë e panjohur";
+        }
+
+        // ⭐ SPEICHERN MIT ADRESA
         const ordersRef = ref(db, "orders");
         const newOrderRef = push(ordersRef);
         currentOrderKey = newOrderRef.key;
@@ -386,6 +392,7 @@
           phone,
           lat,
           lng,
+          adresa,   // <---- WICHTIG!
           status: "open",
           createdAt: Date.now(),
           takenAt: null,
@@ -394,14 +401,14 @@
           canceledReason: null,
         };
 
-        set(newOrderRef, orderData).then(() => {
-          msg.textContent = "Kërkesa u dërgua me sukses.";
-          msg.classList.add("ok");
-          btn.disabled = false;
+        await set(newOrderRef, orderData);
 
-          initClientMap(lat, lng);
-          listenToOrderStatus(currentOrderKey);
-        });
+        msg.textContent = "Kërkesa u dërgua me sukses.";
+        msg.classList.add("ok");
+        btn.disabled = false;
+
+        initClientMap(lat, lng);
+        listenToOrderStatus(currentOrderKey);
       },
       () => {
         msg.textContent = "Nuk u mor lokacioni. Ju lutem lejoni aksesin.";
@@ -412,7 +419,6 @@
   };
 </script>
 
-<!-- Service Worker -->
 <script>
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("/sw-kunde.js").catch(console.error);

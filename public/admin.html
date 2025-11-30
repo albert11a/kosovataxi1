@@ -284,6 +284,13 @@ body::before {
     .month-row:last-child {
       border-bottom: none;
     }
+
+    .history-title {
+      margin-top: 10px;
+      margin-bottom: 6px;
+      font-size: 13px;
+      color: #9ca3af;
+    }
   </style>
 </head>
 
@@ -395,8 +402,17 @@ body::before {
 
       <div id="tabBalances" class="tab-section">
         <h3>Barazimet e shoferëve</h3>
-        <p>Shuma që i takon çdo shoferi (0.25 € për çdo vozitje të përfunduar). Kur e aprovon barazimin, vozitjet ruhen në <code>balanceHistory</code>.</p>
+        <p>
+          Shuma që i takon çdo shoferi (0.25 € për çdo vozitje të përfunduar).
+          Kur e aprovon barazimin, vozitjet ruhen në <code>balanceHistory</code>.
+          Këtu mund t’i shohësh dhe t’i fshish barazimet e përfunduara.
+        </p>
+
+        <h4>Barazimet aktuale</h4>
         <div id="balanceList"></div>
+
+        <h4 class="history-title">Barazimet e përfunduara (historia)</h4>
+        <div id="balanceHistoryAdmin"></div>
       </div>
 
     </div>
@@ -463,11 +479,13 @@ body::before {
   const companyNameInput = document.getElementById("companyName");
   const addCompanyBtn = document.getElementById("addCompanyBtn");
   const balanceListEl = document.getElementById("balanceList");
+  const balanceHistoryAdminEl = document.getElementById("balanceHistoryAdmin");
 
   let ordersCache = {};
   let driversCache = {};
   let balancesCache = {};
   let companiesCache = {};
+  let balanceHistoryCache = {};
 
   adminLoginBtn.addEventListener("click", () => {
     const u = adminUser.value.trim().toLowerCase();
@@ -511,6 +529,7 @@ body::before {
     loadCompanies();
     loadRegistrations();
     loadBalances();
+    loadBalanceHistory();
   }
 
   const monthNamesSq = [
@@ -547,6 +566,7 @@ body::before {
   }
   function isDone(order) { return order.status === "done"; }
 
+  /* -------- ORDERS ---------- */
   function loadOrders() {
     onValue(ref(db, "orders"), snap => {
       ordersCache = snap.val() || {};
@@ -579,11 +599,15 @@ body::before {
       if (o.status === "done") extra += `<small>Përfunduar: ${completed}</small><br>`;
       if (o.status === "canceled") extra += `<small>Arsye anulimi: ${o.canceledReason || "-"}</small><br>`;
 
+      const company = o.takenByCompany || "-";
+      const driverName = o.takenByName || "";
+
       div.innerHTML = `
         ${badgeHtml}<br>
         <strong>${o.name}</strong> • ${o.phone}<br>
         <small>Krijuar: ${created}</small><br>
-        <small>Kompania: ${o.takenByCompany || "-"}</small><br>
+        <small>Kompania: ${company}</small><br>
+        ${driverName ? `<small>Shoferi: ${driverName}</small><br>` : ""}
         ${extra}
         <button class="btn-danger" onclick="window.deleteOrder('${id}')">Fshije porosinë</button>
       `;
@@ -599,6 +623,7 @@ body::before {
     remove(ref(db, "orders/" + id));
   };
 
+  /* ---- ANALYTICS ---- */
   function updateAnalytics() {
     if (!ordersCache) return;
 
@@ -664,6 +689,7 @@ body::before {
     }
   }
 
+  /* ---- DRIVERS ---- */
   function loadDrivers() {
     onValue(ref(db, "drivers"), snap => {
       driversCache = snap.val() || {};
@@ -674,7 +700,7 @@ body::before {
         div.className = "list-item";
         div.innerHTML = `
           <span class="badge badge-driver">Shofer</span><br>
-          <strong>${d.name}</strong> • ${d.company}<br>
+          <strong>${d.name}</strong> • ${d.company}</strong><br>
           <small>Veturë: ${d.plate || "-"}</small><br>
           <small>Tel: ${d.phone || "-"}</small><br>
           <small>PIN: ${d.pin}</small>
@@ -684,6 +710,7 @@ body::before {
     });
   }
 
+  /* ---- REGISTRATIONS ---- */
   function loadRegistrations() {
     onValue(ref(db, "driverRegistrations"), snap => {
       regListEl.innerHTML = "";
@@ -697,7 +724,7 @@ body::before {
           <span class="badge badge-pending">Në pritje</span><br>
           <strong>${r.name}</strong> • ${r.company}<br>
           <small>${r.plate || ""} • ${r.phone || ""}</small><br>
-        `;
+       `;
 
         const approveBtn = document.createElement("button");
         approveBtn.className = "btn-small";
@@ -734,6 +761,7 @@ body::before {
     });
   }
 
+  /* ---- COMPANIES ---- */
   function loadCompanies() {
     onValue(ref(db, "companies"), snap => {
       companyListEl.innerHTML = "";
@@ -762,6 +790,7 @@ body::before {
     companyNameInput.value = "";
   });
 
+  /* ---- BALANCES (aktual) ---- */
   function loadBalances() {
     onValue(ref(db, "balances"), snap => {
       balancesCache = snap.val() || {};
@@ -835,6 +864,11 @@ body::before {
     const totalFromRides = ridesCount * 0.25;
     const total = totalFromRides || balanceObj.total || 0;
 
+    const drv = driversCache[driverId] || {};
+    const driverName = drv.name || "";
+    const driverCompany = drv.company || "";
+    const driverPlate = drv.plate || "";
+
     // 2) Krijo hyrje në balanceHistory / DRIVER / KEY
     const histRef = push(ref(db, "balanceHistory/" + driverId));
     const histKey = histRef.key;
@@ -843,6 +877,10 @@ body::before {
       createdAt: now,
       total,
       ridesCount,
+      driverId,
+      driverName,
+      driverCompany,
+      driverPlate,
       rides: ridesForHistory
     });
 
@@ -862,6 +900,93 @@ body::before {
     await update(ref(db), updates);
 
     alert("Barazimi u ruajt në histori dhe u mbyll me sukses.");
+  }
+
+  /* ---- BALANCE HISTORY (admin panel + driver sync) ---- */
+  function loadBalanceHistory() {
+    onValue(ref(db, "balanceHistory"), snap => {
+      balanceHistoryCache = snap.val() || {};
+      renderBalanceHistoryAdmin();
+    });
+  }
+
+  function renderBalanceHistoryAdmin() {
+    balanceHistoryAdminEl.innerHTML = "";
+
+    const data = balanceHistoryCache || {};
+    const driverIds = Object.keys(data);
+
+    if (driverIds.length === 0) {
+      balanceHistoryAdminEl.innerHTML =
+        "<div class='list-item'>Ende nuk ka barazime të përfunduara.</div>";
+      return;
+    }
+
+    driverIds.forEach(driverId => {
+      const histEntries = data[driverId] || {};
+      const drv = driversCache[driverId] || {};
+      const driverName = drv.name || histEntries.driverName || "Shofer";
+      const company = drv.company || "";
+      const plate = drv.plate || "";
+
+      Object.entries(histEntries).forEach(([histId, h]) => {
+        if (!h || typeof h !== "object" || !h.total) return;
+
+        const div = document.createElement("div");
+        div.className = "list-item";
+
+        const created = h.createdAt ? new Date(h.createdAt).toLocaleString() : "-";
+        const ridesCount = h.ridesCount || 0;
+        const total = h.total || 0;
+
+        const nameFromHist = h.driverName || driverName;
+        const companyFromHist = h.driverCompany || company;
+        const plateFromHist = h.driverPlate || plate;
+
+        div.innerHTML = `
+          <span class="badge badge-done">Barazim i përfunduar</span><br>
+          <strong>${nameFromHist}</strong> • ${companyFromHist || "-"}</strong><br>
+          <small>Veturë: ${plateFromHist || "-"}</small><br>
+          <small>Data barazimit: ${created}</small><br>
+          <small>Vozitje në këtë barazim: ${ridesCount}</small><br>
+          <small>Shuma totale: ${total.toFixed(2)} €</small><br>
+        `;
+
+        const detailBtn = document.createElement("button");
+        detailBtn.className = "btn-small";
+        detailBtn.textContent = "Detajet e klientëve";
+        detailBtn.onclick = () => {
+          const rides = h.rides || {};
+          if (Object.keys(rides).length === 0) {
+            alert("Nuk ka lista të ruajtura të klientëve për këtë barazim.");
+            return;
+          }
+          let msg = `Barazimi për ${nameFromHist} • ${total.toFixed(2)} €\n\n`;
+          Object.values(rides).forEach(r => {
+            const timeStr = r.completedAt ? new Date(r.completedAt).toLocaleString() : "-";
+            msg += `Emri: ${r.name || "-"}\n`;
+            msg += `Tel: ${r.phone || "-"}\n`;
+            msg += `Adresa: ${r.adresa || "-"}\n`;
+            msg += `Koha: ${timeStr}\n`;
+            msg += `-------------------------\n`;
+          });
+          alert(msg);
+        };
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.className = "btn-danger";
+        deleteBtn.textContent = "Fshije këtë barazim";
+        deleteBtn.onclick = () => {
+          if (!confirm("A jeni i sigurt që doni ta fshini këtë barazim?")) return;
+          remove(ref(db, `balanceHistory/${driverId}/${histId}`));
+          // Fshirja këtu e heq barazimin edhe nga shoferi, sepse shoferi lexon nga balanceHistory/{driverId}
+        };
+
+        div.appendChild(detailBtn);
+        div.appendChild(deleteBtn);
+        balanceHistoryAdminEl.appendChild(div);
+      });
+    });
   }
 </script>
 

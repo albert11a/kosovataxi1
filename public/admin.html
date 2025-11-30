@@ -28,11 +28,10 @@
   margin: 0;
   padding: 0;
   height: 100%;
-  background-color: #020617 !important;  /* Verhindert Weiß beim Scrollen */
-  overscroll-behavior: none !important;   /* Kein Bounce-Weiß */
+  background-color: #020617 !important;
+  overscroll-behavior: none !important;
 }
 
-/* Fix: Hintergrund so einfügen, OHNE iOS-Weißfehler */
 body::before {
   content: "";
   position: fixed;
@@ -44,7 +43,6 @@ body::before {
   background: radial-gradient(circle at top, #020617, #020617 60%, #020617);
 }
 
-    /* FIX: iPhone zoom on input */
     input, select {
       font-size: 16px !important;
     }
@@ -153,22 +151,15 @@ body::before {
       margin-top: 4px;
     }
 
-    .btn-chip {
-      padding: 5px 10px;
-      font-size: 12px;
-      background: rgba(15,23,42,0.96);
-      border-radius: 999px;
-      border: 1px solid transparent;
-      cursor: pointer;
-      margin-right: 4px;
-      margin-bottom: 4px;
-      color: #9ca3af;
-    }
-
-    .btn-chip.active {
-      border-color: rgba(59,130,246,0.7);
-      background: rgba(37,99,235,0.2);
-      color: #e5e7eb;
+    .btn-ghost {
+      background:rgba(15,23,42,0.95);
+      border-radius:14px;
+      padding:6px 12px;
+      font-size:12px;
+      color:#e5e7eb;
+      border:1px solid rgba(148,163,184,0.4);
+      box-shadow:none;
+      width:auto;
     }
 
     .grid {
@@ -264,7 +255,7 @@ body::before {
     .badge-cancel  { background: rgba(239,68,68,0.18); color: #fecaca; }
     .badge-pending { background: rgba(250,204,21,0.18); color: #fde047; }
     .badge-driver  { background: rgba(56,189,248,0.16); color: #e0f2fe; }
-    .text-danger { color: #fecaca; font-size: 12px; }
+
     .login-error { color: #f97373; font-size: 13px; margin-top: 6px; }
 
     .month-list {
@@ -286,7 +277,7 @@ body::before {
     }
 
     .history-title {
-      margin-top: 10px;
+      margin-top: 12px;
       margin-bottom: 6px;
       font-size: 13px;
       color: #9ca3af;
@@ -402,17 +393,19 @@ body::before {
 
       <div id="tabBalances" class="tab-section">
         <h3>Barazimet e shoferëve</h3>
-        <p>
-          Shuma që i takon çdo shoferi (0.25 € për çdo vozitje të përfunduar).
-          Kur e aprovon barazimin, vozitjet ruhen në <code>balanceHistory</code>.
-          Këtu mund t’i shohësh dhe t’i fshish barazimet e përfunduara.
-        </p>
-
+        <p>Shuma që i takon çdo shoferi (0.25 € për çdo vozitje të përfunduar). Kur e aprovon barazimin, vozitjet ruhen në <code>balanceHistory</code>.</p>
         <h4>Barazimet aktuale</h4>
         <div id="balanceList"></div>
 
         <h4 class="history-title">Barazimet e përfunduara (historia)</h4>
-        <div id="balanceHistoryAdmin"></div>
+        <div class="flex" style="margin-bottom:8px; align-items:center;">
+          <div style="flex:1; min-width:220px;">
+            <select id="historyDriverSelect">
+              <option value="">Zgjidh shoferin</option>
+            </select>
+          </div>
+        </div>
+        <div id="historyListAdmin"></div>
       </div>
 
     </div>
@@ -479,13 +472,15 @@ body::before {
   const companyNameInput = document.getElementById("companyName");
   const addCompanyBtn = document.getElementById("addCompanyBtn");
   const balanceListEl = document.getElementById("balanceList");
-  const balanceHistoryAdminEl = document.getElementById("balanceHistoryAdmin");
+
+  const historyDriverSelect = document.getElementById("historyDriverSelect");
+  const historyListAdminEl = document.getElementById("historyListAdmin");
 
   let ordersCache = {};
   let driversCache = {};
   let balancesCache = {};
   let companiesCache = {};
-  let balanceHistoryCache = {};
+  let balanceHistoryAdminCache = {};
 
   adminLoginBtn.addEventListener("click", () => {
     const u = adminUser.value.trim().toLowerCase();
@@ -529,7 +524,7 @@ body::before {
     loadCompanies();
     loadRegistrations();
     loadBalances();
-    loadBalanceHistory();
+    loadBalanceHistoryAdmin();
   }
 
   const monthNamesSq = [
@@ -566,7 +561,6 @@ body::before {
   }
   function isDone(order) { return order.status === "done"; }
 
-  /* -------- ORDERS ---------- */
   function loadOrders() {
     onValue(ref(db, "orders"), snap => {
       ordersCache = snap.val() || {};
@@ -599,15 +593,11 @@ body::before {
       if (o.status === "done") extra += `<small>Përfunduar: ${completed}</small><br>`;
       if (o.status === "canceled") extra += `<small>Arsye anulimi: ${o.canceledReason || "-"}</small><br>`;
 
-      const company = o.takenByCompany || "-";
-      const driverName = o.takenByName || "";
-
       div.innerHTML = `
         ${badgeHtml}<br>
         <strong>${o.name}</strong> • ${o.phone}<br>
         <small>Krijuar: ${created}</small><br>
-        <small>Kompania: ${company}</small><br>
-        ${driverName ? `<small>Shoferi: ${driverName}</small><br>` : ""}
+        <small>Kompania: ${o.takenByCompany || "-"}</small><br>
         ${extra}
         <button class="btn-danger" onclick="window.deleteOrder('${id}')">Fshije porosinë</button>
       `;
@@ -623,7 +613,6 @@ body::before {
     remove(ref(db, "orders/" + id));
   };
 
-  /* ---- ANALYTICS ---- */
   function updateAnalytics() {
     if (!ordersCache) return;
 
@@ -689,7 +678,6 @@ body::before {
     }
   }
 
-  /* ---- DRIVERS ---- */
   function loadDrivers() {
     onValue(ref(db, "drivers"), snap => {
       driversCache = snap.val() || {};
@@ -707,10 +695,11 @@ body::before {
         `;
         driverListEl.appendChild(div);
       });
+
+      renderHistoryDriverOptions();
     });
   }
 
-  /* ---- REGISTRATIONS ---- */
   function loadRegistrations() {
     onValue(ref(db, "driverRegistrations"), snap => {
       regListEl.innerHTML = "";
@@ -724,7 +713,7 @@ body::before {
           <span class="badge badge-pending">Në pritje</span><br>
           <strong>${r.name}</strong> • ${r.company}<br>
           <small>${r.plate || ""} • ${r.phone || ""}</small><br>
-       `;
+        `;
 
         const approveBtn = document.createElement("button");
         approveBtn.className = "btn-small";
@@ -761,7 +750,6 @@ body::before {
     });
   }
 
-  /* ---- COMPANIES ---- */
   function loadCompanies() {
     onValue(ref(db, "companies"), snap => {
       companyListEl.innerHTML = "";
@@ -790,7 +778,6 @@ body::before {
     companyNameInput.value = "";
   });
 
-  /* ---- BALANCES (aktual) ---- */
   function loadBalances() {
     onValue(ref(db, "balances"), snap => {
       balancesCache = snap.val() || {};
@@ -885,107 +872,132 @@ body::before {
     });
 
     // 3) Përditëso vozitjet (settled) + balancën në një update
-    const updates = {};
+    const updatesObj = {};
 
     Object.keys(ridesForHistory).forEach((orderId) => {
-      updates[`orders/${orderId}/settled`] = true;
-      updates[`orders/${orderId}/settledAt`] = now;
-      updates[`orders/${orderId}/settledBalanceId`] = histKey;
+      updatesObj[`orders/${orderId}/settled`] = true;
+      updatesObj[`orders/${orderId}/settledAt`] = now;
+      updatesObj[`orders/${orderId}/settledBalanceId`] = histKey;
     });
 
-    updates[`balances/${driverId}/total`] = 0;
-    updates[`balances/${driverId}/status`] = "closed";
-    updates[`balances/${driverId}/lastUpdate`] = now;
+    updatesObj[`balances/${driverId}/total`] = 0;
+    updatesObj[`balances/${driverId}/status`] = "closed";
+    updatesObj[`balances/${driverId}/lastUpdate`] = now;
 
-    await update(ref(db), updates);
+    await update(ref(db), updatesObj);
 
     alert("Barazimi u ruajt në histori dhe u mbyll me sukses.");
   }
 
-  /* ---- BALANCE HISTORY (admin panel + driver sync) ---- */
-  function loadBalanceHistory() {
+  /* ---------- BALANCE HISTORY për ADMIN ---------- */
+  function loadBalanceHistoryAdmin() {
     onValue(ref(db, "balanceHistory"), snap => {
-      balanceHistoryCache = snap.val() || {};
-      renderBalanceHistoryAdmin();
+      balanceHistoryAdminCache = snap.val() || {};
+      renderHistoryDriverOptions();
+      renderBalanceHistoryAdminList();
     });
   }
 
-  function renderBalanceHistoryAdmin() {
-    balanceHistoryAdminEl.innerHTML = "";
+  function renderHistoryDriverOptions() {
+    historyDriverSelect.innerHTML = "<option value=''>Zgjidh shoferin</option>";
+    const data = balanceHistoryAdminCache || {};
+    Object.keys(data).forEach(driverId => {
+      const drv = driversCache[driverId];
+      const name = drv ? drv.name : ("ID: " + driverId);
+      const company = drv && drv.company ? (" • " + drv.company) : "";
+      const opt = document.createElement("option");
+      opt.value = driverId;
+      opt.textContent = name + company;
+      historyDriverSelect.appendChild(opt);
+    });
+  }
 
-    const data = balanceHistoryCache || {};
-    const driverIds = Object.keys(data);
+  historyDriverSelect.addEventListener("change", () => {
+    renderBalanceHistoryAdminList();
+  });
 
-    if (driverIds.length === 0) {
-      balanceHistoryAdminEl.innerHTML =
-        "<div class='list-item'>Ende nuk ka barazime të përfunduara.</div>";
+  function renderBalanceHistoryAdminList() {
+    const driverId = historyDriverSelect.value;
+    historyListAdminEl.innerHTML = "";
+
+    if (!driverId) {
+      historyListAdminEl.innerHTML =
+        "<div class='list-item'>Zgjidh një shofer për të parë barazimet e përfunduara.</div>";
       return;
     }
 
-    driverIds.forEach(driverId => {
-      const histEntries = data[driverId] || {};
-      const drv = driversCache[driverId] || {};
-      const driverName = drv.name || histEntries.driverName || "Shofer";
-      const company = drv.company || "";
-      const plate = drv.plate || "";
+    const driverHist = balanceHistoryAdminCache[driverId] || {};
+    const entries = Object.entries(driverHist);
 
-      Object.entries(histEntries).forEach(([histId, h]) => {
-        if (!h || typeof h !== "object" || !h.total) return;
+    if (entries.length === 0) {
+      historyListAdminEl.innerHTML =
+        "<div class='list-item'>Ky shofer nuk ka ende barazime të përfunduara.</div>";
+      return;
+    }
 
-        const div = document.createElement("div");
-        div.className = "list-item";
+    entries.sort((a,b) => {
+      const aa = a[1]?.createdAt || 0;
+      const bb = b[1]?.createdAt || 0;
+      return bb - aa;
+    });
 
-        const created = h.createdAt ? new Date(h.createdAt).toLocaleString() : "-";
-        const ridesCount = h.ridesCount || 0;
-        const total = h.total || 0;
+    const drv = driversCache[driverId] || {};
+    const driverName = drv.name || (entries[0][1].driverName || "Shofer");
+    const driverCompany = drv.company || (entries[0][1].driverCompany || "" );
+    const driverPlate = drv.plate || (entries[0][1].driverPlate || "" );
 
-        const nameFromHist = h.driverName || driverName;
-        const companyFromHist = h.driverCompany || company;
-        const plateFromHist = h.driverPlate || plate;
+    entries.forEach(([histId, h], idx) => {
+      if (!h || typeof h !== "object") return;
 
-        div.innerHTML = `
-          <span class="badge badge-done">Barazim i përfunduar</span><br>
-          <strong>${nameFromHist}</strong> • ${companyFromHist || "-"}</strong><br>
-          <small>Veturë: ${plateFromHist || "-"}</small><br>
-          <small>Data barazimit: ${created}</small><br>
-          <small>Vozitje në këtë barazim: ${ridesCount}</small><br>
-          <small>Shuma totale: ${total.toFixed(2)} €</small><br>
-        `;
+      const div = document.createElement("div");
+      div.className = "list-item";
 
-        const detailBtn = document.createElement("button");
-        detailBtn.className = "btn-small";
-        detailBtn.textContent = "Detajet e klientëve";
-        detailBtn.onclick = () => {
-          const rides = h.rides || {};
-          if (Object.keys(rides).length === 0) {
-            alert("Nuk ka lista të ruajtura të klientëve për këtë barazim.");
-            return;
-          }
-          let msg = `Barazimi për ${nameFromHist} • ${total.toFixed(2)} €\n\n`;
-          Object.values(rides).forEach(r => {
-            const timeStr = r.completedAt ? new Date(r.completedAt).toLocaleString() : "-";
-            msg += `Emri: ${r.name || "-"}\n`;
-            msg += `Tel: ${r.phone || "-"}\n`;
-            msg += `Adresa: ${r.adresa || "-"}\n`;
-            msg += `Koha: ${timeStr}\n`;
-            msg += `-------------------------\n`;
-          });
-          alert(msg);
-        };
+      const created = h.createdAt ? new Date(h.createdAt).toLocaleString() : "-";
+      const total = h.total || 0;
+      const ridesCount = h.ridesCount || (h.rides ? Object.keys(h.rides).length : 0);
 
-        const deleteBtn = document.createElement("button");
-        deleteBtn.className = "btn-danger";
-        deleteBtn.textContent = "Fshije këtë barazim";
-        deleteBtn.onclick = () => {
-          if (!confirm("A jeni i sigurt që doni ta fshini këtë barazim?")) return;
-          remove(ref(db, `balanceHistory/${driverId}/${histId}`));
-          // Fshirja këtu e heq barazimin edhe nga shoferi, sepse shoferi lexon nga balanceHistory/{driverId}
-        };
+      div.innerHTML = `
+        <span class="badge badge-done">Barazim i përfunduar</span><br>
+        <strong>${driverName}</strong> • ${driverCompany || "-"}</strong><br>
+        <small>Veturë: ${driverPlate || "-"}</small><br>
+        <small>Data barazimit: ${created}</small><br>
+        <small>Vozitje në këtë barazim: ${ridesCount}</small><br>
+        <small>Shuma totale: ${total.toFixed(2)} €</small><br>
+      `;
 
-        div.appendChild(detailBtn);
-        div.appendChild(deleteBtn);
-        balanceHistoryAdminEl.appendChild(div);
-      });
+      const detailsBtn = document.createElement("button");
+      detailsBtn.className = "btn-small";
+      detailsBtn.textContent = "Detajet e klientëve";
+      detailsBtn.onclick = () => {
+        const rides = h.rides || {};
+        if (Object.keys(rides).length === 0) {
+          alert("Nuk ka lista të ruajtura të klientëve për këtë barazim.");
+          return;
+        }
+        let msg = `Barazimi për ${driverName} • ${total.toFixed(2)} €\n\n`;
+        Object.values(rides).forEach(r => {
+          const timeStr = r.completedAt ? new Date(r.completedAt).toLocaleString() : "-";
+          msg += `Emri: ${r.name || "-"}\n`;
+          msg += `Tel: ${r.phone || "-"}\n`;
+          msg += `Adresa: ${r.adresa || "-"}\n`;
+          msg += `Koha: ${timeStr}\n`;
+          msg += `-------------------------\n`;
+        });
+        alert(msg);
+      };
+
+      const deleteBtn = document.createElement("button");
+      deleteBtn.className = "btn-danger";
+      deleteBtn.textContent = "Fshije këtë barazim";
+      deleteBtn.onclick = () => {
+        if (!confirm("A jeni i sigurt që doni ta fshini këtë barazim?")) return;
+        remove(ref(db, `balanceHistory/${driverId}/${histId}`));
+      };
+
+      div.appendChild(detailsBtn);
+      div.appendChild(deleteBtn);
+
+      historyListAdminEl.appendChild(div);
     });
   }
 </script>

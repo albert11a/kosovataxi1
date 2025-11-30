@@ -1,4 +1,4 @@
-const CACHE_NAME = "kosovataxi-shofer-v1";
+const CACHE_NAME = "kosovataxi-shofer-v2";
 const OFFLINE_URLS = [
   "/fahrer.html",
   "/icon-shofer-192.png",

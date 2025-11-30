@@ -413,6 +413,61 @@
       opacity: 0.8;
     }
 
+    /* --- NEUES LAYOUT FÜR BILANCI / BARAZIMET --- */
+    .segmented {
+      display:flex;
+      background:rgba(255,255,255,0.06);
+      padding:6px;
+      border-radius:16px;
+      gap:6px;
+      margin:10px 0 14px;
+    }
+
+    .seg {
+      flex:1;
+      padding:8px 0;
+      text-align:center;
+      border-radius:14px;
+      font-size:13px;
+      cursor:pointer;
+      opacity:0.75;
+      background:rgba(255,255,255,0.04);
+      user-select:none;
+      transition:0.2s;
+    }
+
+    .seg.active {
+      background:rgba(34,197,94,0.25);
+      opacity:1;
+      font-weight:600;
+    }
+
+    .barazim-card {
+      background:rgba(15,23,42,0.92);
+      padding:16px 16px 14px;
+      border-radius:18px;
+      border:1px solid rgba(148,163,184,0.22);
+      margin-bottom:14px;
+    }
+
+    .row {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      font-size:13px;
+      margin-bottom:6px;
+    }
+
+    .row span {
+      color:#9ca3af;
+    }
+
+    .row strong {
+      font-size:14px;
+      font-weight:600;
+      color:#e5e7eb;
+    }
+
     @media (max-width: 400px) {
       body {
         padding: calc(10px + env(safe-area-inset-top, 0px)) 8px calc(18px + env(safe-area-inset-bottom, 0px));
@@ -500,7 +555,6 @@
   <div id="content" style="display:none;">
 
     <!-- TAB 1: TE REJA / OPEN ORDERS -->
-    <!-- Nur Container, Order-Cards kommen dynamisch -->
     <div id="tab-new-content">
       <div id="orders"></div>
       <div id="noOpen" class="empty-text"></div>
@@ -517,8 +571,41 @@
 
     <!-- TAB 3: BILANCI -->
     <div id="tab-balance-content" class="card" style="display:none;">
-      <div class="section-title">Barazimi im</div>
-      <div id="balanceBox" style="font-size:14px; color:#e5e7eb;"></div>
+      <div class="section-title">Barazimet & Statistikat</div>
+
+      <!-- Untertabs für Barazime -->
+      <div class="segmented">
+        <div class="seg active" data-seg="segAktuale">Barazimet aktuale</div>
+        <div class="seg" data-seg="segPerfunduara">Barazimet të përfunduara</div>
+      </div>
+
+      <!-- AKTUALE -->
+      <div id="segAktuale">
+        <div class="barazim-card">
+          <div class="row">
+            <span>Vozitje pa u barazuar</span>
+            <strong id="balanceOpenRides">-</strong>
+          </div>
+          <div class="row">
+            <span>Shuma aktuale</span>
+            <strong id="balanceCurrentAmount">0.00 €</strong>
+          </div>
+          <div class="row">
+            <span>Statusi</span>
+            <strong id="balanceStatusText">-</strong>
+          </div>
+        </div>
+
+        <div id="balanceBox" style="font-size:13px; color:#9ca3af; margin-top:4px;"></div>
+      </div>
+
+      <!-- PERFUNDUARA -->
+      <div id="segPerfunduara" style="display:none;">
+        <div id="balanceHistoryEmpty" class="empty-text">
+          Nuk ka ende barazime të përfunduara në këtë pajisje. Barazimet menaxhohen nga admini.
+        </div>
+        <div id="balanceHistoryList"></div>
+      </div>
     </div>
 
   </div>
@@ -560,11 +647,19 @@
   const headerStatus = document.getElementById("headerStatus");
   const balanceBox = document.getElementById("balanceBox");
 
+  const balanceOpenRidesEl = document.getElementById("balanceOpenRides");
+  const balanceCurrentAmountEl = document.getElementById("balanceCurrentAmount");
+  const balanceStatusTextEl = document.getElementById("balanceStatusText");
+
   const tabsBox = document.getElementById("tabsBox");
   const infoCardOpen = document.getElementById("infoCardOpen");
   const notifCount = document.getElementById("notifCount");
 
   const tabs = document.querySelectorAll(".tab");
+
+  const segButtons = document.querySelectorAll(".seg");
+  const segAktuale = document.getElementById("segAktuale");
+  const segPerfunduara = document.getElementById("segPerfunduara");
 
   /* ---------------- TAB LOGIK (FLAT-TABS) ------------------- */
 
@@ -592,6 +687,18 @@
       } else {
         infoCardOpen.style.display = "none";
       }
+    });
+  });
+
+  /* --------- SEGMENTED BARAZIME (AKTUALE / PERFUNDUARA) --------- */
+  segButtons.forEach(s => {
+    s.addEventListener("click", () => {
+      segButtons.forEach(b => b.classList.remove("active"));
+      s.classList.add("active");
+
+      const t = s.dataset.seg;
+      segAktuale.style.display = t === "segAktuale" ? "block" : "none";
+      segPerfunduara.style.display = t === "segPerfunduara" ? "block" : "none";
     });
   });
 
@@ -847,20 +954,32 @@
     const balRef = ref(db, "balances/" + currentDriver.id);
     onValue(balRef, (snap) => {
       const data = snap.val();
+
       if (!data) {
+        balanceOpenRidesEl.textContent = "-";
+        balanceCurrentAmountEl.textContent = "0.00 €";
+        balanceStatusTextEl.textContent = "Nuk ka barazim aktiv.";
         balanceBox.innerHTML = "Nuk ka barazim aktual.";
         return;
       }
 
+      const total = data.total || 0;
+      const rides = total > 0 ? Math.round(total / 0.25) : 0;
+
+      balanceOpenRidesEl.textContent = rides > 0 ? String(rides) : "0";
+      balanceCurrentAmountEl.textContent = total.toFixed(2) + " €";
+
       if (data.status === "open") {
+        balanceStatusTextEl.textContent = "Në pritje të barazimit";
         balanceBox.innerHTML = `
-          <strong>Barazim i hapur:</strong> ${data.total.toFixed(2)} €<br>
-          <small>Ju lutem barazohuni me administratën.</small>
+          <strong>Barazim i hapur:</strong> ${total.toFixed(2)} €<br>
+          <small>Barazimi bëhet nga administrata, jo nga shoferi.</small>
         `;
       } else {
+        balanceStatusTextEl.textContent = "I barazuar";
         balanceBox.innerHTML = `
           <strong>Barazim i përfunduar ✔</strong><br>
-          <small>Aktualisht nuk keni borxh.</small>
+          <small>Aktualisht nuk keni borxh aktiv.</small>
         `;
       }
     });

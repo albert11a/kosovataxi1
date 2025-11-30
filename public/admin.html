@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="sq">
 <head>
   <meta charset="UTF-8" />
@@ -23,11 +24,6 @@
   </script>
 
   <style>
-
-    
-
-
-    
  html, body {
   margin: 0;
   padding: 0;
@@ -65,8 +61,8 @@ body::before {
       --success: #22c55e;
     }
 
-    * { 
-      box-sizing: border-box; 
+    * {
+      box-sizing: border-box;
       -webkit-touch-callout: none;
     }
 
@@ -399,6 +395,7 @@ body::before {
 
       <div id="tabBalances" class="tab-section">
         <h3>Barazimet e shoferëve</h3>
+        <p>Shuma që i takon çdo shoferi (0.25 € për çdo vozitje të përfunduar). Kur e aprovon barazimin, vozitjet ruhen në <code>balanceHistory</code>.</p>
         <div id="balanceList"></div>
       </div>
 
@@ -425,6 +422,7 @@ body::before {
     storageBucket: "kosovataxi-f6ca3.firebasestorage.app",
     messagingSenderId: "1075646412122",
     appId: "1:1075646412122:web:7aab19b92f51844fe32f63",
+    measurementId: "G-QYQE2476PR",
     databaseURL: "https://kosovataxi-f6ca3-default-rtdb.europe-west1.firebasedatabase.app/"
   };
 
@@ -787,7 +785,7 @@ body::before {
       if (!drv) return;
 
       const div = document.createElement("div");
-      div.className = "list-inline item";
+      div.className = "list-item";
 
       div.innerHTML = `
         <strong>${drv.name}</strong> • ${drv.company || "-"}</strong><br>
@@ -796,22 +794,74 @@ body::before {
         <small>Statusi: ${b.status === "closed" ? "Barazim i përfunduar" : "Barazim i hapur"}</small><br>
       `;
 
-      if (b.status !== "closed" && b.total > 0) {
+      if (b.total > 0 && b.status !== "closed") {
         const btn = document.createElement("button");
         btn.className = "btn-small";
         btn.textContent = "Aprovo barazimin";
-        btn.onclick = () => {
-          update(ref(db, "balances/" + driverId), {
-            total: 0,
-            status: "closed",
-            lastUpdate: Date.now()
-          });
-        };
+        btn.onclick = () => approveBalance(driverId, b);
         div.appendChild(btn);
       }
 
       balanceListEl.appendChild(div);
     });
+  }
+
+  async function approveBalance(driverId, balanceObj) {
+    if (!confirm("A jeni i sigurt që doni ta aprovoni barazimin për këtë shofer?")) return;
+
+    const now = Date.now();
+
+    // 1) Gjej të gjitha vozitjet e përfunduara pa u barazuar
+    const ridesForHistory = {};
+    let ridesCount = 0;
+
+    Object.entries(ordersCache).forEach(([orderId, o]) => {
+      if (
+        o.status === "done" &&
+        o.takenByDriverId === driverId &&
+        !o.settled
+      ) {
+        ridesCount++;
+        ridesForHistory[orderId] = {
+          name: o.name || "",
+          phone: o.phone || "",
+          adresa: o.adresa || "",
+          createdAt: o.createdAt || null,
+          completedAt: o.completedAt || null
+        };
+      }
+    });
+
+    const totalFromRides = ridesCount * 0.25;
+    const total = totalFromRides || balanceObj.total || 0;
+
+    // 2) Krijo hyrje në balanceHistory / DRIVER / KEY
+    const histRef = push(ref(db, "balanceHistory/" + driverId));
+    const histKey = histRef.key;
+
+    await set(histRef, {
+      createdAt: now,
+      total,
+      ridesCount,
+      rides: ridesForHistory
+    });
+
+    // 3) Përditëso vozitjet (settled) + balancën në një update
+    const updates = {};
+
+    Object.keys(ridesForHistory).forEach((orderId) => {
+      updates[`orders/${orderId}/settled`] = true;
+      updates[`orders/${orderId}/settledAt`] = now;
+      updates[`orders/${orderId}/settledBalanceId`] = histKey;
+    });
+
+    updates[`balances/${driverId}/total`] = 0;
+    updates[`balances/${driverId}/status`] = "closed";
+    updates[`balances/${driverId}/lastUpdate`] = now;
+
+    await update(ref(db), updates);
+
+    alert("Barazimi u ruajt në histori dhe u mbyll me sukses.");
   }
 </script>
 
